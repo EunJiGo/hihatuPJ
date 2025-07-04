@@ -1,0 +1,1 @@
+const String domain = "http://192.168.1.8:19021/docs#/default/";
