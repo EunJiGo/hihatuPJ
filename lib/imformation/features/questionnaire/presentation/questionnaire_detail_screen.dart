@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:hihatu_project/base/base_screen.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/presentation/questionnaire_list_screen.dart';
+import '../../../../screens/information_screen.dart';
 import '../../../../utils/image_picker_helper.dart';
 import '../data/fetch_questionnaire_detail.dart';
 import '../data/fetch_questionnaire_detail_answer.dart';
@@ -74,7 +76,23 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
           content: Text(status == 0 ? '保存が完了しました。' : '提出が完了しました。'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                Navigator.pop(context); // 다이얼로그 닫고
+                // 화면을 QuestionaireListScreen으로 이동 (이전 화면 스택 교체)
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => InformationScreen(),
+                  ),
+                );
+
+                // Navigator.pushReplacement(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => const HHTTabbar(initialIndex: 2), // 2번 탭이 InformationScreen
+                //   ),
+                // );
+              },
               child: Text('OK'),
             )
           ],
