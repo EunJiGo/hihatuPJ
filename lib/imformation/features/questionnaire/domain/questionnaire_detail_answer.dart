@@ -1,31 +1,29 @@
+// Answer 가져오는 타입에서 질문이 아닌 단순 answers 배열로 정의
 class QuestionnaireDetailAnswer {
   final int id;
-  final String title;
-  final String startFrom;
-  final String deadline;
-  final String? answeredAt;
-  final int answered;
-  final int saved;
+  final int survey;
+  final String employeeId;
+  final List<dynamic> answers;
+  final int status;
+  final String answeredAt;
 
   QuestionnaireDetailAnswer({
     required this.id,
-    required this.title,
-    required this.startFrom,
-    required this.deadline,
+    required this.survey,
+    required this.employeeId,
+    required this.answers,
+    required this.status,
     required this.answeredAt,
-    required this.answered,
-    required this.saved,
   });
 
   factory QuestionnaireDetailAnswer.fromJson(Map<String, dynamic> json) {
     return QuestionnaireDetailAnswer(
       id: json['id'] ?? 0,
-      title: json['title'] ?? '',
-      startFrom: json['startfrom'] ?? '',
-      deadline: json['deadline'] ?? '',
-      answeredAt: json['answered_at'],
-      answered: json['answered'] ?? 0,
-      saved: json['saved'] ?? 0,
+      survey: json['survey'] ?? 0,
+      employeeId: json['employee_id'] ?? '',
+      answers: json['answers'] ?? [],
+      status: json['status'] ?? 0,
+      answeredAt: json['answeredAt'] ?? '',
     );
   }
 }

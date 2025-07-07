@@ -60,14 +60,19 @@ class _QuestionnaireListScreenState extends State<QuestionnaireListScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              QuestionDetailScreen(questionnaireId: item.id),
+                          builder:
+                              (context) => QuestionDetailScreen(
+                                questionnaireId: item.id,
+                              ),
                         ),
                       );
                     },
                     child: Container(
                       // margin: const EdgeInsets.symmetric(vertical: 8),
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 18),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 18,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white30,
                         borderRadius: BorderRadius.circular(8),
@@ -108,10 +113,15 @@ class _QuestionnaireListScreenState extends State<QuestionnaireListScreen> {
                               ),
 
                               item.answered == 1
-                                  ? Image.asset(
-                                    'assets/images/information/correct/correct.png',
-                                    height: 22,
-                                    width: 22,
+                                  // ? Image.asset(
+                                  //   'assets/images/information/correct/correct.png',
+                                  //   height: 22,
+                                  //   width: 22,
+                                  // )
+                                  ? Icon(
+                                    Icons.check_circle_outline,
+                                    color: Colors.greenAccent,
+                                    size: 25,
                                   )
                                   : item.saved == 1
                                   ? Icon(
