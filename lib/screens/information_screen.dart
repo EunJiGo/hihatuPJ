@@ -25,9 +25,11 @@ class InformationScreen extends StatelessWidget {
             unreadNoticeCount: 1,
             unreadQuestionnaireCount: 3,
           ),
-          SizedBox(
-            height: 20,
-          ),
+
+           SizedBox(
+              height: 20,
+            ),
+
           Expanded(child: InformationTabs()),
 
           // Expanded(child: QuestionnaireListScreen()), // 중요!!

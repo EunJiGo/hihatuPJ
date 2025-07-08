@@ -24,14 +24,14 @@ class QuestionSubmitButtons extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blue),
+                  border: Border.all(color: Color(0xFF0253B3),),
                   borderRadius: BorderRadius.circular(15),
-                  color: Colors.blue,
+                  color: Colors.white,
                 ),
-                width: 140,
+                width: 150,
                 height: 50,
                 child: const Center(
-                  child: Text('保　　存', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+                  child: Text('保　　存', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Color(0xFF0253B3),)),
                 ),
               ),
             ),
@@ -40,14 +40,14 @@ class QuestionSubmitButtons extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blue),
+                  border: Border.all(color: Color(0xFF0253B3),),
                   borderRadius: BorderRadius.circular(15),
-                  color: Colors.blue,
+                    color: Color(0xFF0253B3),
                 ),
-                width: 140,
+                width: 150,
                 height: 50,
                 child: const Center(
-                  child: Text('提　　出', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+                  child: Text('提　　出', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white)),
                 ),
               ),
             ),

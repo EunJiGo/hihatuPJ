@@ -32,7 +32,7 @@ class QuestionImageUpload extends StatelessWidget {
       },
       child: Center(
         child: Container(
-          width: MediaQuery.of(context).size.width * 0.9,
+          width: MediaQuery.of(context).size.width * 0.95,
           height: 200,
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(

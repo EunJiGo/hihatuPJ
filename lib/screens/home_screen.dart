@@ -7,18 +7,16 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BaseScreen(
-      child: SafeArea(
-        child: Column(
-          children: [
-            WelcomeHeader(
-              title: '高さん、お疲れ様です。\nHIHATUへようこそ！',
-              subtitle: getJapaneseFormattedDate(),
-              titleFontSize: 18,
-              subtitleFontSize: 12,
-              imagePath: 'assets/images/home/home_image/home_image.png',
-            ),
-          ],
-        ),
+      child: Column(
+        children: [
+          WelcomeHeader(
+            title: '高さん、お疲れ様です。\nHIHATUへようこそ！',
+            subtitle: getJapaneseFormattedDate(),
+            titleFontSize: 18,
+            subtitleFontSize: 12,
+            imagePath: 'assets/images/home/home_image/home_image.png',
+          ),
+        ],
       ),
     );
   }

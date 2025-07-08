@@ -31,12 +31,18 @@ class QuestionItemWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Q. ${question.text}',
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+          Row(
+            children: [
+              Icon(Icons.question_answer_outlined, color: Color(0xFF0253B3),),
+              SizedBox(width: 5,),
+              Text(
+                question.text,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           if (question.type == 'text')
@@ -67,7 +73,7 @@ class QuestionItemWidget extends StatelessWidget {
                   onImageSelected: (path) => onChanged(path),
                 ),
           const SizedBox(height: 16),
-          const Divider(height: 32),
+          // const Divider(height: 32), // 밑줄
         ],
       ),
     );
