@@ -33,10 +33,17 @@ class _HHTTabbarState extends State<HHTTabbar> {
     // MineScreen(),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex; // 초기화 시만 사용
+
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      // _selectedIndex = widget.initialIndex;
+      
     });
   }
 
