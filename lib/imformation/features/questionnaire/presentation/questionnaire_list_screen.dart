@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hihatu_project/base/base_screen.dart';
-import 'package:hihatu_project/imformation/features/questionnaire/presentation/questionnaire_detail_screen.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/presentation/detail/questionnaire_detail_screen.dart';
 import 'package:intl/intl.dart';
 import '../data/fetch_questionnaire.dart';
 import '../domain/questionnaire.dart';
