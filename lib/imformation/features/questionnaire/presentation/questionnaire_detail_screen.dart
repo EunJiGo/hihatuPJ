@@ -136,7 +136,10 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const HHTTabbar(initialIndex: 2),
+                    builder: (context) => const HHTTabbar(
+                        initialIndex: 2,
+                      informationTabIndex: 1,
+                    ),
                   ),
                       (Route<dynamic> route) => false,
                 );

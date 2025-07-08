@@ -12,7 +12,13 @@ import '../screens/information_screen.dart';
 
 class HHTTabbar extends StatefulWidget {
   final int initialIndex;
-  const HHTTabbar({Key? key, this.initialIndex = 0}) : super(key: key);
+  final int? informationTabIndex;
+
+  const HHTTabbar({
+    Key? key,
+    this.initialIndex = 0,
+    this.informationTabIndex,
+  }) : super(key: key);
 
   @override
   State<HHTTabbar> createState() => _HHTTabbarState();
@@ -43,7 +49,7 @@ class _HHTTabbarState extends State<HHTTabbar> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      
+
     });
   }
 

@@ -4,14 +4,26 @@ import 'package:hihatu_project/imformation/features/summary/presentation/questio
 import '../../questionnaire/presentation/questionnaire_list_screen.dart';
 
 class InformationTabs extends StatefulWidget {
-  const InformationTabs({super.key});
+  final int initialTabIndex; // 추가
+
+  const InformationTabs({super.key, this.initialTabIndex = 0}); // 기본값은 お知らせ
 
   @override
   State<InformationTabs> createState() => _InformationTabsState();
 }
 
-class _InformationTabsState extends State<InformationTabs> {
-  int selectedIndex = 0; // 0: お知らせ, 1: 安否確認
+class _InformationTabsState extends State<InformationTabs> with TickerProviderStateMixin{
+  // int selectedIndex = 0; // 0: お知らせ, 1: 安否確認
+
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.index = widget.initialTabIndex; // 초기 탭 설정
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,12 +41,12 @@ class _InformationTabsState extends State<InformationTabs> {
           ),
         ),
         // const SizedBox(height: 16),
-        if (selectedIndex == 1) QuestionnaireStatusLegend(),
+        if (_tabController.index == 1) QuestionnaireStatusLegend(),
 
         const SizedBox(height: 16),
 
         // 선택된 리스트 보여주기
-        if (selectedIndex == 0)
+        if (_tabController.index == 0)
           _buildNoticeList()
         else
           Expanded(child: QuestionnaireListScreen())
@@ -44,12 +56,12 @@ class _InformationTabsState extends State<InformationTabs> {
   }
 
   Widget _buildTabButton(String title, int index) {
-    final bool isSelected = selectedIndex == index;
+    final bool isSelected = _tabController.index  == index;
 
     return GestureDetector(
       onTap: () {
         setState(() {
-          selectedIndex = index;
+          _tabController.index  = index;
         });
       },
       child: Container(
