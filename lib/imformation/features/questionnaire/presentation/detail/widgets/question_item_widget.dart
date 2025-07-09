@@ -1,6 +1,3 @@
-// 질문 1개에 대한 UI 렌더링 분기
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import '../../../domain/questionnaire_detail.dart';
 import 'question_text_field.dart';
@@ -26,25 +23,45 @@ class QuestionItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x220253B3),
+            blurRadius: 6,
+            offset: Offset(2, 4),
+          )
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // 제목 영역
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.question_answer_outlined, color: Color(0xFF0253B3),),
-              SizedBox(width: 5,),
-              Text(
-                question.text,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+              const Icon(Icons.question_answer_rounded,
+                  color: Color(0xFF42A5F5), size: 24),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  question.text,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF263238), // 다크그레이
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
+
+          // 질문 타입별 위젯 렌더링
           if (question.type == 'text')
             QuestionTextField(
               answerStatus: answerStatus,
@@ -63,7 +80,9 @@ class QuestionItemWidget extends StatelessWidget {
               QuestionCheckboxList(
                 options: question.options,
                 answerStatus: answerStatus,
-                checkedValues: answer is List ? List<String?>.from(answer) : List.filled(question.options.length, null),
+                checkedValues: answer is List
+                    ? List<String?>.from(answer)
+                    : List.filled(question.options.length, null),
                 onChanged: onChanged,
               )
             else if (question.type == 'upload')
@@ -72,8 +91,8 @@ class QuestionItemWidget extends StatelessWidget {
                   imagePath: answer is String ? answer : null,
                   onImageSelected: (path) => onChanged(path),
                 ),
-          const SizedBox(height: 16),
-          // const Divider(height: 32), // 밑줄
+
+          const SizedBox(height: 8),
         ],
       ),
     );

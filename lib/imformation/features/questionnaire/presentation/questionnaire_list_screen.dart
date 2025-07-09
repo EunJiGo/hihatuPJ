@@ -41,8 +41,8 @@ class _QuestionnaireListScreenState extends ConsumerState<QuestionnaireListScree
     // 상태관리에서 데이터 받아오기
     final list = ref.watch(questionnaireListProvider);
 
-    return BaseScreen(
-      child: Container(
+    return Container(
+      color: Color(0xFFEFF2F4),
         child: list.isEmpty
             ? const Center(child: CircularProgressIndicator())
             : ListView.builder(
@@ -122,7 +122,6 @@ class _QuestionnaireListScreenState extends ConsumerState<QuestionnaireListScree
             );
           },
         ),
-      ),
-    );
+      );
   }
 }

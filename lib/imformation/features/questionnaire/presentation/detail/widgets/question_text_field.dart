@@ -1,5 +1,3 @@
-// 텍스트 타입 질문 UI
-
 import 'package:flutter/material.dart';
 
 class QuestionTextField extends StatelessWidget {
@@ -21,26 +19,54 @@ class QuestionTextField extends StatelessWidget {
     if (answerStatus == 1) {
       // 제출 후 읽기 전용 상태
       return Container(
-        padding: const EdgeInsets.all(10),
-        width: MediaQuery.of(context).size.width * 0.8,
+        width: double.infinity,
+        padding: const EdgeInsets.all(14),
+        margin: const EdgeInsets.only(top: 4),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.black45),
+          color: const Color(0xFFF2F6FB),
+          border: Border.all(color: const Color(0xFFB0BEC5)),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
-          initialAnswer?.toString() ?? '',
-          style: const TextStyle(fontSize: 16, color: Colors.black45),
+          initialAnswer?.toString() ?? '（未入力）',
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.black54,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       );
     } else {
-      return TextField(
-        maxLines: null,
-        controller: controller,
-        decoration: const InputDecoration(
-          hintText: '回答を入力してください',
-          border: OutlineInputBorder(),
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFB0BEC5)),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x220253B3),
+              blurRadius: 6,
+              offset: Offset(2, 4),
+            )
+          ],
         ),
-        readOnly: answerStatus == 1,
-        onChanged: onChanged,
+        child: TextField(
+          maxLines: null,
+          controller: controller,
+          style: const TextStyle(fontSize: 16),
+          decoration: const InputDecoration(
+            hintText: '回答を入力してください',
+            hintStyle: TextStyle(color: Colors.grey),
+            contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+            border: OutlineInputBorder(
+              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.all(Radius.circular(12)),
+            ),
+            filled: true,
+            fillColor: Colors.white,
+          ),
+          onChanged: onChanged,
+        ),
       );
     }
   }

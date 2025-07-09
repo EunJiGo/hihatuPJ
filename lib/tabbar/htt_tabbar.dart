@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hihatu_project/screens/apply_screen.dart';
 import 'package:hihatu_project/screens/mypage_screen.dart';
 import '../screens/attendance_screen.dart';
 import '../screens/home_screen.dart';
@@ -31,7 +32,9 @@ class _HHTTabbarState extends State<HHTTabbar> {
     HomeScreen(),
     AttendanceScreen(),
     InformationScreen(),
+    ApplyScreen(),
     MypageScreen(),
+
 
     // ITCaseScreen(),
     // TechnicianScreen(),
@@ -86,6 +89,17 @@ class _HHTTabbarState extends State<HHTTabbar> {
         size: 18,
       ),
       label: 'お知らせ',
+    ),
+    BottomNavigationBarItem(
+      icon: ImageIcon(
+        AssetImage('assets/images/tabbar/apply/apply.png'),
+        size: 18,
+      ),
+      activeIcon: ImageIcon(
+        AssetImage('assets/images/tabbar/apply/apply.png'),
+        size: 18,
+      ),
+      label: '申請',
     ),
     BottomNavigationBarItem(
       icon: ImageIcon(

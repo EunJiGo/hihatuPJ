@@ -1,6 +1,8 @@
 // 제출/저장 버튼 UI
 import 'package:flutter/material.dart';
 
+import '../../../../../../utils/dialog/confirmation_dialog.dart';
+
 class QuestionSubmitButtons extends StatelessWidget {
   final VoidCallback onSavePressed;
   final VoidCallback onSubmitPressed;
@@ -10,6 +12,23 @@ class QuestionSubmitButtons extends StatelessWidget {
     required this.onSavePressed,
     required this.onSubmitPressed,
   });
+  
+  Future<void> _handleAction(BuildContext context, String actionType) async {
+    final bool? confirmed = await ConfirmationDialog.show(
+      context,
+      message: actionType == 'save'
+          ? '安否確認内容を提出しますか？'
+          : '安否確認内容を保存しますか？',
+    );
+
+    if (confirmed == true) {
+      if (actionType == 'save') {
+        onSavePressed();
+      } else {
+        onSubmitPressed();
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +39,7 @@ class QuestionSubmitButtons extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             GestureDetector(
-              onTap: onSavePressed,
+              onTap: () => _handleAction(context, 'submit'),
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
@@ -36,7 +55,7 @@ class QuestionSubmitButtons extends StatelessWidget {
               ),
             ),
             GestureDetector(
-              onTap: onSubmitPressed,
+              onTap: () => _handleAction(context, 'save'),
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(

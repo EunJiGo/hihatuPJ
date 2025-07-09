@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hihatu_project/tabbar/htt_tabbar.dart';
 
@@ -19,7 +20,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'HHT App',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(
+        appBarTheme: AppBarTheme(
+          systemOverlayStyle: SystemUiOverlayStyle.dark, // ← 여기 추가
+        ),
+          // primarySwatch: Colors.blue
+      ),
       home: const HHTTabbar(),
     );
   }

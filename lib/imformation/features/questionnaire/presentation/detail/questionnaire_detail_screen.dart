@@ -1,11 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hihatu_project/base/base_screen.dart';
 import 'package:hihatu_project/imformation/features/questionnaire/presentation/detail/widgets/question_submit_buttons.dart';
 import '../../../../../tabbar/htt_tabbar.dart';
-import '../../../../../utils/dialog.dart';
+import '../../../../../utils/dialog/attention_dialog.dart';
+import '../../../../../utils/dialog/success_dialog.dart';
+import '../../../../../utils/dialog/warning_dialog.dart';
 import '../../data/fetch_questionnaire_detail.dart';
 import '../../data/fetch_questionnaire_detail_answer.dart';
 import '../../data/fetch_save_questionnaire_answer.dart';
@@ -96,7 +99,11 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
     });
 
     if (!hasAnyAnswer) {
-      showAlertDialog(context, '注意', '何も入力されていません。');
+      attentionDialog(
+          context,
+          '注意',
+          '何も入力されていません。'
+      );
       return;
     }
 
@@ -105,9 +112,8 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
       status: status,
       answers: selectedAnswers,
     );
-
     if (success) {
-      await showAlertDialog(
+      await successDialog(
         context,
         '成功',
         status == 0 ? '保存が完了しました。' : '提出が完了しました。',
@@ -123,7 +129,7 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
         (Route<dynamic> route) => false,
       );
     } else {
-      showAlertDialog(context, 'エラー', '送信に失敗しました。');
+      warningDialog(context, 'エラー', '送信に失敗しました。');
     }
   }
 
@@ -132,6 +138,7 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
     final detailAsync = ref.watch(
       questionnaireDetailProvider(widget.questionnaireId),
     );
+
     final answerStatus = ref.watch(answerStatusProvider);
     final selectedAnswers = ref.watch(selectedAnswersProvider);
 
@@ -142,8 +149,9 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
         //   overflow: TextOverflow.ellipsis,
         //   maxLines: 1,
         // ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
+        // backgroundColor: Colors.white,
+        // foregroundColor: Colors.black87,
         elevation: 1,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -151,6 +159,7 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
             Navigator.pop(context);
           },
         ),
+
       ),
       body: Container(
         color: Colors.white,
@@ -263,8 +272,8 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
                         ),
                       ),
                       QuestionSubmitButtons(
-                        onSavePressed: () => handleSaveOrSubmit(0),
-                        onSubmitPressed: () => handleSaveOrSubmit(1),
+                        onSavePressed: () => handleSaveOrSubmit(1),
+                        onSubmitPressed: () => handleSaveOrSubmit(0),
                       ),
                     ],
                   );

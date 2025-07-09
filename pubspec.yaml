@@ -69,6 +69,7 @@ flutter:
     - assets/images/tabbar/mypage/mypage_unselect.png
     - assets/images/tabbar/attendance/attendance_select.png
     - assets/images/tabbar/attendance/attendance_unselect.png
+    - assets/images/tabbar/apply/apply.png
     - assets/images/home/home_image/home_image.png
     - assets/images/technician/technician_image.png
     - assets/images/add/notice_bell.png

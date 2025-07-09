@@ -29,6 +29,9 @@ Future<bool> fetchSaveQuestionnaireAnswer({
     if (body['code'] == 0) {
       return true;
     }
+  } else {
+    throw Exception(
+        'アンケート詳細の取得に失敗しました（HTTP ${response.statusCode}）');
   }
 
   return false;
