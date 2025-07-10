@@ -1,47 +1,56 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../questionnaire/domain/questionnaire_status.dart';
+import '../../questionnaire/state/questionnaire_status_legend_filter_provider.dart.dart';
 
-class QuestionnaireStatusLegend extends StatelessWidget {
+class QuestionnaireStatusLegend extends ConsumerWidget {
   const QuestionnaireStatusLegend({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedSet = ref.watch(questionnaireFilterSetProvider);
+
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10),
-      child: Row(
-        children: [
-          // 未回答 (미작성)
-          Row(
-            children: [
-              Icon(Icons.error_outline, color: Colors.red, size: 14),
-              const SizedBox(width: 4),
-              const Text('未作成', style: TextStyle(fontSize: 12)),
-            ],
-          ),
-          const SizedBox(width: 16),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12,),
+      child: Wrap(
+        spacing: 12,
+        alignment: WrapAlignment.start, // 기본 center
+        children: List.generate(statusList.length, (index) {
+          final status = statusList[index];
+          // final isFilterEmpty = selectedSet.isEmpty;
+          // final isSelected = isFilterEmpty || selectedSet.contains(index);
+          final isSelected = selectedSet.contains(index);
 
-          // 保存済 (작성 중)
-          Row(
-            children: [
-              Icon(Icons.warning, color: Colors.amber, size: 14),
-              const SizedBox(width: 4),
-              const Text('作成中', style: TextStyle(fontSize: 12)),
-            ],
-          ),
-          const SizedBox(width: 16),
-
-          // 回答済 (작성 완료)
-          Row(
-            children: [
-              Image.asset(
-                'assets/images/information/correct/correct.png',
-                width: 14,
-                height: 14,
-              ),
-              const SizedBox(width: 4),
-              const Text('作成完了', style: TextStyle(fontSize: 12)),
-            ],
-          ),
-        ],
+          return GestureDetector(
+            onTap: () {
+              final notifier = ref.read(questionnaireFilterSetProvider.notifier);
+              final updated = {...notifier.state};
+              isSelected ? updated.remove(index) : updated.add(index);
+              notifier.state = updated;
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  status.icon,
+                  size: 18,
+                  color: isSelected ? status.color : Colors.black26,
+                ),
+                const SizedBox(width: 3),
+                Text(
+                  status.label,
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontSize: 12
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
       ),
     );
   }

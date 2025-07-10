@@ -8,7 +8,8 @@ Future<void> warningDialog(
   return showDialog(
     context: context,
     builder: (context) => Dialog(
-      backgroundColor: const Color(0xFFFFEBEE), // 연한 빨강 배경
+      backgroundColor: const Color(0xFFdddddd),
+      // backgroundColor: const Color(0xFFFFEBEE), // 연한 빨강 배경
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
@@ -37,6 +38,7 @@ Future<void> warningDialog(
               message,
               style: const TextStyle(
                 fontSize: 16,
+                fontWeight: FontWeight.w600,
                 color: Colors.black87,
               ),
               textAlign: TextAlign.center,

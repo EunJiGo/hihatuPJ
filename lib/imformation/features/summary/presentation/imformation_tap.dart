@@ -43,7 +43,7 @@ class _InformationTabsState extends State<InformationTabs> with TickerProviderSt
         // const SizedBox(height: 16),
         if (_tabController.index == 1) QuestionnaireStatusLegend(),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 03),
 
         // 선택된 리스트 보여주기
         if (_tabController.index == 0)

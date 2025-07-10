@@ -28,24 +28,28 @@ class HHTTabbar extends StatefulWidget {
 class _HHTTabbarState extends State<HHTTabbar> {
   int _selectedIndex = 0;
 
-  final List<Widget> _screens = [
+  late List<Widget> _screens = [
     HomeScreen(),
     AttendanceScreen(),
     InformationScreen(),
     ApplyScreen(),
     MypageScreen(),
-
-
-    // ITCaseScreen(),
-    // TechnicianScreen(),
-    // CostScreen(),
-    // MineScreen(),
   ];
 
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.initialIndex; // 초기화 시만 사용
+
+    _screens = [
+      HomeScreen(),
+      AttendanceScreen(),
+      InformationScreen(
+        informationTabIndex: widget.informationTabIndex ?? 0,
+      ),
+      ApplyScreen(),
+      MypageScreen(),
+    ];
 
   }
 
@@ -112,27 +116,6 @@ class _HHTTabbarState extends State<HHTTabbar> {
       ),
       label: 'マイページ',
     ),
-
-    // BottomNavigationBarItem(
-    //   icon: ImageIcon(AssetImage('images/ITCaseSelect.png')),
-    //   activeIcon: ImageIcon(AssetImage('images/ITCaseSelect.png')),
-    //   label: 'IT案件',
-    // ),
-    // BottomNavigationBarItem(
-    //   icon: ImageIcon(AssetImage('images/TechnicianUnselect.png')),
-    //   activeIcon: ImageIcon(AssetImage('images/TechnicianSelect.png')),
-    //   label: '技術者',
-    // ),
-    // BottomNavigationBarItem(
-    //   icon: ImageIcon(AssetImage('images/CostSelect.png')),
-    //   activeIcon: ImageIcon(AssetImage('images/CostSelect.png')),
-    //   label: '経費精算',
-    // ),
-    // BottomNavigationBarItem(
-    //   icon: ImageIcon(AssetImage('images/MineUnselect.png')),
-    //   activeIcon: ImageIcon(AssetImage('images/MineSelect.png')),
-    //   label: 'マイン',
-    // ),
   ];
 
   @override

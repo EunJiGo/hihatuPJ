@@ -89,29 +89,56 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
 
   void handleSaveOrSubmit(int status) async {
     final selectedAnswers = ref.read(selectedAnswersProvider);
-    bool hasAnyAnswer = selectedAnswers.any((ans) {
-      if (ans == null) return false;
-      if (ans is String && ans.trim().isEmpty) return false;
-      if (ans is List &&
-          ans.every((e) => e == null || e.toString().trim().isEmpty))
-        return false;
-      return true;
-    });
 
-    if (!hasAnyAnswer) {
-      attentionDialog(
+    // status == 1 (제출 시) → 모든 항목이 비어있지 않아야 함
+    if (status == 1) {
+      bool hasEmptyAnswer = selectedAnswers.any((ans) {
+        if (ans == null) return true;
+        if (ans is String && ans.trim().isEmpty) return true;
+        if (ans is List &&
+            ans.every((e) => e == null || e.toString().trim().isEmpty)) {
+          return true;
+        }
+        return false;
+      });
+
+      if (hasEmptyAnswer) {
+        attentionDialog(
           context,
           '注意',
-          '何も入力されていません。'
-      );
-      return;
+          '入力していない項目があります。入力してください。',
+        );
+        return;
+      }
+    } else {
+      // status == 0 (저장 시) → 모든 항목이 비어있으면 경고
+      bool hasAnyAnswer = selectedAnswers.any((ans) {
+        if (ans == null) return false;
+        if (ans is String && ans.trim().isEmpty) return false;
+        if (ans is List &&
+            ans.every((e) => e == null || e.toString().trim().isEmpty)) {
+          return false;
+        }
+        return true;
+      });
+
+      if (!hasAnyAnswer) {
+        attentionDialog(
+          context,
+          '注意',
+          '何も入力されていません。',
+        );
+        return;
+      }
     }
 
+    // 서버 송신
     bool success = await fetchSaveQuestionnaireAnswer(
       questionnaireId: widget.questionnaireId,
       status: status,
       answers: selectedAnswers,
     );
+
     if (success) {
       await successDialog(
         context,
@@ -119,19 +146,21 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
         status == 0 ? '保存が完了しました。' : '提出が完了しました。',
       );
 
+      if (!mounted) return;
+
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder:
-              (context) =>
-                  const HHTTabbar(initialIndex: 2, informationTabIndex: 1),
+          builder: (context) =>
+          const HHTTabbar(initialIndex: 2, informationTabIndex: 1),
         ),
-        (Route<dynamic> route) => false,
+            (Route<dynamic> route) => false,
       );
     } else {
       warningDialog(context, 'エラー', '送信に失敗しました。');
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -271,10 +300,10 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
                           },
                         ),
                       ),
-                      QuestionSubmitButtons(
+                      if (answerStatus == 0) QuestionSubmitButtons(
                         onSavePressed: () => handleSaveOrSubmit(1),
                         onSubmitPressed: () => handleSaveOrSubmit(0),
-                      ),
+                      )
                     ],
                   );
                 },

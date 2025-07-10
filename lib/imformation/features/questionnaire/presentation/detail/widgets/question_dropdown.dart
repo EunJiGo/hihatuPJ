@@ -15,6 +15,8 @@ class QuestionDropdown extends StatelessWidget {
   });
 
   void _showBottomSheet(BuildContext context) {
+    if (answerStatus == 1) return; // 제출완료면 열리지 않게
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -29,7 +31,6 @@ class QuestionDropdown extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // 🔽 항목 리스트 (스크롤 가능)
                 ConstrainedBox(
                   constraints: BoxConstraints(
                     maxHeight: MediaQuery.of(context).size.height * 0.4,
@@ -96,7 +97,6 @@ class QuestionDropdown extends StatelessWidget {
 
                 const SizedBox(height: 20),
 
-                // ⛔ 취소 버튼
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
                   child: Container(
@@ -137,26 +137,43 @@ class QuestionDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = TextEditingController(text: selectedValue ?? '');
 
+    // 회색/비활성 느낌 색상
+    final isDisabled = answerStatus == 1;
+
     return GestureDetector(
-      onTap: answerStatus == 1 ? null : () => _showBottomSheet(context),
+      onTap: isDisabled ? null : () => _showBottomSheet(context),
       child: AbsorbPointer(
         child: TextFormField(
           controller: controller,
           readOnly: true,
+          style: TextStyle(
+            color: isDisabled ? Colors.grey.shade500 : Colors.black87,
+          ),
           decoration: InputDecoration(
             labelText: '選択してください',
-            labelStyle: const TextStyle(color: Color(0xFF1565C0)),
+            labelStyle: TextStyle(
+              color: isDisabled ? Colors.grey : const Color(0xFF1565C0),
+            ),
             enabledBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Color(0xFF90CAF9), width: 1.5),
+              borderSide: BorderSide(
+                color: isDisabled ? Colors.grey.shade400 : const Color(0xFF90CAF9),
+                width: 1.5,
+              ),
               borderRadius: BorderRadius.circular(12),
             ),
             focusedBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Color(0xFF42A5F5), width: 2),
+              borderSide: BorderSide(
+                color: isDisabled ? Colors.grey.shade400 : const Color(0xFF42A5F5),
+                width: 2,
+              ),
               borderRadius: BorderRadius.circular(12),
             ),
-            suffixIcon: const Icon(Icons.arrow_drop_down, color: Color(0xFF1565C0)),
+            suffixIcon: Icon(
+              Icons.arrow_drop_down,
+              color: isDisabled ? Colors.grey : const Color(0xFF1565C0),
+            ),
             filled: true,
-            fillColor: const Color(0xFFF0F7FF),
+            fillColor: isDisabled ? Colors.grey.shade200 : const Color(0xFFF0F7FF),
           ),
         ),
       ),
