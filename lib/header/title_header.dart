@@ -59,6 +59,7 @@ class WelcomeHeader extends StatelessWidget {
                   color: const Color(0xFF333333),
                   fontWeight: FontWeight.w400,
                 ),
+                maxLines: 2,
               ),
             ],
           ),
