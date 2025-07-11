@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'features/transportation/presentation/transportation/request/transportation_screen.dart';
+import 'features/transportation/presentation/transportation_screen.dart';
 
 class ApplicationListScreen extends StatelessWidget {
   final List<Map<String, dynamic>> applyItems = [

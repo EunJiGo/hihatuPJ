@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hihatu_project/apply/features/transportation/presentation/transportation/request/transportation_detail_screen.dart';
 import '../apply/apply_list.dart';
 import '../apply/features/transportation/presentation/transportation/widgets/summary_total_box.dart';
 import '../base/base_screen.dart';
