@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hihatu_project/apply/features/transportation/presentation/transportation/detail/transportation_detail_screen.dart';
 import 'package:intl/intl.dart';
 
 import '../state/transportation_provider.dart';
@@ -118,33 +119,54 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
               itemDate.month == currentMonth.month;
         }).toList();
 
-    final teikikenList =
-        monthData.where((item) => item['type'] == '定期券').toList();
+    // final teikikenList =
+    //     monthData.where((item) => item['type'] == '定期券').toList();
+    //
+    // final koutsuuhiList =
+    //     monthData.where((item) => item['type'] == '交通費').toList();
 
-    final koutsuuhiList =
-        monthData.where((item) => item['type'] == '交通費').toList();
-
-    final teikikenTotal = teikikenList.fold<num>(
-      0,
-      (sum, item) => sum + item['amount'],
-    );
-    final koutsuuhiTotal = koutsuuhiList.fold<num>(
-      0,
-      (sum, item) => sum + item['amount'],
-    );
-    final grandTotal = teikikenTotal + koutsuuhiTotal;
+    // final teikikenTotal = teikikenList.fold<num>(
+    //   0,
+    //   (sum, item) => sum + item['amount'],
+    // );
+    // final koutsuuhiTotal = koutsuuhiList.fold<num>(
+    //   0,
+    //   (sum, item) => sum + item['amount'],
+    // );
 
     return transportationAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text('에러 발생: $e')),
       data: (transportationItem) {
         // transportationItem에서 "commute" 타입 필터링
+        // 정기권
         final commuteList =
             transportationItem
                 .where((item) => item.expenseType == 'commute')
                 .toList();
 
         print('commuteList : $commuteList');
+
+        final commuteTotal = commuteList.fold(
+            0,
+            (sum, item) => sum + item.amount //
+        );
+
+        // 교통비
+        final singleList =
+            transportationItem
+                .where((item) => item.expenseType == 'single')
+                .toList();
+
+        print('singleList : $singleList');
+
+        final singleTotal = singleList.fold(
+            0,
+            (sum, item) => sum + item.amount
+        );
+
+        final grandTotal = commuteTotal + singleTotal;
+        
 
         return Scaffold(
           appBar: AppBar(
@@ -402,7 +424,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    '定期券(${teikikenList.length}件)',
+                                    '定期券(${commuteList.length}件)',
                                     style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 16,
@@ -412,7 +434,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                                   ),
                                 ),
                                 Text(
-                                  '￥$teikikenTotal',
+                                  '￥${formatCurrency(commuteTotal)}',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
@@ -431,7 +453,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    '交通費(${koutsuuhiList.length}件)',
+                                    '交通費(${singleList.length}件)',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 16,
@@ -441,7 +463,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                                   ),
                                 ),
                                 Text(
-                                  '￥$koutsuuhiTotal',
+                                  '￥${formatCurrency(singleTotal)}',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
@@ -475,7 +497,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                                   ),
                                 ),
                                 Text(
-                                  '￥$grandTotal',
+                                  '￥${formatCurrency(grandTotal)}',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 18,
@@ -524,7 +546,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                           ],
                         ),
                         const SizedBox(height: 8),
-                        if (teikikenList.isEmpty)
+                        if (commuteList.isEmpty)
                           Padding(
                             padding: const EdgeInsets.only(left: 10.0),
                             child: const Text(
@@ -618,7 +640,9 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                                         ),
                                         const SizedBox(width: 4),
                                         Text(
-                                          formatCommuteDuration(commuteList[index].commuteDuration),
+                                          formatCommuteDuration(
+                                            commuteList[index].commuteDuration,
+                                          ),
                                           style: const TextStyle(
                                             fontSize: 13,
                                             color: Color(0xFF515151),
@@ -653,7 +677,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                           ],
                         ),
                         const SizedBox(height: 8),
-                        if (koutsuuhiList.isEmpty)
+                        if (singleList.isEmpty)
                           Padding(
                             padding: const EdgeInsets.only(left: 10.0),
                             child: const Text(
@@ -662,95 +686,103 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                             ),
                           )
                         else
-                          ...koutsuuhiList.map((item) {
-                            final parsedDate = DateTime.tryParse(
-                              item['date'] ?? '',
-                            );
-                            final dateText =
-                                parsedDate != null
-                                    ? DateFormat('MM/dd').format(parsedDate)
-                                    : '-';
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 12),
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.05),
-                                    blurRadius: 6,
-                                    offset: const Offset(1, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.directions_bus,
-                                        color: Color(0xFFFFB74D),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: Text(
-                                          '${item['from']} → ${item['to']}',
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      Text(
-                                        '￥${item['amount']}',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            // 스크롤 안 되도록 (SingleChildScrollView 내에 있으므로)
+                            itemCount: singleList.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              final item = singleList[index];
+                              final parsedDate = DateTime.tryParse(
+                                item.updatedAt,
+                              );
+                              final dateText =
+                                  parsedDate != null
+                                      ? DateFormat('MM/dd').format(parsedDate)
+                                      : '-';
+
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 12),
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.05),
+                                      blurRadius: 6,
+                                      offset: const Offset(1, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.directions_bus,
                                           color: Color(0xFFFFB74D),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 10),
-
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.date_range,
-                                        size: 16,
-                                        color: Color(0xFFfe673e),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '申請日：$dateText',
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          color: Color(0xFF515151),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            '${singleList[index].fromStation}~${singleList[index].toStation}',
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(width: 16),
-                                      const Icon(
-                                        Icons.info_outline,
-                                        size: 14,
-                                        color: Color(0xFF5b0075),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Expanded(
-                                        child: Text(
-                                          item['reason'] ?? '-',
+                                        Text(
+                                          '￥${formatCurrency(singleList[index].amount)}',
                                           style: const TextStyle(
-                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFFFFB74D),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10),
+
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.date_range,
+                                          size: 16,
+                                          color: Color(0xFFfe673e),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '申請日：$dateText',
+                                          style: const TextStyle(
+                                            fontSize: 13,
                                             color: Color(0xFF515151),
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            );
-                          }).toList(),
+                                        const SizedBox(width: 16),
+                                        const Icon(
+                                          Icons.info_outline,
+                                          size: 14,
+                                          color: Color(0xFF5b0075),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Expanded(
+                                          child: Text(
+                                            singleList[index].reason ?? '-',
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Color(0xFF515151),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
 
                         const SizedBox(height: 10),
                       ],
@@ -764,10 +796,13 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () {
-                          // TODO: 정기권 신청 화면 이동 처리
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => TransportationInputScreen())
+                          );
                         },
                         icon: const Icon(Icons.confirmation_number_outlined),
-                        label: const Text('定期券 申請'),
+                        label: const Text('定期券申請'),
                         style: ElevatedButton.styleFrom(
                           foregroundColor: const Color(0xFF004D40),
                           backgroundColor: const Color(0xFF81C784),
@@ -775,7 +810,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          textStyle: const TextStyle(fontSize: 16),
+                          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
@@ -794,7 +829,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          textStyle: const TextStyle(fontSize: 16),
+                          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
@@ -811,7 +846,6 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
   }
 }
 
-
 String formatCommuteDuration(String? duration) {
   switch (duration) {
     case '1m':
@@ -825,8 +859,7 @@ String formatCommuteDuration(String? duration) {
   }
 }
 
-
-String formatCurrency(int amount) {
+String formatCurrency(int? amount) {
   final formatter = NumberFormat('#,###');
-  return formatter.format(amount);
+  return formatter.format(amount) ?? '';
 }
