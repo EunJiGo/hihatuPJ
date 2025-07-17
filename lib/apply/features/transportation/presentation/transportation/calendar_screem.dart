@@ -25,32 +25,37 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F0), // 아주 연한 베이지톤 배경
-      appBar: AppBar(
-        title: Text(
-          '${_selectedDay.year}年 ${_selectedDay.month}月 ${_selectedDay.day}日',
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: const Color(0xFFD0E8FF), // 부드러운 핑크톤
-        actions: [
-          IconButton(
-            icon: Icon(
-              useCustomCalendar ? Icons.swap_horiz : Icons.swap_vert,
-              color: Colors.white,
+    return Container(
+      color: Colors.white,
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: const Color(0xFFFFF8F0), // 아주 연한 베이지톤 배경
+          appBar: AppBar(
+            title: Text(
+              '${_selectedDay.year}年 ${_selectedDay.month}月 ${_selectedDay.day}日',
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            tooltip: '달력 모드 변경',
-            onPressed: () {
-              setState(() {
-                useCustomCalendar = !useCustomCalendar;
-              });
-            },
-          )
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: _buildCustomCalendar(),
+            backgroundColor: const Color(0xFF81C784), // 부드러운 핑크톤
+            // actions: [
+            //   IconButton(
+            //     icon: Icon(
+            //       useCustomCalendar ? Icons.swap_horiz : Icons.swap_vert,
+            //       color: Colors.white,
+            //     ),
+            //     tooltip: '달력 모드 변경',
+            //     onPressed: () {
+            //       setState(() {
+            //         useCustomCalendar = !useCustomCalendar;
+            //       });
+            //     },
+            //   )
+            // ],
+          ),
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: _buildCustomCalendar(),
+          ),
+        ),
       ),
     );
   }

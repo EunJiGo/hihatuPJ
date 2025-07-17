@@ -5,11 +5,8 @@ import 'dart:io';
 class ImagePickerHelper {
   static final ImagePicker _picker = ImagePicker();
 
-  static Future<void> showImagePicker({
-    required BuildContext context,
-    required Function(File image) onImageSelected,
-  }) async {
-    showModalBottomSheet(
+  static Future<String?> showImagePicker(BuildContext context) async {
+    final result = await showModalBottomSheet<String>(
       context: context,
       builder: (BuildContext ctx) {
         return SafeArea(
@@ -18,36 +15,24 @@ class ImagePickerHelper {
               ListTile(
                 leading: const Icon(Icons.photo_library),
                 title: const Text('アルバムから選択'),
-                onTap: () async {
-                  Navigator.of(ctx).pop();
-                  final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-                  if (image != null) {
-                    onImageSelected(File(image.path));
-                  }
-                },
+                onTap: () => Navigator.of(ctx).pop('gallery'),
               ),
               ListTile(
                 leading: const Icon(Icons.camera_alt),
                 title: const Text('カメラで撮影'),
-                onTap: () async {
-                  Navigator.of(ctx).pop();
-                  final XFile? image = await _picker.pickImage(source: ImageSource.camera);
-                  if (image != null) {
-                    onImageSelected(File(image.path));
-                  }
-                },
+                onTap: () => Navigator.of(ctx).pop('camera'),
               ),
               ListTile(
                 leading: const Icon(Icons.cancel),
                 title: const Text('キャンセル'),
-                onTap: () {
-                  Navigator.of(ctx).pop();
-                },
+                onTap: () => Navigator.of(ctx).pop('cancel'),
               ),
             ],
           ),
         );
       },
     );
+
+    return result;
   }
 }

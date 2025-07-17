@@ -49,6 +49,15 @@ class _QuestionnaireListScreenState
     final sortedList = [...list]; // 원본을 복사해서 정렬
 
     sortedList.sort((a, b) {
+
+      bool isExpiredA = DateTime.tryParse(a.deadline)?.isBefore(DateTime.now()) ?? false;
+      bool isExpiredB = DateTime.tryParse(b.deadline)?.isBefore(DateTime.now()) ?? false;
+
+      // 1. 기한이 지난 항목은 항상 아래로
+      if (isExpiredA != isExpiredB) {
+        return isExpiredA ? 1 : -1; // true이면 아래로 감
+      }
+
       // 1. 상태 우선순위 비교 (미작성: 0, 저장됨: 1, 제출됨: 2)
       int getStatusRank(Questionnaire q) {
         if (q.answered == 1) return 2; // 제출 완료

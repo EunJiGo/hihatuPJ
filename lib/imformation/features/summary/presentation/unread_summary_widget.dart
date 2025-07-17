@@ -36,7 +36,7 @@ class UnreadSummaryWidget extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 5),
 
           // 📦 알림 요약 박스
           Container(
@@ -57,7 +57,7 @@ class UnreadSummaryWidget extends StatelessWidget {
               children: [
                 // 📢 お知らせ
                 Container(
-                  padding: const EdgeInsets.all(15),
+                  padding: const EdgeInsets.all(5),
                   decoration: BoxDecoration(
                     // color: const Color(0xFFE7F0FB), // 연한 파란색 배경
                     borderRadius: BorderRadius.circular(8),

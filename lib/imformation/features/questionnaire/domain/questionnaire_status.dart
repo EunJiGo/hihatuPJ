@@ -14,17 +14,17 @@ class QuestionnaireStatus {
 
 final List<QuestionnaireStatus> statusList = [
   QuestionnaireStatus(
-    label: '未記入',
+    label: '未作成',
     icon: Icons.error_outline,
     color: Colors.red,
   ),
   QuestionnaireStatus(
-    label: '記入中',
+    label: '作成中',
     icon: Icons.warning_amber_outlined,
     color: Colors.amber,
   ),
   QuestionnaireStatus(
-    label: '提出済み',
+    label: '作成完了',
     icon: Icons.check_circle_outline,
     color: Colors.green,
   ),

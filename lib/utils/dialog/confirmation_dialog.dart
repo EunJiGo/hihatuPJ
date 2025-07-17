@@ -10,7 +10,7 @@ class ConfirmationDialog {
       barrierDismissible: false, // 배경 터치 시 닫히지 않도록
       builder: (BuildContext context) {
         return Dialog(
-          backgroundColor: const Color(0xFFdddddd), // 핑크빛 배경
+          backgroundColor: const Color(0xFFdddddd), // 배경
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(25),
           ),
@@ -21,7 +21,7 @@ class ConfirmationDialog {
               children: [
                 const Icon(
                   Icons.help_outline_rounded,
-                  color: Color(0xFF42A5F5), // 딸기핑크
+                  color: Color(0xFF42A5F5),
                   size: 48,
                 ),
                 const SizedBox(height: 16),

@@ -2,13 +2,17 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../../../../../utils/image_picker_helper.dart';
 
+import 'package:image_picker/image_picker.dart';
+
 class QuestionImageUpload extends StatelessWidget {
+  final FocusNode focusNode;
   final int answerStatus;
   final String? imagePath;
   final void Function(String) onImageSelected;
 
   const QuestionImageUpload({
     super.key,
+    required this.focusNode,
     required this.answerStatus,
     required this.imagePath,
     required this.onImageSelected,
@@ -21,34 +25,42 @@ class QuestionImageUpload extends StatelessWidget {
     return GestureDetector(
       onTap: answerStatus == 1
           ? null
-          : () {
-        ImagePickerHelper.showImagePicker(
-          context: context,
-          onImageSelected: (File imageFile) {
-            onImageSelected(imageFile.path);
-          },
-        );
+          : () async {
+        // 1. 먼저 포커스 해제 (이건 optional)
+        focusNode.unfocus();
+
+        // 2. 이미지 picker 모달 띄움
+        final result = await ImagePickerHelper.showImagePicker(context);
+
+        // 3. 모달이 완전히 닫힌 다음, 다시 포커스 해제 (이게 중요함)
+        focusNode.unfocus();
+
+        // 4. 선택에 따라 이미지 가져오기
+        if (result == 'gallery') {
+          final XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+          if (image != null) {
+            onImageSelected(image.path);
+          }
+        } else if (result == 'camera') {
+          final XFile? image = await ImagePicker().pickImage(source: ImageSource.camera);
+          if (image != null) {
+            onImageSelected(image.path);
+          }
+        }
       },
       child: Center(
         child: Stack(
           children: [
             Container(
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width * 0.95,
+              width: MediaQuery.of(context).size.width * 0.95,
               height: 200,
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: imagePath != null
-                    ?
-                Colors.white
-                    :
-                    answerStatus == 1
-                        ?
-                    Colors.grey.shade200
-                        :
-                const Color(0xFFF0F7FF),
+                    ? Colors.white
+                    : answerStatus == 1
+                    ? Colors.grey.shade200
+                    : const Color(0xFFF0F7FF),
                 borderRadius: borderRadius,
                 border: Border.all(color: const Color(0xFFB0BEC5)),
                 boxShadow: const [
@@ -85,7 +97,9 @@ class QuestionImageUpload extends StatelessWidget {
                             : const Color(0xFF6096D0)),
                     const SizedBox(height: 10),
                     Text(
-                      answerStatus == 1 ? '画像をアップロードしてない' : '画像をアップロードする',
+                      answerStatus == 1
+                          ? '画像をアップロードしてない'
+                          : '画像をアップロードする',
                       style: TextStyle(
                         fontSize: 16,
                         color: answerStatus == 1
@@ -109,9 +123,7 @@ class QuestionImageUpload extends StatelessWidget {
               ),
           ],
         ),
-      )
-      ,
-
+      ),
     );
   }
 }

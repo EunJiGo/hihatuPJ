@@ -21,13 +21,13 @@ class InformationScreen extends StatelessWidget {
         children: [
           WelcomeHeader(
             title: 'お知らせ',
-            subtitle: 'お知らせ・安否確認をお願い致します。',
+            subtitle: 'お知らせ・安否確認をお願い致しま\nす。',
             titleFontSize: 20,
             subtitleFontSize: 14,
             imagePath: 'assets/images/technician/technician_image.png',
           ),
           SizedBox(
-            height: 20,
+            height: 5,
           ),
           UnreadSummaryWidget(
             unreadNoticeCount: 1,
@@ -35,7 +35,7 @@ class InformationScreen extends StatelessWidget {
           ),
 
            SizedBox(
-              height: 20,
+              height: 5,
             ),
 
           Expanded(child: InformationTabs(initialTabIndex: informationTabIndex ?? 0,)),

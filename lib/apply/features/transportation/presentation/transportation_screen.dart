@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hihatu_project/apply/features/transportation/presentation/transportation/detail/transportation_detail_screen.dart';
+import 'package:hihatu_project/apply/features/transportation/presentation/transportation/widgets/transportation_approval_status.dart';
 import 'package:intl/intl.dart';
 
 import '../state/transportation_provider.dart';
@@ -15,54 +16,14 @@ class TransportationScreen extends ConsumerStatefulWidget {
 }
 
 // ➋ State → ConsumerState 로 변경
-class _TransportationScreenState extends ConsumerState<TransportationScreen> {
+class _TransportationScreenState extends ConsumerState<TransportationScreen> with SingleTickerProviderStateMixin {
   DateTime currentMonth = DateTime.now();
 
   late ScrollController _scrollController;
   bool isSummaryVisible = true;
   double _lastOffset = 0;
 
-  List<Map<String, dynamic>> commuteData = [
-    {
-      'type': '定期券',
-      'amount': 12000,
-      'date': '2025-07-05',
-      'section': '池袋〜秋葉原',
-      'duration': '1ヶ月分',
-    },
-    {
-      'type': '交通費',
-      'amount': 380,
-      'date': '2025-07-07',
-      'from': '渋谷',
-      'to': '新宿',
-      'reason': '打ち合わせのため',
-    },
-    {
-      'type': '交通費',
-      'amount': 380,
-      'date': '2025-07-07',
-      'from': '渋谷',
-      'to': '新宿',
-      'reason': '打ち合わせのため',
-    },
-    {
-      'type': '交通費',
-      'amount': 380,
-      'date': '2025-07-07',
-      'from': '渋谷',
-      'to': '新宿',
-      'reason': '打ち合わせのため',
-    },
-    {
-      'type': '交通費',
-      'amount': 380,
-      'date': '2025-07-07',
-      'from': '渋谷',
-      'to': '新宿',
-      'reason': '打ち合わせのため',
-    },
-  ];
+  AnimationController? _animationController;
 
   void moveMonth(int diff) {
     setState(() {
@@ -94,12 +55,17 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
     super.initState();
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
+    _animationController = AnimationController(
+      duration: const Duration(seconds: 2), // 한 바퀴 도는 데 걸리는 시간
+      vsync: this,
+    )..repeat(); // 무한 반복 회전
   }
 
   @override
   void dispose() {
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
+    _animationController?.dispose();
     super.dispose();
   }
 
@@ -110,29 +76,6 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
     // final ym = DateFormat('yyyy年 MM月').format(currentMonth); // 7월이면 07월이됨
     final ym = '${currentMonth.year}年 ${currentMonth.month}月';
 
-    // 이번 달 데이터 필터링
-    final monthData =
-        commuteData.where((item) {
-          final itemDate = DateTime.tryParse(item['date'] ?? '');
-          return itemDate != null &&
-              itemDate.year == currentMonth.year &&
-              itemDate.month == currentMonth.month;
-        }).toList();
-
-    // final teikikenList =
-    //     monthData.where((item) => item['type'] == '定期券').toList();
-    //
-    // final koutsuuhiList =
-    //     monthData.where((item) => item['type'] == '交通費').toList();
-
-    // final teikikenTotal = teikikenList.fold<num>(
-    //   0,
-    //   (sum, item) => sum + item['amount'],
-    // );
-    // final koutsuuhiTotal = koutsuuhiList.fold<num>(
-    //   0,
-    //   (sum, item) => sum + item['amount'],
-    // );
 
     return transportationAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -141,32 +84,28 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
         // transportationItem에서 "commute" 타입 필터링
         // 정기권
         final commuteList =
-            transportationItem
-                .where((item) => item.expenseType == 'commute')
-                .toList();
-
-        print('commuteList : $commuteList');
+        transportationItem
+            .where((item) => item.expenseType == 'commute')
+            .toList();
 
         final commuteTotal = commuteList.fold(
             0,
-            (sum, item) => sum + item.amount //
+                (sum, item) => sum + item.amount //
         );
 
         // 교통비
         final singleList =
-            transportationItem
-                .where((item) => item.expenseType == 'single')
-                .toList();
-
-        print('singleList : $singleList');
+        transportationItem
+            .where((item) => item.expenseType == 'single')
+            .toList();
 
         final singleTotal = singleList.fold(
             0,
-            (sum, item) => sum + item.amount
+                (sum, item) => sum + item.amount
         );
 
         final grandTotal = commuteTotal + singleTotal;
-        
+
 
         return Scaffold(
           appBar: AppBar(
@@ -259,12 +198,6 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                 // 월 이동 Row
                 Container(
                   margin: const EdgeInsets.only(bottom: 10),
-                  // padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 1),
-                  // decoration: BoxDecoration(
-                  //   color: Colors.white,
-                  //   borderRadius: BorderRadius.circular(16),
-                  //   border: Border.all(color: const Color(0xFFBBDEFB), width: 1),
-                  // ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -509,10 +442,14 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                     ],
                   ),
                 ),
+
+                StatusExplanation(),
+
+                const SizedBox(height: 10),
 
                 // 신청 내역들 영역 (스크롤 가능)
                 Expanded(
@@ -569,9 +506,9 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                                 item.updatedAt,
                               );
                               final dateText =
-                                  parsedDate != null
-                                      ? DateFormat('MM/dd').format(parsedDate)
-                                      : '-';
+                              parsedDate != null
+                                  ? DateFormat('MM/dd').format(parsedDate)
+                                  : '-';
 
                               return Container(
                                 margin: const EdgeInsets.only(bottom: 12),
@@ -598,7 +535,18 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                                         ),
                                         const SizedBox(width: 8),
                                         Text(
-                                          '${commuteList[index].fromStation}~${commuteList[index].toStation}',
+                                          commuteList[index].fromStation,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Icon(Icons.remove_rounded, size: 15),
+                                        const SizedBox(width: 5),
+                                        Text(
+                                          commuteList[index].toStation,
                                           style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,
@@ -606,13 +554,28 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                                           ),
                                         ),
                                         const Spacer(),
-                                        Text(
-                                          '￥${formatCurrency(commuteList[index].amount)}',
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                            color: Color(0xFF81C784),
-                                          ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              '￥',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                                // color: Color(0xFF282828),
+                                                color: Color(0xFF81C784),
+                                              ),
+                                            ),
+                                            Text(
+                                              formatCurrency(
+                                                  commuteList[index].amount),
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                                color: Color(0xFF424242),
+                                                // color: Color(0xFF81C784),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
@@ -648,6 +611,17 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                                             color: Color(0xFF515151),
                                           ),
                                         ),
+                                        const Spacer(),
+
+                                        commuteList[index].reviewStatus == 'pending' ?
+                                        RotationTransition(
+                                          turns: _animationController ?? AlwaysStoppedAnimation(0),
+                                          child: getStatusText(
+                                              commuteList[index].reviewStatus),
+                                        )
+                                            :
+                                        getStatusText(
+                                            commuteList[index].reviewStatus),
                                       ],
                                     ),
                                   ],
@@ -697,9 +671,9 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                                 item.updatedAt,
                               );
                               final dateText =
-                                  parsedDate != null
-                                      ? DateFormat('MM/dd').format(parsedDate)
-                                      : '-';
+                              parsedDate != null
+                                  ? DateFormat('MM/dd').format(parsedDate)
+                                  : '-';
 
                               return Container(
                                 margin: const EdgeInsets.only(bottom: 12),
@@ -725,20 +699,39 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                                           color: Color(0xFFFFB74D),
                                         ),
                                         const SizedBox(width: 8),
-                                        Expanded(
-                                          child: Text(
-                                            '${singleList[index].fromStation}~${singleList[index].toStation}',
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
                                         Text(
-                                          '￥${formatCurrency(singleList[index].amount)}',
+                                          singleList[index].fromStation,
                                           style: const TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            color: Color(0xFFFFB74D),
+                                            fontSize: 16,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        singleList[index].twice
+                                            ?
+                                        Icon(Icons.repeat, size: 20,
+                                          color: Color(0xFF0125f3),)
+                                            :
+                                        Icon(Icons.arrow_right_alt, size: 18,
+                                          color: Color(0xFFf30101),),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          singleList[index].toStation,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                        Text(
+                                          '￥${formatCurrency(
+                                              singleList[index].amount)}',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                            color: Color(0xFF81C784),
                                           ),
                                         ),
                                       ],
@@ -767,15 +760,23 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                                           color: Color(0xFF5b0075),
                                         ),
                                         const SizedBox(width: 4),
-                                        Expanded(
-                                          child: Text(
-                                            singleList[index].reason ?? '-',
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Color(0xFF515151),
-                                            ),
+                                        Text(
+                                          singleList[index].goals ?? '-',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Color(0xFF515151),
                                           ),
                                         ),
+                                        const Spacer(),
+                                        singleList[index].reviewStatus == 'pending' ?
+                                        RotationTransition(
+                                          turns: _animationController ?? AlwaysStoppedAnimation(0),
+                                          child: getStatusText(
+                                              singleList[index].reviewStatus),
+                                        )
+                                            :
+                                        getStatusText(
+                                            singleList[index].reviewStatus),
                                       ],
                                     ),
                                   ],
@@ -797,8 +798,9 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                       child: ElevatedButton.icon(
                         onPressed: () {
                           Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => TransportationInputScreen())
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => TransportationInputScreen())
                           );
                         },
                         icon: const Icon(Icons.confirmation_number_outlined),
@@ -810,7 +812,8 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                          textStyle: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
@@ -829,7 +832,8 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                          textStyle: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
@@ -863,3 +867,19 @@ String formatCurrency(int? amount) {
   final formatter = NumberFormat('#,###');
   return formatter.format(amount) ?? '';
 }
+
+// 상태에 따라 텍스트와 색상을 반환하는 함수
+Icon getStatusText(String status) {
+  switch (status) {
+    case 'pending':
+      return Icon(Icons.hourglass_top, color: Color(0xFFeece01), size: 18,);
+    case 'approved':
+      return Icon(Icons.check_circle_outline, color: Color(0xFF33A1FD), size: 20);
+    case 'returned':
+      return Icon(Icons.cancel_outlined, color: Color(0xFFE53935), size: 20);
+    default:
+      return Icon(Icons.help_outline, color: Colors.grey,);
+  }
+}
+
+

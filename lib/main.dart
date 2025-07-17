@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hihatu_project/tabbar/htt_tabbar.dart';
+import 'package:hihatu_project/utils/route_observer.dart';
 
 /*
 1단계: Riverpod 도입 및 기본 상태관리 구조 만들기
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       title: 'HHT App',
       theme: ThemeData(
@@ -26,6 +28,7 @@ class MyApp extends StatelessWidget {
         ),
           // primarySwatch: Colors.blue
       ),
+      navigatorObservers: [routeObserver],
       home: const HHTTabbar(),
     );
   }

@@ -5,6 +5,7 @@ import '../../../../../../utils/widget/text_field_widget.dart';
 class QuestionTextField extends StatelessWidget {
   final int answerStatus;
   final TextEditingController? controller;
+  final FocusNode? focusNode;
   final dynamic initialAnswer;
   final void Function(String) onChanged;
 
@@ -12,6 +13,7 @@ class QuestionTextField extends StatelessWidget {
     super.key,
     required this.answerStatus,
     this.controller,
+    this.focusNode,
     required this.initialAnswer,
     required this.onChanged,
   });
@@ -24,6 +26,7 @@ class QuestionTextField extends StatelessWidget {
       isReadOnly: isReadOnly,
       inputValue: initialAnswer?.toString() ?? '',
       controller: controller,
+      focusNode: focusNode,
       onChanged: onChanged,
       hintText: '回答を入力してください',
       hintColor: const Color(0xFFF0F7FF),

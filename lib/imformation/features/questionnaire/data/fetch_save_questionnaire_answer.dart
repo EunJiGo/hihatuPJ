@@ -10,11 +10,17 @@ Future<bool> fetchSaveQuestionnaireAnswer({
 }) async {
   final url = Uri.parse('http://192.168.1.8:19021/questionnaire/$status');
 
+
+  print('questionnaireId: $questionnaireId');
+  print('status: $status');
+  print('answers: ${jsonEncode(answers)}');
+
+
   final response = await http.put(
     url,
     headers: {
       'Authorization':
-      'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbnMiLCJleHAiOjE3NTQ0NzE0Nzl9.nvlIRcBaken29ePMWnUy3vTlY0QC2riyXMiF0AI-4zw',
+      'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbnMiLCJleHAiOjE3NTUxNDgxMTF9.X-J3NdWt1Y0W0M3iv05VVQqrszoUp9p4jV7PmRkt1oM',
       'Content-Type': 'application/json',
     },
     body: jsonEncode({
@@ -23,6 +29,8 @@ Future<bool> fetchSaveQuestionnaireAnswer({
     }),
   );
 
+  print('${response.statusCode}');
+  print('${response.body}');
   if (response.statusCode == 200) {
     print("sucess teisilyutu");
     final body = jsonDecode(response.body);
@@ -31,7 +39,7 @@ Future<bool> fetchSaveQuestionnaireAnswer({
     }
   } else {
     throw Exception(
-        'アンケート詳細の取得に失敗しました（HTTP ${response.statusCode}）');
+        'アンケート詳細の取得に失敗しました（HTTP ${response.body}）');
   }
 
   return false;

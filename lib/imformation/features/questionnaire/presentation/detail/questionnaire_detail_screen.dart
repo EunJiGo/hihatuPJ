@@ -132,12 +132,16 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
       }
     }
 
+
+
     // 서버 송신
     bool success = await fetchSaveQuestionnaireAnswer(
       questionnaireId: widget.questionnaireId,
       status: status,
       answers: selectedAnswers,
     );
+
+    print('success : $success');
 
     if (success) {
       await successDialog(

@@ -1,9 +1,8 @@
 import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class TextFieldWidget extends StatefulWidget {
+class TextFieldWidget extends StatelessWidget {
   final Color readOnlyBackgroundColor;
   final Color readOnlyBorderColor;
   final Color editableBackgroundColor;
@@ -13,6 +12,7 @@ class TextFieldWidget extends StatefulWidget {
   final bool isReadOnly;
   final String inputValue;
   final TextEditingController? controller;
+  final FocusNode? focusNode;
   final void Function(String) onChanged;
 
   const TextFieldWidget({
@@ -25,32 +25,25 @@ class TextFieldWidget extends StatefulWidget {
     required this.hintColor,
     required this.isReadOnly,
     required this.inputValue,
+    this.focusNode,
     this.controller,
     required this.onChanged,
   });
 
   @override
-  State<TextFieldWidget> createState() =>
-      _TextFieldWidgetState();
-}
-
-class _TextFieldWidgetState extends State<TextFieldWidget> {
-
-
-  @override
   Widget build(BuildContext context) {
-    if(widget.isReadOnly) {
+    if(isReadOnly) {
       return Container(
           width: double.infinity,
           padding: const EdgeInsets.all(14),
           margin: const EdgeInsets.only(top: 4),
           decoration: BoxDecoration(
-            color: widget.readOnlyBackgroundColor,
-            border: Border.all(color: widget.readOnlyBorderColor),
+            color: readOnlyBackgroundColor,
+            border: Border.all(color: readOnlyBorderColor),
             borderRadius: BorderRadius.circular(12),
           ),
         child: Text(
-          widget.inputValue,
+            inputValue,
           style: TextStyle(
             fontSize: 16,
             color: Colors.grey.shade500,
@@ -62,9 +55,9 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
 
     return Container(
       decoration: BoxDecoration(
-        color: widget.editableBackgroundColor, // 통일감을 위한 밝은 파랑 회색 배경
+        color: editableBackgroundColor, // 통일감을 위한 밝은 파랑 회색 배경
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: widget.editableBorderColor),
+        border: Border.all(color: editableBorderColor),
         boxShadow: const [
           BoxShadow(
             color: Color(0x220253B3),
@@ -75,25 +68,21 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
       ),
       child: TextField(
         maxLines: null,
-        controller: widget.controller,
+        controller: controller,
+        focusNode: focusNode,
         style: const TextStyle(fontSize: 16),
         decoration: InputDecoration(
-          hintText: widget.hintText,
+          hintText: hintText,
           hintStyle: TextStyle(color: Colors.grey),
           contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
           border: OutlineInputBorder(
-            // borderSide: BorderSide.none,
+            borderSide: BorderSide.none,
             borderRadius: BorderRadius.all(Radius.circular(12)),
-            borderSide: BorderSide(color: Color(0xFF81D4FA), width: 2),
           ),
           filled: true,
-          fillColor: widget.hintColor, // ⬅️ 내부도 동일한 색상
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Color(0xFF81D4FA), width: 2),
-          ),
+          fillColor: hintColor, // ⬅️ 내부도 동일한 색상
         ),
-        onChanged: widget.onChanged,
+        onChanged: onChanged,
       ),
     );
   }
