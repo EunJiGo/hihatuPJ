@@ -30,42 +30,16 @@ class _QuestionItemWidgetState extends State<QuestionItemWidget> with RouteAware
   final FocusNode _focusNode = FocusNode();
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      FocusScope.of(context).unfocus();
-    });
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // routeObserver.subscribe(this, ModalRoute.of(context)!); // ✅ 구독
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   FocusScope.of(context).unfocus();
-    // });
-  }
-
-  @override
   void dispose() {
-    print('dispose');
-    // routeObserver.unsubscribe(this); // ✅ 구독 해제
     _focusNode.dispose();
     super.dispose();
   }
 
-  /// ✅ 다른 화면에서 돌아왔을 때 호출됨
-  @override
-  void didPopNext() {
-    print('didPopNext');
-    FocusScope.of(context).unfocus(); // 포커스 해제
-  }
-
   @override
   Widget build(BuildContext context) {
-
     return GestureDetector(
-      onTap: () {
+      // 바깥 영역 터치 시 키보드 닫힘
+    onTap: () {
         _focusNode.unfocus(); // 여기에도 명시적으로 unfocus
         FocusScope.of(context).unfocus();
       },

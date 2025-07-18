@@ -40,16 +40,17 @@ class QuestionCheckboxList extends StatelessWidget {
               color: isDisabled
                   ? Colors.grey.shade200
                   : isChecked
-                  ? const Color(0xFFE3F2FD)
+                  ? const Color(0xFFF0F7FF)
+                  // ? const Color(0xFFE3F2FD)
                   : const Color(0xFFF9FBFC),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 color: isDisabled
                     ? Colors.grey.shade400
                     : isChecked
-                    ? const Color(0xFF64B5F6)
+                    ? const Color(0xFF90CAF9)
                     : Colors.grey.shade300,
-                width: isChecked ? 2 : 1,
+                width: isChecked ? 1.5: 1,
               ),
               boxShadow: isChecked && !isDisabled
                   ? [
@@ -70,7 +71,7 @@ class QuestionCheckboxList extends StatelessWidget {
                   color: isDisabled
                       ? Colors.grey.shade400
                       : isChecked
-                      ? const Color(0xFF1565C0)
+                      ? const Color(0xFF6096D0)
                       : Colors.grey,
                 ),
                 const SizedBox(width: 10),
@@ -83,7 +84,7 @@ class QuestionCheckboxList extends StatelessWidget {
                       color: isDisabled
                           ? Colors.grey
                           : isChecked
-                          ? const Color(0xFF1565C0)
+                          ? const Color(0xFF6096D0)
                           : Colors.black87,
                     ),
                   ),

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import '../../../../../../utils/image_picker_helper.dart';
+import '../../../../../../utils/widgets/image_upload_widget.dart';
+import '../../../../../../utils/widgets/modals/image_picker_bottom_sheet.dart';
 
 import 'package:image_picker/image_picker.dart';
 
@@ -23,107 +24,44 @@ class QuestionImageUpload extends StatelessWidget {
     final borderRadius = BorderRadius.circular(16);
 
     return GestureDetector(
-      onTap: answerStatus == 1
-          ? null
-          : () async {
-        // 1. 먼저 포커스 해제 (이건 optional)
-        focusNode.unfocus();
+        behavior: HitTestBehavior.translucent,
+        onTap: answerStatus == 1
+            ? null
+            : () async {
+          // 1. 먼저 포커스 해제
+          FocusScope.of(context).requestFocus(FocusNode()); // 💥 기존 포커스 강제 제거
+          await Future.delayed(Duration(milliseconds: 100)); // 살짝 딜레이 줌
 
-        // 2. 이미지 picker 모달 띄움
-        final result = await ImagePickerHelper.showImagePicker(context);
+          // 2. 이미지 picker 모달 띄움
+          final result = await ImagePickerBottomSheet.showImagePicker(context, const Color(0xFF376EB3));
 
-        // 3. 모달이 완전히 닫힌 다음, 다시 포커스 해제 (이게 중요함)
-        focusNode.unfocus();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            focusNode.unfocus(); // ✅ 이게 진짜로 안전하게 작동함
+          });
 
-        // 4. 선택에 따라 이미지 가져오기
-        if (result == 'gallery') {
-          final XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
-          if (image != null) {
-            onImageSelected(image.path);
+
+          // 4. 선택에 따라 이미지 가져오기
+          if (result == 'gallery') {
+            final XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+            if (image != null) {
+              onImageSelected(image.path);
+            }
+          } else if (result == 'camera') {
+            final XFile? image = await ImagePicker().pickImage(source: ImageSource.camera);
+            if (image != null) {
+              onImageSelected(image.path);
+            }
           }
-        } else if (result == 'camera') {
-          final XFile? image = await ImagePicker().pickImage(source: ImageSource.camera);
-          if (image != null) {
-            onImageSelected(image.path);
-          }
-        }
-      },
-      child: Center(
-        child: Stack(
-          children: [
-            Container(
-              width: MediaQuery.of(context).size.width * 0.95,
-              height: 200,
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: imagePath != null
-                    ? Colors.white
-                    : answerStatus == 1
-                    ? Colors.grey.shade200
-                    : const Color(0xFFF0F7FF),
-                borderRadius: borderRadius,
-                border: Border.all(color: const Color(0xFFB0BEC5)),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x220253B3),
-                    blurRadius: 8,
-                    offset: Offset(2, 4),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: borderRadius,
-                child: imagePath != null && imagePath!.isNotEmpty
-                    ? ColorFiltered(
-                  colorFilter: answerStatus == 1
-                      ? const ColorFilter.mode(
-                      Colors.grey, BlendMode.saturation)
-                      : const ColorFilter.mode(
-                      Colors.transparent, BlendMode.multiply),
-                  child: Image.file(
-                    File(imagePath!),
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: double.infinity,
-                  ),
-                )
-                    : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.add_a_photo_rounded,
-                        size: 40,
-                        color: answerStatus == 1
-                            ? Colors.grey.shade500
-                            : const Color(0xFF6096D0)),
-                    const SizedBox(height: 10),
-                    Text(
-                      answerStatus == 1
-                          ? '画像をアップロードしてない'
-                          : '画像をアップロードする',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: answerStatus == 1
-                            ? Colors.grey.shade500
-                            : const Color(0xFF6096D0),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if (answerStatus == 1)
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.5),
-                    borderRadius: borderRadius,
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
+        },
+        child: ImageUploadDisplayWidget(
+          imagePath: imagePath,
+          isDisabled: answerStatus == 1,
+          enabledBorderColor: Color(0xFF90CAF9),
+          enabledShadowColor: Color(0x220253B3),
+          enabledIconColor: Color(0xFF6096D0),
+          enabledTextColor: Color(0xFF6096D0  ),
+        )
+      ,
+      );
   }
 }

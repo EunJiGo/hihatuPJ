@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class ImagePickerModal {
+class ImagePickerBottomSheet {
   static Future<String?> showImagePicker(BuildContext context, Color iconColor,) async {
     final result = await showModalBottomSheet<String>(
       context: context,

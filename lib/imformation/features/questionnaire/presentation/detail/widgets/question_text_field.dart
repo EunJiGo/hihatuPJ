@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../../utils/widget/text_field_widget.dart';
+import '../../../../../../utils/widgets/text_field_widget.dart';
 
 class QuestionTextField extends StatelessWidget {
   final int answerStatus;
@@ -28,12 +28,11 @@ class QuestionTextField extends StatelessWidget {
       controller: controller,
       focusNode: focusNode,
       onChanged: onChanged,
-      hintText: '回答を入力してください',
-      hintColor: const Color(0xFFF0F7FF),
+      hintText: '回答を入力してください。',
+      hintColor: const Color(0xFFF0F7FF), // 지금 editableBackgroundColor의 색깔이 hintColor가 덮어씌움
       editableBackgroundColor: const Color(0xFFF0F7FF),
-      editableBorderColor: const Color(0xFFB0BEC5),
-      readOnlyBackgroundColor: Colors.grey.shade200,
-      readOnlyBorderColor: Colors.grey.shade400,
+      editableBorderColor: const Color(0xFF90CAF9),
+      selectedBorderColor: const Color(0xFF80D8FF),
     );
   }
 }
