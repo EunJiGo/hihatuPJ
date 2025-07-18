@@ -5,11 +5,6 @@ import '../screens/attendance_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/information_screen.dart';
 
-// import '../screens/attendance_screen.dart';
-// import '../screens/it_case_screen.dart';
-// import '../screens/technician_screen.dart';
-// import '../screens/cost_screen.dart';
-// import '../screens/mine_screen.dart';
 
 class HHTTabbar extends StatefulWidget {
   final int initialIndex;
@@ -94,14 +89,27 @@ class _HHTTabbarState extends State<HHTTabbar> {
       ),
       label: 'お知らせ',
     ),
+    // BottomNavigationBarItem(
+    //   icon: ImageIcon(
+    //     AssetImage('assets/images/tabbar/apply/apply.png'),
+    //     size: 18,
+    //   ),
+    //   activeIcon: ImageIcon(
+    //     AssetImage('assets/images/tabbar/apply/apply.png'),
+    //     size: 18,
+    //   ),
+    //   label: '申請',
+    // ),
     BottomNavigationBarItem(
-      icon: ImageIcon(
-        AssetImage('assets/images/tabbar/apply/apply.png'),
-        size: 18,
+      icon: Image.asset(
+        'assets/images/tabbar/apply/apply.png',
+        width: 24,
+        height: 24,
       ),
-      activeIcon: ImageIcon(
-        AssetImage('assets/images/tabbar/apply/apply.png'),
-        size: 18,
+      activeIcon: Image.asset(
+        'assets/images/tabbar/apply/apply.png',
+        width: 24,
+        height: 24,
       ),
       label: '申請',
     ),
