@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as ref;
 
 import 'features/transportation/presentation/transportation_screen.dart';
+import 'features/transportation/state/transportation_provider.dart';
 
-class ApplicationListScreen extends StatelessWidget {
+// class ApplicationListScreen extends StatelessWidget {
+class ApplicationListScreen extends ConsumerWidget {
   final List<Map<String, dynamic>> applyItems = [
     {'label': '休暇管理', 'icon': Icons.beach_access},
     {'label': '交通費・定期券', 'icon': Icons.train},
@@ -18,7 +22,8 @@ class ApplicationListScreen extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  // Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       // appBar: AppBar(
@@ -78,13 +83,33 @@ class ApplicationListScreen extends StatelessWidget {
                       size: 16,
                       color: Color(0xFF888888),
                     ),
-                    onTap: () {
+                    onTap: () async {
                       final label = item['label'];
                   
                       if (label == '休暇管理') {
                         // Navigator.push(context, MaterialPageRoute(builder: (_) => VacationScreen()));
                       } else if (label == '交通費・定期券') {
                         Navigator.push(context, MaterialPageRoute(builder: (_) => TransportationScreen()));
+                        // showDialog(
+                        //   context: context,
+                        //   barrierDismissible: false,
+                        //   builder: (_) => const Center(
+                        //     child: CircularProgressIndicator(color: Color(0xFF42A5F5)),
+                        //   ),
+                        // );
+                        //
+                        //
+                        // // await ref.read(transportationProvider.notifier).loadData();
+                        //
+                        // // 데이터 미리 로딩 (예: 현재 날짜)
+                        // await ref.read(transportationProvider(DateTime.now()).future);
+                        //
+                        // Navigator.of(context).pop(); // 로딩 닫기
+                        //
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(builder: (_) => TransportationScreen()),
+                        // );
                       } else if (label == '在宅勤務手当') {
                         // Navigator.push(context, MaterialPageRoute(builder: (_) => RemoteWorkAllowanceScreen()));
                       } else if (label == 'その他の経費申請') {

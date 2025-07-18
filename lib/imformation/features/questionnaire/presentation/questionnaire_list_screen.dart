@@ -49,9 +49,10 @@ class _QuestionnaireListScreenState
     final sortedList = [...list]; // 원본을 복사해서 정렬
 
     sortedList.sort((a, b) {
-
-      bool isExpiredA = DateTime.tryParse(a.deadline)?.isBefore(DateTime.now()) ?? false;
-      bool isExpiredB = DateTime.tryParse(b.deadline)?.isBefore(DateTime.now()) ?? false;
+      bool isExpiredA =
+          DateTime.tryParse(a.deadline)?.isBefore(DateTime.now()) ?? false;
+      bool isExpiredB =
+          DateTime.tryParse(b.deadline)?.isBefore(DateTime.now()) ?? false;
 
       // 1. 기한이 지난 항목은 항상 아래로
       if (isExpiredA != isExpiredB) {
@@ -79,28 +80,38 @@ class _QuestionnaireListScreenState
     });
 
     // 필터링
-    final filteredList = sortedList.where((item) {
-      final isExpired =
-          DateTime.tryParse(item.deadline)?.isBefore(DateTime.now()) ?? false;
+    final filteredList =
+        sortedList.where((item) {
+          final isExpired =
+              DateTime.tryParse(item.deadline)?.isBefore(DateTime.now()) ??
+              false;
 
-      if (filterSet.isEmpty) return true;
+          // if (filterSet.isEmpty) return true; // 필터가 다 무효화되면 모든 데이터가 리스트에 표시
 
-      final statusId = isExpired
-          ? 3
-          : item.answered == 1
-          ? 2
-          : item.saved == 1
-          ? 1
-          : 0;
+          final statusId =
+              isExpired
+                  ? 3
+                  : item.answered == 1
+                  ? 2
+                  : item.saved == 1
+                  ? 1
+                  : 0;
 
-      return filterSet.contains(statusId);
-    }).toList();
+          return filterSet.contains(statusId);
+        }).toList();
 
     return Container(
       color: Color(0xFFEFF2F4),
       child:
           list.isEmpty
               ? const Center(child: CircularProgressIndicator())
+              : filteredList.isEmpty
+              ? const Center(
+                child: Text(
+                  'データがありません',
+                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                ),
+              )
               : ListView.builder(
                 itemCount: filteredList.length,
                 itemBuilder: (context, index) {
