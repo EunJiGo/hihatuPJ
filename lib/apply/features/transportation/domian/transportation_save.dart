@@ -35,7 +35,7 @@ class TransportationSave {
       "expense_type": "single", // "交通費" → API에서는 "single" 로 기대할 수 있음
       "pay_day": todayStr,
       "goals": goals,
-      "destination": "", // 임의 값 지정
+      "destination": railwayName, // 임의 값 지정
       "railway_name": railwayName,
       "from_station": fromStation,
       "to_station": toStation,
@@ -48,16 +48,11 @@ class TransportationSave {
       "duration_start": null,
       "duration_end": null,
       "pay_to": "",
-      "period": "$toStation ~ $fromStation",
-      "reason": null,
       "amount": amount,
       "image": image,
-      "image_compressed": false,
       "submission_status": submissionStatus,
       "review_status": reviewStatus,
-      "update": true,
-      "created_at": nowStr,
-      "updated_at": nowStr,
+      "update": false,
       "id": null,
     };
   }

@@ -857,12 +857,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => TransportationInputScreen(),
-                              ),
-                            );
+                            // TODO: 정기권 신청 화면 이동 처리
                           },
                           icon: const Icon(
                             Icons.confirmation_number_outlined,
@@ -886,7 +881,13 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            // TODO: 교통비 신청 화면 이동 처리
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => TransportationInputScreen(),
+                              ),
+                            );
+
                           },
                           icon: const Icon(Icons.directions_bus_outlined),
                           label: const Text('交通費 申請'),

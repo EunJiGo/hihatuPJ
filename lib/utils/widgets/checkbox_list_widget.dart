@@ -88,7 +88,7 @@ class SelectableCheckboxList extends StatelessWidget {
                     option,
                     style: TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: isChecked ? FontWeight.w600 : FontWeight.w500,
                       color: isDisabled
                           ? Colors.grey
                           : isChecked

@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'package:hihatu_project/apply/features/transportation/domian/transportation_response.dart';
-import 'package:hihatu_project/apply/features/transportation/domian/transportation_item.dart';
 import 'package:http/http.dart' as http;
 
 import '../domian/transportation_save.dart';
@@ -34,7 +32,7 @@ Future<bool> fetchTransportationSave(TransportationSave data) async {
     }
     // return responseObj.data;
   } else {
-    throw Exception('交通費の登録に失敗しました（HTTP ${response.statusCode}）');
+    throw Exception('交通費の登録に失敗しました（HTTP ${response.statusCode}');
   }
   return false;
 

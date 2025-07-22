@@ -2,17 +2,16 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hihatu_project/apply/features/transportation/presentation/transportation/detail/widgets/transportation_image_upload.dart';
 import 'package:hihatu_project/apply/features/transportation/presentation/transportation_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
-import '../../../../../../tabbar/htt_tabbar.dart';
 import '../../../../../../utils/dialog/attention_dialog.dart';
 import '../../../../../../utils/dialog/confirmation_dialog.dart';
 import '../../../../../../utils/dialog/success_dialog.dart';
-import '../../../data/fetch_transportation.dart';
+import '../../../../../../utils/widgets/image_upload_widget.dart';
 import '../../../data/fetch_transportation_save.dart';
-import '../../../domian/transportation_item.dart';
 import '../../../domian/transportation_save.dart';
 import '../calendar_screem.dart';
 
@@ -58,82 +57,6 @@ class _TransportationInputScreenState extends State<TransportationInputScreen> {
     '営業',
     'その他',
   ];
-
-  void _showImageSourceSelector() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return SafeArea(
-          child: Wrap(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.camera_alt, color: Colors.teal),
-                title: const Text('カメラで撮影'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickImageFromCamera();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_library, color: Colors.teal),
-                title: const Text('ギャラリーから選択'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickImageFromGallery();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.cancel, color: Colors.redAccent),
-                title: const Text('キャンセル'),
-                onTap: () {
-                  Navigator.pop(context);
-                  // 취소 시 특별 처리 없으면 그냥 모달 닫힘
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> _pickImageFromGallery() async {
-    final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      setState(() {
-        _imageFile = File(picked.path);
-      });
-    }
-  }
-
-  Future<void> _pickImageFromCamera() async {
-    final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.camera);
-    if (picked != null) {
-      setState(() {
-        _imageFile = File(picked.path);
-      });
-    }
-  }
-
-  void _addTransferStation() {
-    setState(() {
-      _transferStations.add('');
-    });
-  }
-
-  void _removeTransferStation() {
-    if (_transferStations.isNotEmpty) {
-      setState(() {
-        _transferStations.removeLast();
-      });
-    }
-  }
 
   Widget _buildLabel(String text, {IconData? icon}) {
     return Padding(
@@ -671,38 +594,17 @@ class _TransportationInputScreenState extends State<TransportationInputScreen> {
                 const SizedBox(height: 22),
 
                 _buildLabel('領収書/チケットア添付', icon: Icons.receipt_long),
-                GestureDetector(
-                  onTap: _showImageSourceSelector,
-                  child: Container(
-                    width: double.infinity,
-                    height: 160,
-                    decoration: BoxDecoration(
-                      color: boxBackgroundColor,
-                      border: Border.all(color: borderColor),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.teal.shade100.withOpacity(0.5),
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child:
-                        _imageFile == null
-                            ? Center(
-                              child: Icon(
-                                Icons.cloud_upload,
-                                size: 44,
-                                color: Color(0xFF81C784),
-                              ),
-                            )
-                            : ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Image.file(_imageFile!, fit: BoxFit.cover),
-                            ),
-                  ),
+
+                TransportationImageUpload(
+                  focusNode: FocusNode(),
+                  imagePath: _imageFile?.path,
+                  onImageSelected: (path) {
+                    setState(() {
+                      _imageFile = File(path);
+                    });
+                  },
                 ),
+
 
                 const SizedBox(height: 36),
 
@@ -761,7 +663,7 @@ class _TransportationInputScreenState extends State<TransportationInputScreen> {
                                   ? (_customPurpose ?? '')
                                   : _purpose,
                           image: base64Image ?? '',
-                          submissionStatus: 'submitted',
+                          submissionStatus: 'draft',
                           reviewStatus: 'pending',
                         );
 

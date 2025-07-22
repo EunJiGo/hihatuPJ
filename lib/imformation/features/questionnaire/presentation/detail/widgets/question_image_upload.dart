@@ -21,7 +21,6 @@ class QuestionImageUpload extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderRadius = BorderRadius.circular(16);
 
     return GestureDetector(
         behavior: HitTestBehavior.translucent,
@@ -59,7 +58,7 @@ class QuestionImageUpload extends StatelessWidget {
           enabledBorderColor: Color(0xFF90CAF9),
           enabledShadowColor: Color(0x220253B3),
           enabledIconColor: Color(0xFF6096D0),
-          enabledTextColor: Color(0xFF6096D0  ),
+          enabledTextColor: Color(0xFF6096D0),
         )
       ,
       );
