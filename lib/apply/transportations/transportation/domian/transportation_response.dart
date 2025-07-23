@@ -1,4 +1,4 @@
-import 'package:hihatu_project/apply/features/transportation/domian/transportation_item.dart';
+import 'package:hihatu_project/apply/transportations/transportation/domian/transportation_item.dart';
 
 class TransportationResponse {
   final int code;

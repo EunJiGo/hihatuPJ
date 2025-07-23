@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:hihatu_project/apply/features/transportation/domian/transportation_response.dart';
-import 'package:hihatu_project/apply/features/transportation/domian/transportation_item.dart';
+import 'package:hihatu_project/apply/transportations/transportation/domian/transportation_response.dart';
+import 'package:hihatu_project/apply/transportations/transportation/domian/transportation_item.dart';
 import 'package:http/http.dart' as http;
 
 // HTTP 요청 처리 (http://192.168.1.8:19021/questionnaire 호출)

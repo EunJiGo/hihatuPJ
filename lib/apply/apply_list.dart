@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as ref;
 
-import 'features/transportation/presentation/transportation_screen.dart';
-import 'features/transportation/state/transportation_provider.dart';
+import 'transportations/transportation_screen.dart';
+import 'transportations/transportation/state/transportation_provider.dart';
 
 // class ApplicationListScreen extends StatelessWidget {
 class ApplicationListScreen extends ConsumerWidget {

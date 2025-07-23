@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hihatu_project/apply/features/transportation/presentation/transportation/detail/transportation_detail_screen.dart';
-import 'package:hihatu_project/apply/features/transportation/presentation/transportation/widgets/transportation_approval_status.dart';
+import 'package:hihatu_project/apply/transportations/commuter/presentation/commuter_screen.dart';
+import 'package:hihatu_project/apply/transportations/transportation/presentation/detail/transportation_detail_screen.dart';
+import 'package:hihatu_project/apply/transportations/summary/widgets/transportation_approval_status.dart';
 import 'package:intl/intl.dart';
 
-import '../state/transportation_provider.dart';
+import 'transportation/state/transportation_provider.dart';
 
 // ➊ ConsumerStatefulWidget 으로 변경
 class TransportationScreen extends ConsumerStatefulWidget {
@@ -857,7 +858,12 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            // TODO: 정기권 신청 화면 이동 처리
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => CommuterScreen(),
+                              ),
+                            );
                           },
                           icon: const Icon(
                             Icons.confirmation_number_outlined,
@@ -887,7 +893,6 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                                 builder: (_) => TransportationInputScreen(),
                               ),
                             );
-
                           },
                           icon: const Icon(Icons.directions_bus_outlined),
                           label: const Text('交通費 申請'),

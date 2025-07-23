@@ -35,21 +35,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               '${_selectedDay.year}年 ${_selectedDay.month}月 ${_selectedDay.day}日',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            backgroundColor: const Color(0xFF81C784), // 부드러운 핑크톤
-            // actions: [
-            //   IconButton(
-            //     icon: Icon(
-            //       useCustomCalendar ? Icons.swap_horiz : Icons.swap_vert,
-            //       color: Colors.white,
-            //     ),
-            //     tooltip: '달력 모드 변경',
-            //     onPressed: () {
-            //       setState(() {
-            //         useCustomCalendar = !useCustomCalendar;
-            //       });
-            //     },
-            //   )
-            // ],
+            backgroundColor: const Color(0xFF81C784),
           ),
           body: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -61,8 +47,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   Widget _buildCustomCalendar() {
-    final japaneseWeekdays = ['日', '月', '火', '水', '木', '金', '土'];
-
     return Column(
       children: [
         _customHeader(),
@@ -141,26 +125,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
               );
             },
-
-            // todayBuilder: (context, day, focusedDay) {
-            //   // 오늘 날짜 강조하려면 여기 살짝 꾸며도 됨
-            //   return Container(
-            //     decoration: BoxDecoration(
-            //       border: Border.all(color: Colors.purpleAccent, width: 2),
-            //       shape: BoxShape.circle,
-            //     ),
-            //     alignment: Alignment.center,
-            //     child: Text(
-            //       '${day.day}',
-            //       style: const TextStyle(
-            //         color: Colors.purple,
-            //         fontWeight: FontWeight.w600,
-            //         fontSize: 16,
-            //         fontFamily: 'ComicSansMS',
-            //       ),
-            //     ),
-            //   );
-            // },
           ),
           onDaySelected: (selectedDay, focusedDay) {
             setState(() {

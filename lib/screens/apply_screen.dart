@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../apply/apply_list.dart';
-import '../apply/features/transportation/presentation/transportation/widgets/summary_total_box.dart';
 import '../base/base_screen.dart';
 import '../header/title_header.dart';
 import '../utils/date_utils.dart';

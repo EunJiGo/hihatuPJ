@@ -30,7 +30,7 @@ class QuestionTextField extends StatelessWidget {
       onChanged: onChanged,
       hintText: '回答を入力してください。',
       hintColor: const Color(0xFFF0F7FF), // 지금 editableBackgroundColor의 색깔이 hintColor가 덮어씌움
-      editableBackgroundColor: const Color(0xFFF0F7FF),
+      // editableBackgroundColor: const Color(0xFFF0F7FF), // 이거 넣으면 뒤에 네모 상자가나옴
       editableBorderColor: const Color(0xFF90CAF9),
       selectedBorderColor: const Color(0xFF80D8FF),
     );

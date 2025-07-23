@@ -1,9 +1,8 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class TextFieldWidget extends StatelessWidget {
-  final Color editableBackgroundColor;
+  final Color? editableBackgroundColor;
   final Color editableBorderColor;
   final Color selectedBorderColor;
   final String hintText;
@@ -13,10 +12,12 @@ class TextFieldWidget extends StatelessWidget {
   final TextEditingController? controller;
   final FocusNode? focusNode;
   final void Function(String) onChanged;
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
 
   const TextFieldWidget({
     super.key,
-    required this.editableBackgroundColor,
+    this.editableBackgroundColor,
     required this.editableBorderColor,
     required this.selectedBorderColor,
     required this.hintText,
@@ -26,6 +27,8 @@ class TextFieldWidget extends StatelessWidget {
     this.focusNode,
     this.controller,
     required this.onChanged,
+    this.keyboardType,
+    this.inputFormatters,
   });
 
   @override
@@ -55,15 +58,6 @@ class TextFieldWidget extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: editableBackgroundColor, // 통일감을 위한 밝은 파랑 회색 배경
-        // borderRadius: BorderRadius.circular(12),
-        // border: Border.all(color: editableBorderColor),
-        // boxShadow: const [
-        //   BoxShadow(
-        //     color: Color(0x220253B3),
-        //     blurRadius: 6,
-        //     offset: Offset(2, 4),
-        //   )
-        // ],
       ),
       child: TextField(
         maxLines: null,
@@ -88,6 +82,8 @@ class TextFieldWidget extends StatelessWidget {
               inputValue.isEmpty ? Colors.white : hintColor, // ⬅️ 내부도 동일한 색상
         ),
         onChanged: onChanged,
+        keyboardType: keyboardType,
+        inputFormatters: inputFormatters,
       ),
     );
   }
