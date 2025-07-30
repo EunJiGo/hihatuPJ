@@ -18,6 +18,7 @@ class PassDurationRadioRow extends StatelessWidget {
     super.key,
     required this.value,
     required this.onChanged,
+    required this.isDisabled,
     this.activeColor,
     this.inactiveColor,
     this.scale = 0.85,
@@ -27,6 +28,7 @@ class PassDurationRadioRow extends StatelessWidget {
 
   final PassDuration value;
   final ValueChanged<PassDuration> onChanged;
+  final bool isDisabled;
   final Color? activeColor;
   final Color? inactiveColor;
   final double scale;
@@ -42,12 +44,15 @@ class PassDurationRadioRow extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: PassDuration.values.map((duration) {
         final selected  = duration == value;
-        final textColor = selected ? selectedColor : unselectedColor;
+        final textColor = isDisabled
+            ? Colors.grey
+            : (selected ? selectedColor : unselectedColor);
+
 
         return Padding(
           padding: EdgeInsets.only(right: gap),
           child: InkWell(
-            onTap: () => onChanged(duration),
+            onTap: isDisabled ? null : () => onChanged(duration),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -56,7 +61,9 @@ class PassDurationRadioRow extends StatelessWidget {
                   child: Radio<PassDuration>(
                     value: duration,
                     groupValue: value,
-                    onChanged: (d) => d != null ? onChanged(d) : null,
+                    onChanged: isDisabled
+                        ? null
+                        : (d) => d != null ? onChanged(d) : null,
                     activeColor: selectedColor,
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     visualDensity: const VisualDensity(horizontal: -4, vertical: -4),

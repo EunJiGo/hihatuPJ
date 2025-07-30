@@ -26,6 +26,7 @@ class ApplicationListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
+      // backgroundColor: const Color(0xFFF5F7FA),
       // appBar: AppBar(
       //   title: const Text('申請・承認'),
       //   backgroundColor: const Color(0xFF82B1FF),

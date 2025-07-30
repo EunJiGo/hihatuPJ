@@ -37,6 +37,7 @@ class CommuterTextField extends StatelessWidget {
       hintText: hintText,
       hintColor: const Color(0xFFFCFFF0), // 지금 editableBackgroundColor의 색깔이 hintColor가 덮어씌움
       // editableBackgroundColor: const Color(0xFFFCFFF0), // 이거 넣으면 뒤에 네모 상자가나옴
+      // editableBackgroundColor: Colors.white, // 이거 넣으면 뒤에 네모 상자가나옴
       editableBorderColor: const Color(0xFF81C784),
       selectedBorderColor: const Color(0xFFB8EF4F),
       keyboardType: keyboardType,

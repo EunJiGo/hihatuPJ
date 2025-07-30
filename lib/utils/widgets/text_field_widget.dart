@@ -38,6 +38,7 @@ class TextFieldWidget extends StatelessWidget {
         margin: const EdgeInsets.only(top: 4),
         decoration: BoxDecoration(
           color: Colors.grey.shade200,
+          // color: Colors.grey.shade200,
           border: Border.all(color: Colors.grey.shade400),
           borderRadius: BorderRadius.circular(12),
         ),
@@ -52,37 +53,32 @@ class TextFieldWidget extends StatelessWidget {
       );
     }
 
-    print('editableBackgroundColor = ${editableBackgroundColor}');
-    return Container(
-      decoration: BoxDecoration(
-        color: editableBackgroundColor, // 통일감을 위한 밝은 파랑 회색 배경
-      ),
-      child: TextField(
-        maxLines: null,
-        controller: controller,
-        focusNode: focusNode,
-        style: const TextStyle(fontSize: 16),
-        decoration: InputDecoration(
-          hintText: hintText,
-          // hintStyle: TextStyle(color: const Color(0xFF1565C0),),
-          hintStyle: TextStyle(color: Colors.grey),
-          contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: editableBorderColor),
-            borderRadius: BorderRadius.all(Radius.circular(12)),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: selectedBorderColor, width: 1.5),
-            borderRadius: BorderRadius.all(Radius.circular(12)),
-          ),
-          filled: true,
-          fillColor:
-          controller?.text.isEmpty == true ? Colors.white : hintColor, // ⬅️ 내부도 동일한 색상
+    print(' controller?.text.isEmpty = ${controller?.text.isEmpty}');
+    return TextField(
+      maxLines: null,
+      controller: controller,
+      focusNode: focusNode,
+      style: const TextStyle(fontSize: 16),
+      decoration: InputDecoration(
+        hintText: hintText,
+        // hintStyle: TextStyle(color: const Color(0xFF1565C0),),
+        hintStyle: TextStyle(color: Colors.grey),
+        contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: editableBorderColor),
+          borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
-        onChanged: onChanged,
-        keyboardType: keyboardType,
-        inputFormatters: inputFormatters,
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: selectedBorderColor, width: 1.5),
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+        ),
+        filled: true,
+        // fillColor: Colors.white,
+        fillColor: controller?.text.isEmpty == true ? Colors.white : hintColor, // ⬅️ 내부도 동일한 색상
       ),
+      onChanged: onChanged,
+      keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
     );
   }
 }

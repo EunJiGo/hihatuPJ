@@ -36,10 +36,10 @@ class TransportationTextField extends StatelessWidget {
       focusNode: focusNode,
       onChanged: onChanged,
       hintText: hintText,
-      hintColor: const Color(0xFFFCFFF0), // 지금 editableBackgroundColor의 색깔이 hintColor가 덮어씌움
+      hintColor: const Color(0xFFfef7f0), // 지금 editableBackgroundColor의 색깔이 hintColor가 덮어씌움
       // editableBackgroundColor: const Color(0xFFFCFFF0), // 이거 넣으면 뒤에 네모 상자가나옴
-      editableBorderColor: const Color(0xFF81C784),
-      selectedBorderColor: const Color(0xFFB8EF4F),
+      editableBorderColor: const Color(0xFFfea643),
+      selectedBorderColor: const Color(0xFFffcc00),
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
     );

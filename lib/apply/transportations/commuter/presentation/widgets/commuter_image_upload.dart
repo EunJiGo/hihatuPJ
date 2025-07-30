@@ -8,6 +8,8 @@ import '../../../../../utils/widgets/server_image_viewer_widget.dart';
 class CommuterImageUpload extends StatefulWidget {
   final FocusNode focusNode;
   final String? imagePath; // 서버 이미지 파일명
+  final Color themeColor;
+  final Color shadowColor;
   final bool isDisabled;
   final void Function(String) onImageSelected;
 
@@ -15,6 +17,8 @@ class CommuterImageUpload extends StatefulWidget {
     super.key,
     required this.focusNode,
     required this.imagePath,
+    required this.themeColor,
+    required this.shadowColor,
     required this.isDisabled,
     required this.onImageSelected,
   });
@@ -25,6 +29,8 @@ class CommuterImageUpload extends StatefulWidget {
 
 class _CommuterImageUploadState extends State<CommuterImageUpload> {
   String? _localImagePath;
+
+
 
   Future<void> _pickImage() async {
     FocusScope.of(context).requestFocus(FocusNode());
@@ -56,25 +62,33 @@ class _CommuterImageUploadState extends State<CommuterImageUpload> {
 
   @override
   Widget build(BuildContext context) {
+    print('isDisabled : ${widget.isDisabled}');
+    print('(widget.imagePath');
+    print(widget.imagePath);
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
-      onTap: _pickImage,
+      onTap: () {
+        if (!widget.isDisabled) {
+          _pickImage();
+        }
+      },
       child: _localImagePath != null
           ? ImageUploadDisplayWidget(
         imagePath: _localImagePath!,
-        isDisabled: false,
-        enabledBorderColor: const Color(0xFF81C784),
-        enabledShadowColor: const Color(0x2281C784),
-        enabledIconColor: const Color(0xFF81C784),
-        enabledTextColor: const Color(0xFF81C784),
+        isDisabled: widget.isDisabled,
+        enabledBorderColor: widget.themeColor,
+        enabledShadowColor: widget.shadowColor,
+        enabledIconColor: widget.themeColor,
+        enabledTextColor: widget.themeColor,
       )
           : ServerImageDisplayWidget(
         imageFileName: widget.imagePath,
         isDisabled: widget.isDisabled,
-        enabledBorderColor: const Color(0xFF81C784),
-        enabledShadowColor: const Color(0x2281C784),
-        enabledIconColor: const Color(0xFF81C784),
-        enabledTextColor: const Color(0xFF81C784),
+        enabledBorderColor: widget.themeColor,
+        // enabledBorderColor: const Color(0xFF81C784),
+        enabledShadowColor: widget.shadowColor,
+        enabledIconColor: widget.themeColor,
+        enabledTextColor: widget.themeColor,
       ),
     );
   }

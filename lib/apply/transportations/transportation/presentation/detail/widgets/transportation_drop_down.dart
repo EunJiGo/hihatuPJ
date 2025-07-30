@@ -34,19 +34,19 @@ class TransportationDropDown extends StatelessWidget {
           options: dropdownOptions,
           selectedValue: selectedValue,
           onSelected: (val) => onChanged(val),
-          selectedTextColor: const Color(0xFF66BB6A),
-          selectedIconColor: const Color(0xFF81C784),
-          selectedBorderColor: const Color(0xFFA4D65C),
-          selectedBackgroundColor: const Color(0xFFFCFFF0),
+          selectedTextColor: const Color(0xFFfea643),
+          selectedIconColor: const Color(0xFFfea643),
+          selectedBorderColor: const Color(0xFFffcc00),
+          selectedBackgroundColor: const Color(0xFFfefcfa),
         );
       },
 
       // 💡 활성화 시 커스터마이징 가능한 색상
-      iconColor: const Color(0xFF66BB6A), // 0xFF4CAF50  0xFF388E3C
+      iconColor: const Color(0xFFfea643), // 0xFF4CAF50  0xFF388E3C
       textColor: Colors.black87,
-      enabledBorderColor: const Color(0xFF81C784),
-      focusedBorderColor: const Color(0xFFB8EF4F),
-      fillColor: const Color(0xFFFCFFF0),
+      enabledBorderColor: const Color(0xFFfea643),
+      focusedBorderColor: const Color(0xFFffcc00),
+      fillColor: const Color(0xFFfef7f0),
     );
   }
 }

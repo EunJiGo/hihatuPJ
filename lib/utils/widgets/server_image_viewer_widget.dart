@@ -24,7 +24,8 @@ class ServerImageDisplayWidget extends StatefulWidget {
   });
 
   @override
-  State<ServerImageDisplayWidget> createState() => _ServerImageDisplayWidgetState();
+  State<ServerImageDisplayWidget> createState() =>
+      _ServerImageDisplayWidgetState();
 }
 
 class _ServerImageDisplayWidgetState extends State<ServerImageDisplayWidget> {
@@ -34,12 +35,17 @@ class _ServerImageDisplayWidgetState extends State<ServerImageDisplayWidget> {
   @override
   void initState() {
     super.initState();
+    print('initState');
+    print(widget.imageFileName);
     _loadImage();
   }
 
   Future<void> _loadImage() async {
-    if (widget.imageFileName == null || widget.imageFileName!.isEmpty) return;
+    print('name');
+    print(widget.imageFileName);
 
+    if (widget.imageFileName == null || widget.imageFileName!.isEmpty) return;
+    print('_loadImage_loadImage_loadImage');
     setState(() => _isLoading = true);
     final result = await fetchImageBlob(widget.imageFileName!);
 
@@ -54,78 +60,103 @@ class _ServerImageDisplayWidgetState extends State<ServerImageDisplayWidget> {
   @override
   Widget build(BuildContext context) {
     final hasImage = _imageBytes != null;
+    final isDisabled = widget.isDisabled;
+    final noImageFile = widget.imageFileName == null || widget.imageFileName!.isEmpty;
 
-    return Center(
-      child: Stack(
-        children: [
-          Container(
-            width: MediaQuery.of(context).size.width * 0.95,
-            height: 200,
-            padding: const EdgeInsets.all(1),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: const BorderRadius.all(Radius.circular(16)),
-              border: Border.all(
-                color: widget.isDisabled ? const Color(0xFF90CAF9) : widget.enabledBorderColor,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: widget.isDisabled ? const Color(0x220253B3) : widget.enabledShadowColor,
-                  blurRadius: 8,
-                  offset: const Offset(2, 4),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(16)),
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : hasImage
-                  ? ColorFiltered(
-                colorFilter: widget.isDisabled
-                    ? const ColorFilter.mode(Colors.grey, BlendMode.saturation)
-                    : const ColorFilter.mode(Colors.transparent, BlendMode.multiply),
-                child: Image.memory(
-                  _imageBytes!,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: double.infinity,
-                ),
-              )
-                  : Column(
+    final shouldShowUploadHint = !isDisabled && noImageFile;
+    final shouldShowNoImageMessage = isDisabled && noImageFile;
+    final shouldAllowTap = !isDisabled;
+
+    print('111111111111');
+    print(isDisabled);
+    print(noImageFile);
+    print(widget.imageFileName);
+    print(noImageFile);
+
+
+    final borderColor = isDisabled
+        ? Colors.grey.shade400
+        : widget.enabledBorderColor;
+    final shadowColor = isDisabled
+        ? Colors.grey.shade400
+        : widget.enabledShadowColor;
+    final iconColor = isDisabled
+        ? Colors.grey.shade500
+        : widget.enabledIconColor;
+    final textColor = isDisabled
+        ? Colors.grey.shade500
+        : widget.enabledTextColor;
+
+    final content = _isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : hasImage
+        ? Image.memory(
+      _imageBytes!,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+    )
+        : Center(
+          child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.add_a_photo_rounded,
-                    size: 40,
-                    color: widget.isDisabled ? Colors.grey.shade500 : widget.enabledIconColor,
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    widget.isDisabled ? '画像がありません' : '画像をアップロードする',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: widget.isDisabled
-                          ? Colors.grey.shade500
-                          : widget.enabledTextColor,
-                    ),
-                  ),
-                ],
-              ),
+          Icon(
+            Icons.add_a_photo_rounded,
+            size: 40,
+            color: iconColor,
+          ),
+          const SizedBox(height: 10),
+          Text(
+            shouldShowNoImageMessage
+                ? '画像がありません'
+                : '画像をアップロードする',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: textColor,
             ),
           ),
-          if (widget.isDisabled)
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.5),
-                  borderRadius: const BorderRadius.all(Radius.circular(16)),
-                ),
+                ],
               ),
-            ),
+        );
+
+    final imageContainer = Container(
+      width: MediaQuery.of(context).size.width * 0.95,
+      height: 200,
+      padding: const EdgeInsets.all(1),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.all(Radius.circular(16)),
+        border: Border.all(color: borderColor),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor,
+            blurRadius: 8,
+            offset: const Offset(2, 4),
+          ),
         ],
       ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.all(Radius.circular(16)),
+        child: Stack(
+          children: [
+            content,
+            if (isDisabled && hasImage)
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: const BorderRadius.all(Radius.circular(16)),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+
+    return Center(
+      child: imageContainer,
     );
   }
 }

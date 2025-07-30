@@ -213,10 +213,6 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
 
                     final QuestionnaireDetail questionnaireDetail = detail.data;
 
-                    print('111111');
-                    print(questionnaireDetail.description);
-                    print(questionnaireDetail.description == '');
-
                     return Column(
                       children: [
 

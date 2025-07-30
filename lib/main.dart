@@ -23,6 +23,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'HHT App',
       theme: ThemeData(
+
         appBarTheme: AppBarTheme(
           systemOverlayStyle: SystemUiOverlayStyle.dark, // ← 여기 추가
         ),

@@ -7,12 +7,14 @@ import '../../../../../../../utils/widgets/modals/image_picker_bottom_sheet.dart
 class TransportationImageUpload extends StatelessWidget {
   final FocusNode focusNode;
   final String? imagePath;
+  final Color themeColor;
   final void Function(String) onImageSelected;
 
   const TransportationImageUpload({
     super.key,
     required this.focusNode,
     required this.imagePath,
+    required this.themeColor,
     required this.onImageSelected,
   });
 
@@ -28,7 +30,7 @@ class TransportationImageUpload extends StatelessWidget {
         // 2. 이미지 선택 모달
         final result = await ImagePickerBottomSheet.showImagePicker(
           context,
-          const Color(0xFF388E3C), // 초록색 계열 테마
+          const Color(0xFFfea643), // 초록색 계열 테마
         );
 
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -51,10 +53,10 @@ class TransportationImageUpload extends StatelessWidget {
       child: ImageUploadDisplayWidget(
         imagePath: imagePath,
         isDisabled: false, // 운송비 등록은 항상 활성화 상태
-        enabledBorderColor: const Color(0xFF81C784),     // 연초록 테두리
-        enabledShadowColor: const Color(0x2281C784),     // 연초록 그림자
-        enabledIconColor: const Color(0xFF81C784),       // 연초록 아이콘
-        enabledTextColor: const Color(0xFF81C784),       // 연초록 텍스트
+        enabledBorderColor: themeColor,     // 연초록 테두리
+        enabledShadowColor: themeColor,     // 연초록 그림자
+        enabledIconColor: themeColor,       // 연초록 아이콘
+        enabledTextColor: themeColor,       // 연초록 텍스트
       ),
     );
   }

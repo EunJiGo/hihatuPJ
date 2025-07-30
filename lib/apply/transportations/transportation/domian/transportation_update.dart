@@ -3,9 +3,9 @@ class TransportationUpdate {
   final String employeeId;
   final String expenseType; // "commute"
   final int? amount;
-  final String commuteDuration; // "1m", "3m", etc.
-  final String durationStart;
-  final String durationEnd;
+  final String? commuteDuration; // "1m", "3m", etc.
+  final String? durationStart;
+  final String? durationEnd;
 
   final DateTime date;
   final String fromStation;
@@ -38,9 +38,9 @@ class TransportationUpdate {
     required this.employeeId,
     required this.expenseType,
     this.amount,
-    required this.commuteDuration,
-    required this.durationStart,
-    required this.durationEnd,
+    this.commuteDuration,
+    this.durationStart,
+    this.durationEnd,
     this.payDay,
     required this.fromStation,
     required this.toStation,

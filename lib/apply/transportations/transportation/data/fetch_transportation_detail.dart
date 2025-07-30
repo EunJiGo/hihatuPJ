@@ -18,7 +18,7 @@ Future<TransportationDetailResponse> fetchTransportationDetail(int id) async {
   );
 
   print('statusCode: ${response.statusCode}');
-  print('body: ${response.body}');
+  print('fetchTransportationDetail body: ${response.body}');
 
   if (response.statusCode == 200) {
     return TransportationDetailResponse.fromJson(json.decode(response.body));

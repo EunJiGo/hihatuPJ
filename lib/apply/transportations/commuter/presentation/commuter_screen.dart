@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,14 +12,14 @@ import 'dart:io';
 
 import '../../../../../../utils/dialog/attention_dialog.dart';
 import '../../../../../../utils/dialog/success_dialog.dart';
-import '../../../../utils/dialog/confirmation_dialog.dart';
+import '../../../../utils/dialog/warning_dialog.dart';
 import '../../../../utils/widgets/common_submit_buttons.dart';
 import '../../summary/widgets/calendar_screen.dart';
 import '../../summary/widgets/date_picker_button.dart';
 import '../../transportation/constants/transportation_transport_options.dart';
 import '../../transportation/data/fetch_image_upload.dart';
+import '../../transportation/data/fetch_transportation_delete.dart';
 import '../../transportation/data/fetch_transportation_save.dart';
-import '../../transportation/data/fetch_transportation_submit.dart';
 import '../../transportation/domian/transportation_save.dart';
 import '../../transportation/presentation/detail/widgets/transportation_image_upload.dart';
 import '../../transportation/state/transportation_provider.dart';
@@ -145,7 +143,6 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
   }
 
   @override
-  @override
   void initState() {
     super.initState();
 
@@ -198,14 +195,14 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
         color: Colors.white,
         child: SafeArea(
           child: Scaffold(
-            backgroundColor: Colors.grey[100],
+            backgroundColor: Colors.white,
             appBar: AppBar(
               title: const Text(
                 '定期券申請',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
-                  // color: Color(0xFF3d3d3d),
-                  color: Colors.teal,
+                  color: Color(0xFF3d3d3d),
+                  // color: Colors.teal,
                 ),
               ),
               backgroundColor: Color(0xFF81C784),
@@ -236,12 +233,22 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                         iconColor: Color(0xFF81C784),
                       ),
                       Center(
-                        child: DatePickerButton(
+                        child: _submissionStatus == "submitted"
+                                ? DatePickerButton(
+                          date: _selectedDate,
+                          backgroundColor: Colors.grey.shade200, // 비활성화 스타일
+                          borderRadius: 20,
+                          shadowColor: const Color(0xFF8e8e8e),
+                          onPick: () async {
+                            return _selectedDate; // 그냥 현재 날짜 리턴, 아무것도 안 바꿈
+                          },
+                        )
+                            :DatePickerButton(
                           date: _selectedDate,
                           backgroundColor: Colors.white,
                           borderRadius: 20,
                           shadowColor: const Color(0xFF8e8e8e),
-                          onPick: () async {
+                          onPick:  () async {
                             print(
                               'scope(hasFocus): ${FocusScope.of(context).hasFocus}',
                             );
@@ -283,6 +290,7 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                             // _endDate = _calcEndDate(_selectedDate, newDuration);
                           });
                         },
+                        isDisabled: _submissionStatus == 'submitted' ? true : false,
                       ),
                       const SizedBox(height: 28),
 
@@ -292,7 +300,7 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                         iconColor: Color(0xFF81C784),
                       ),
                       CommuterTextField(
-                        answerStatus: 0,
+                        answerStatus: _submissionStatus == 'submitted' ? 1 : 0,
                         controller: _departureController,
                         // initialAnswer: _departureController.text,
                         onChanged: (val) {
@@ -352,7 +360,7 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                         for (int i = 0; i < _viaCtrls.length; i++) ...[
                           if (i != 0) ...[const SizedBox(height: 15)],
                           CommuterTextField(
-                            answerStatus: 0,
+                            answerStatus: _submissionStatus == 'submitted' ? 1 : 0,
                             controller: _viaCtrls[i],
                             initialAnswer: _viaValues[i],
                             onChanged: (val) {
@@ -374,7 +382,7 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                         iconColor: Color(0xFF81C784),
                       ),
                       CommuterTextField(
-                        answerStatus: 0,
+                        answerStatus: _submissionStatus == 'submitted' ? 1 : 0,
                         controller: _arrivalController,
                         // initialAnswer: _arrivalController.text,
                         onChanged: (val) {
@@ -393,6 +401,9 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                             Icons.transfer_within_a_station,
                             size: 16,
                             color:
+                                _submissionStatus == 'submitted' ?
+                                    Colors.black26
+                                    :
                                 _hasViaStation
                                     ? Colors.teal.shade700
                                     : Colors.grey,
@@ -404,9 +415,12 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
                               color:
+                              _submissionStatus == 'submitted' ?
+                              Colors.black26
+                              :
                                   _hasViaStation
                                       ? Colors.teal.shade700
-                                      : Colors.grey,
+                                      : Colors.black45,
                             ),
                           ),
                           const SizedBox(width: 3),
@@ -417,12 +431,14 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                               scale: 0.8, // 크기를 80%로 줄임 (1.0이 기본)
                               child: Switch.adaptive(
                                 value: _hasViaStation,
-                                onChanged: (v) {
+                                onChanged:  _submissionStatus == 'submitted' ? null : (v) {
                                   FocusScope.of(context).unfocus();
                                   _toggleVia(v);
                                 },
-                                activeColor: Colors.teal.shade700,
-                                inactiveThumbColor: Colors.grey,
+                                activeColor: _submissionStatus == 'submitted' ? Colors.black45 : Colors.teal.shade700,
+                                inactiveThumbColor: _submissionStatus == 'submitted' ?
+                                Colors.black26
+                                    : Colors.black45,
                               ),
                             ),
                           ),
@@ -438,7 +454,7 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                       ),
                       CommuterDropDown(
                         options: transportationTransportOptions,
-                        answerStatus: 0, // 비활성화면 1 넣기
+                        answerStatus: _submissionStatus == 'submitted' ? 1 : 0, // 비활성화면 1 넣기
                         selectedValue: _transport,
                         onChanged: (val) {
                           setState(() {
@@ -455,7 +471,7 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                       if (_transport == 'その他') ...[
                         const SizedBox(height: 12),
                         CommuterTextField(
-                          answerStatus: 0,
+                          answerStatus: _submissionStatus == 'submitted' ? 1 : 0,
                           controller: _customTransportController,
                           initialAnswer: _customTransport,
                           onChanged: (val) {
@@ -474,7 +490,7 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                         iconColor: Color(0xFF81C784),
                       ),
                       CommuterTextField(
-                        answerStatus: 0,
+                        answerStatus: _submissionStatus == 'submitted' ? 1 : 0,
                         controller: _costController,
                         // initialAnswer: _cost,
                         onChanged: (val) {
@@ -502,7 +518,9 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                         CommuterImageUpload(
                           focusNode: FocusNode(),
                           imagePath: _imageName,
-                          isDisabled: false, // 업로드 활성화
+                          themeColor: const Color(0xFF81C784),
+                          shadowColor: const Color(0x2281C784),
+                          isDisabled: _submissionStatus == 'submitted' ? true : false, // 업로드 활성화 -- 이상
                           onImageSelected: (path) {
                             setState(() {
                               _imageFile = File(path);
@@ -516,6 +534,7 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                         TransportationImageUpload(
                           focusNode: FocusNode(),
                           imagePath: _imageFile?.path,
+                          themeColor: const Color(0xFF81C784),
                           onImageSelected: (path) {
                             setState(() {
                               _imageFile = File(path);
@@ -689,36 +708,46 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                                 (route) => false,
                               );
                             } else {
-                              attentionDialog(
-                                context,
-                                '保存エラー',
-                                '交通費保存に失敗しました。',
-                              );
+                              warningDialog(context, 'エラー', '交通費保存に失敗しました。');
                             }
                           }
                         },
 
-                        // 취소
-                        onSubmitPressed: widget.commuteId != null
-                            ? () async {
-                          // 여기에 삭제 로직 작성 또는 확인창만 띄워도 됨
-                          final confirmed = await ConfirmationDialog.show(
-                            context,
-                            message: 'この定期券申請を削除しますか？',
-                          );
-                          if (confirmed == true) {
-                            // 실제 삭제 로직 or 화면 이동
-                            Navigator.pop(context);
-                          }
-                        }
-                            : () {},
+                        // 삭제
+                        onSubmitPressed:
+                            widget.commuteId != null
+                                ? () async {
+                                  final success =
+                                      await fetchTransportationDelete(
+                                        commuteIdInt!,
+                                      );
+                                  if (success) {
+                                    await successDialog(
+                                      context,
+                                      '削除完了',
+                                      '交通費削除が完了しました。',
+                                    );
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (_) => const TransportationScreen(),
+                                      ),
+                                      (route) => false,
+                                    );
+                                  } else {
+                                    warningDialog(context, 'エラー', '送信に失敗しました。');
+                                  }
+                                }
+                                : () {},
 
                         // 🧑‍🎨 옵션 설정 (텍스트/색상)
-                        saveText: '保　　存',
                         submitText: '削　　除',
                         saveConfirmMessage: '交通費を保存しますか？',
                         submitConfirmMessage: '交通費を削除しますか？',
-                        showSubmitButton: widget.commuteId != null, // ← 조건부로 삭제 버튼 숨김
+                        showSubmitButton: widget.commuteId != null && _submissionStatus == 'draft',
+                        showSaveButton: widget.commuteId == null || _submissionStatus == 'draft' ,
+                        // ← 조건부로 삭제 버튼 숨김
                         themeColor: Colors.teal.shade700,
                         padding: 0.0, // 원하는 색상
                       ),

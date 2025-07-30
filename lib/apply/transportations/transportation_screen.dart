@@ -7,6 +7,7 @@ import 'package:hihatu_project/apply/transportations/transportation/data/fetch_t
 import 'package:hihatu_project/apply/transportations/transportation/presentation/detail/transportation_detail_screen.dart';
 import 'package:hihatu_project/apply/transportations/summary/widgets/transportation_approval_status.dart';
 import 'package:intl/intl.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../tabbar/htt_tabbar.dart';
 import '../../utils/dialog/attention_dialog.dart';
@@ -35,6 +36,9 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
   double _lastOffset = 0;
 
   AnimationController? _animationController;
+
+  bool showCommuteList = true;
+  bool showSingleList = true;
 
   void moveMonth(int diff) {
     setState(() {
@@ -528,6 +532,21 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                                       color: Colors.black,
                                     ),
                                   ),
+                                  const Spacer(),
+                                  IconButton(
+                                    icon: Icon(
+                                      showCommuteList
+                                          ? Icons.keyboard_arrow_down_rounded
+                                          : Icons.keyboard_arrow_up_rounded,
+                                      color: Colors.grey.shade700,
+                                      size: 24,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        showCommuteList = !showCommuteList;
+                                      });
+                                    },
+                                  ),
                                 ],
                               ),
                             ],
@@ -542,158 +561,160 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                               ),
                             )
                           else
-                            ListView.builder(
-                              //shrinkWrap: true를 주면 ListView가 자식 위젯 크기에 맞춰 높이를 최소로 잡아줌
-                              // 대신 성능은 약간 떨어질 수 있으니 리스트 아이템 수가 많지 않을 때 권장
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              // 스크롤 안 되도록 (SingleChildScrollView 내에 있으므로)
-                              itemCount: commuteList.length,
-                              // transportationAsync 리스트에서  expenseType이 타입이 "commute"인 것만 그 길이
-                              itemBuilder: (context, index) {
-                                final item = commuteList[index];
-                                final parsedDate = DateTime.tryParse(
-                                  item.updatedAt,
-                                );
-                                final dateText =
-                                parsedDate != null
-                                    ? DateFormat(
-                                  'MM/dd',
-                                ).format(parsedDate)
-                                    : '-';
+                            if (showCommuteList)
+                              ListView.builder(
+                                //shrinkWrap: true를 주면 ListView가 자식 위젯 크기에 맞춰 높이를 최소로 잡아줌
+                                // 대신 성능은 약간 떨어질 수 있으니 리스트 아이템 수가 많지 않을 때 권장
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                // 스크롤 안 되도록 (SingleChildScrollView 내에 있으므로)
+                                itemCount: commuteList.length,
+                                // transportationAsync 리스트에서  expenseType이 타입이 "commute"인 것만 그 길이
+                                itemBuilder: (context, index) {
+                                  final item = commuteList[index];
+                                  final parsedDate = DateTime.tryParse(
+                                    item.updatedAt,
+                                  );
+                                  final dateText =
+                                  parsedDate != null
+                                      ? DateFormat(
+                                    'MM/dd',
+                                  ).format(parsedDate)
+                                      : '-';
 
-                                return GestureDetector(
-                                  onTap: () {
-                                    print('commute ID: ${item.id}');
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) =>
-                                              CommuterScreen(
-                                                  commuteId: item.id),)
-                                    );
-                                  },
-                                  child: Container(
-                                    margin: const EdgeInsets.only(bottom: 12),
-                                    padding: const EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(16),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.05),
-                                          blurRadius: 6,
-                                          offset: const Offset(1, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.confirmation_number,
-                                              color: Color(0xFF81C784),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              commuteList[index].fromStation,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                                color: Colors.black87,
+                                  return GestureDetector(
+                                    onTap: () {
+                                      print('commute ID: ${item.id}');
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) =>
+                                                CommuterScreen(
+                                                    commuteId: item.id),)
+                                      );
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.only(bottom: 12),
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(16),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(0.05),
+                                            blurRadius: 6,
+                                            offset: const Offset(1, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.confirmation_number,
+                                                color: Color(0xFF81C784),
                                               ),
-                                            ),
-                                            const SizedBox(width: 5),
-                                            Icon(
-                                              Icons.remove_rounded,
-                                              size: 15,
-                                            ),
-                                            const SizedBox(width: 5),
-                                            Text(
-                                              commuteList[index].toStation,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                                color: Colors.black87,
-                                              ),
-                                            ),
-                                            const Spacer(),
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  '￥',
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 16,
-                                                    // color: Color(0xFF282828),
-                                                    color: Color(0xFF81C784),
-                                                  ),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                commuteList[index].fromStation,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                  color: Colors.black87,
                                                 ),
-                                                Text(
-                                                  formatCurrency(
-                                                    commuteList[index].amount,
-                                                  ),
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 16,
-                                                    color: Color(0xFF424242),
-                                                    // color: Color(0xFF81C784),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 10),
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.date_range,
-                                              size: 16,
-                                              color: Color(0xFFfe673e),
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              '申請日：$dateText',
-                                              style: const TextStyle(
-                                                fontSize: 13,
-                                                color: Color(0xFF515151),
                                               ),
-                                            ),
-                                            const SizedBox(width: 16),
-                                            const Icon(
-                                              Icons.timelapse,
-                                              size: 16,
-                                              color: Color(0xFFfa6a23),
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              formatCommuteDuration(
+                                              const SizedBox(width: 5),
+                                              Icon(
+                                                Icons.remove_rounded,
+                                                size: 15,
+                                              ),
+                                              const SizedBox(width: 5),
+                                              Text(
+                                                commuteList[index].toStation,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                  color: Colors.black87,
+                                                ),
+                                              ),
+                                              const Spacer(),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    '￥',
+                                                    style: const TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 16,
+                                                      // color: Color(0xFF282828),
+                                                      color: Color(0xFF81C784),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    formatCurrency(
+                                                      commuteList[index].amount,
+                                                    ),
+                                                    style: const TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 16,
+                                                      color: Color(0xFF424242),
+                                                      // color: Color(0xFF81C784),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.date_range,
+                                                size: 16,
+                                                color: Color(0xFFfe673e),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                '申請日：$dateText',
+                                                style: const TextStyle(
+                                                  fontSize: 13,
+                                                  color: Color(0xFF515151),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 16),
+                                              const Icon(
+                                                Icons.timelapse,
+                                                size: 16,
+                                                color: Color(0xFFfa6a23),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                formatCommuteDuration(
+                                                  commuteList[index]
+                                                      .commuteDuration,
+                                                ),
+                                                style: const TextStyle(
+                                                  fontSize: 13,
+                                                  color: Color(0xFF515151),
+                                                ),
+                                              ),
+                                              const Spacer(),
+                                              getStatusIcon(
                                                 commuteList[index]
-                                                    .commuteDuration,
+                                                    .submissionStatus,
+                                                commuteList[index].reviewStatus,
                                               ),
-                                              style: const TextStyle(
-                                                fontSize: 13,
-                                                color: Color(0xFF515151),
-                                              ),
-                                            ),
-                                            const Spacer(),
-                                            getStatusIcon(
-                                              commuteList[index]
-                                                  .submissionStatus,
-                                              commuteList[index].reviewStatus,
-                                            ),
-                                          ],
-                                        ),
-                                      ],
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
-                            ),
+                                  );
+                                },
+                              )
+                            ,
                           const SizedBox(height: 30),
 
                           // 교통비 신청 내역
@@ -713,6 +734,21 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                                   color: Colors.black,
                                 ),
                               ),
+                              const Spacer(),
+                              IconButton(
+                                icon: Icon(
+                                  showSingleList
+                                      ? Icons.keyboard_arrow_down_rounded
+                                      : Icons.keyboard_arrow_up_rounded,
+                                  color: Colors.grey.shade700,
+                                  size: 24,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    showSingleList = !showSingleList;
+                                  });
+                                },
+                              ),
                             ],
                           ),
                           const SizedBox(height: 8),
@@ -725,138 +761,161 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                               ),
                             )
                           else
-                            ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              // 스크롤 안 되도록 (SingleChildScrollView 내에 있으므로)
-                              itemCount: singleList.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                final item = singleList[index];
-                                final parsedDate = DateTime.tryParse(
-                                  item.updatedAt,
-                                );
-                                final dateText =
-                                parsedDate != null
-                                    ? DateFormat(
-                                  'MM/dd',
-                                ).format(parsedDate)
-                                    : '-';
+                            if (showSingleList)
+                              ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                // 스크롤 안 되도록 (SingleChildScrollView 내에 있으므로)
+                                itemCount: singleList.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  final item = singleList[index];
+                                  final parsedDate = DateTime.tryParse(
+                                    item.updatedAt,
+                                  );
+                                  final dateText =
+                                  parsedDate != null
+                                      ? DateFormat(
+                                    'MM/dd',
+                                  ).format(parsedDate)
+                                      : '-';
 
-                                return GestureDetector(
-                                  onTap: () {
-                                    print('single ID: ${item.id}');
-                                  },
-                                  child: Container(
-                                    margin: const EdgeInsets.only(bottom: 12),
-                                    padding: const EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(16),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.05),
-                                          blurRadius: 6,
-                                          offset: const Offset(1, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.directions_bus,
-                                              color: Color(0xFFFFB74D),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              singleList[index].fromStation,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                                color: Colors.black87,
+                                  return GestureDetector(
+                                    onTap: () {
+                                      print('single ID: ${item.id}');
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) =>
+                                                TransportationInputScreen(
+                                                    transportationId: item.id),)
+                                      );
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.only(bottom: 12),
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(16),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(0.05),
+                                            blurRadius: 6,
+                                            offset: const Offset(1, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.directions_bus,
+                                                color: Color(0xFFFFB74D),
                                               ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            singleList[index].twice
-                                                ? Icon(
-                                              Icons.repeat,
-                                              size: 20,
-                                              color: Color(0xFF0125f3),
-                                            )
-                                                : Icon(
-                                              Icons.arrow_right_alt,
-                                              size: 18,
-                                              color: Color(0xFFf30101),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              singleList[index].toStation,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                                color: Colors.black87,
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                singleList[index].fromStation,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                  color: Colors.black87,
+                                                ),
                                               ),
-                                            ),
-                                            const Spacer(),
-                                            Text(
-                                              '￥${formatCurrency(
-                                                  singleList[index].amount)}',
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                                color: Color(0xFF81C784),
+                                              const SizedBox(width: 8),
+                                              singleList[index].twice
+                                                  ? Icon(
+                                                Icons.repeat,
+                                                size: 20,
+                                                color: Color(0xFF0125f3),
+                                              )
+                                                  : Icon(
+                                                Icons.arrow_right_alt,
+                                                size: 18,
+                                                color: Color(0xFFf30101),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 10),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                singleList[index].toStation,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                  color: Colors.black87,
+                                                ),
+                                              ),
+                                              const Spacer(),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    '￥',
+                                                    style: const TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 16,
+                                                      // color: Color(0xFF282828),
+                                                      color: Color(0xFFFFB74D),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    formatCurrency(
+                                                      singleList[index].amount,
+                                                    ),
+                                                    style: const TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 16,
+                                                      color: Color(0xFF424242),
+                                                      // color: Color(0xFF81C784),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 10),
 
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.date_range,
-                                              size: 16,
-                                              color: Color(0xFFfe673e),
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              '申請日：$dateText',
-                                              style: const TextStyle(
-                                                fontSize: 13,
-                                                color: Color(0xFF515151),
+                                          Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.date_range,
+                                                size: 16,
+                                                color: Color(0xFFfe673e),
                                               ),
-                                            ),
-                                            const SizedBox(width: 16),
-                                            const Icon(
-                                              Icons.info_outline,
-                                              size: 14,
-                                              color: Color(0xFF5b0075),
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              singleList[index].goals ?? '-',
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                color: Color(0xFF515151),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                '申請日：$dateText',
+                                                style: const TextStyle(
+                                                  fontSize: 13,
+                                                  color: Color(0xFF515151),
+                                                ),
                                               ),
-                                            ),
-                                            const Spacer(),
-                                            getStatusIcon(
-                                              singleList[index]
-                                                  .submissionStatus,
-                                              singleList[index].reviewStatus,
-                                            )
-                                          ],
-                                        ),
-                                      ],
+                                              const SizedBox(width: 16),
+                                              const Icon(
+                                                Icons.info_outline,
+                                                size: 14,
+                                                color: Color(0xFF5b0075),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                singleList[index].goals ?? '-',
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  color: Color(0xFF515151),
+                                                ),
+                                              ),
+                                              const Spacer(),
+                                              getStatusIcon(
+                                                singleList[index]
+                                                    .submissionStatus,
+                                                singleList[index].reviewStatus,
+                                              )
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
-                            ),
+                                  );
+                                },
+                              ),
 
                           const SizedBox(height: 10),
                         ],
@@ -864,67 +923,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                     ),
                   ),
 
-                  // 신청 버튼 2개
-                  // Row(
-                  //   children: [
-                  //     Expanded(
-                  //       child: ElevatedButton.icon(
-                  //         onPressed: () {
-                  //           Navigator.push(
-                  //             context,
-                  //             MaterialPageRoute(
-                  //               builder: (_) => CommuterScreen(),
-                  //             ),
-                  //           );
-                  //         },
-                  //         icon: const Icon(
-                  //           Icons.confirmation_number_outlined,
-                  //         ),
-                  //         label: const Text('定期券申請'),
-                  //         style: ElevatedButton.styleFrom(
-                  //           foregroundColor: const Color(0xFF004D40),
-                  //           backgroundColor: const Color(0xFF81C784),
-                  //           padding: const EdgeInsets.symmetric(vertical: 14),
-                  //           shape: RoundedRectangleBorder(
-                  //             borderRadius: BorderRadius.circular(16),
-                  //           ),
-                  //           textStyle: const TextStyle(
-                  //             fontSize: 16,
-                  //             fontWeight: FontWeight.w600,
-                  //           ),
-                  //         ),
-                  //       ),
-                  //     ),
-                  //     const SizedBox(width: 14),
-                  //     Expanded(
-                  //       child: ElevatedButton.icon(
-                  //         onPressed: () {
-                  //           Navigator.push(
-                  //             context,
-                  //             MaterialPageRoute(
-                  //               builder: (_) => TransportationInputScreen(),
-                  //             ),
-                  //           );
-                  //         },
-                  //         icon: const Icon(Icons.directions_bus_outlined),
-                  //         label: const Text('交通費 申請'),
-                  //         style: ElevatedButton.styleFrom(
-                  //           foregroundColor: const Color(0xFFBF360C),
-                  //           backgroundColor: const Color(0xFFFFB74D),
-                  //           padding: const EdgeInsets.symmetric(vertical: 14),
-                  //           shape: RoundedRectangleBorder(
-                  //             borderRadius: BorderRadius.circular(16),
-                  //           ),
-                  //           textStyle: const TextStyle(
-                  //             fontSize: 16,
-                  //             fontWeight: FontWeight.w600,
-                  //           ),
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-
+                  // 신청버튼 / 제출버튼
                   CommonSubmitButtons(
                     onSavePressed: () {
                       final options = [
@@ -937,6 +936,11 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                           '交通費申請',
                           icon: Icons.directions_bus,
                           iconColor: Color(0xFFFFB74D),
+                        ),
+                        DropdownOption.fromText(
+                          '在宅勤務手当',
+                          icon: FontAwesomeIcons.houseLaptop,
+                          iconColor: Color(0xFFfdab94),
                         ),
                       ];
 

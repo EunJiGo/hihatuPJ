@@ -36,15 +36,15 @@ class ImageUploadDisplayWidget extends StatelessWidget {
                   : Colors.white,
               borderRadius: const BorderRadius.all(Radius.circular(16)),
               border: Border.all(
-                color: isDisabled ? const Color(0xFF90CAF9) : enabledBorderColor,
+                color: isDisabled ? Colors.grey.shade400 : enabledBorderColor,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: isDisabled ? const Color(0x220253B3) : enabledShadowColor,
-                  blurRadius: 8,
-                  offset: const Offset(2, 4),
-                ),
-              ],
+              // boxShadow: [
+              //   BoxShadow(
+              //     color: isDisabled ? Colors.grey.shade400 : enabledShadowColor,
+              //     blurRadius: 8,
+              //     offset: const Offset(2, 4),
+              //   ),
+              // ],
             ),
             child: ClipRRect(
               borderRadius: const BorderRadius.all(Radius.circular(16)),
