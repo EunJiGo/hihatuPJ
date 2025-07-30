@@ -8,10 +8,9 @@ class TextFieldWidget extends StatelessWidget {
   final String hintText;
   final Color hintColor;
   final bool isReadOnly;
-  final String inputValue;
   final TextEditingController? controller;
   final FocusNode? focusNode;
-  final void Function(String) onChanged;
+  final void Function(String)? onChanged;
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
 
@@ -23,10 +22,9 @@ class TextFieldWidget extends StatelessWidget {
     required this.hintText,
     required this.hintColor,
     required this.isReadOnly,
-    required this.inputValue,
     this.focusNode,
     this.controller,
-    required this.onChanged,
+    this.onChanged,
     this.keyboardType,
     this.inputFormatters,
   });
@@ -44,7 +42,7 @@ class TextFieldWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
-          inputValue,
+          controller?.text ?? '',
           style: TextStyle(
             fontSize: 16,
             color: Colors.grey.shade500,
@@ -79,7 +77,7 @@ class TextFieldWidget extends StatelessWidget {
           ),
           filled: true,
           fillColor:
-              inputValue.isEmpty ? Colors.white : hintColor, // ⬅️ 내부도 동일한 색상
+          controller?.text.isEmpty == true ? Colors.white : hintColor, // ⬅️ 내부도 동일한 색상
         ),
         onChanged: onChanged,
         keyboardType: keyboardType,

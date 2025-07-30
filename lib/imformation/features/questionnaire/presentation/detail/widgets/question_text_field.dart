@@ -24,7 +24,7 @@ class QuestionTextField extends StatelessWidget {
 
     return TextFieldWidget(
       isReadOnly: isReadOnly,
-      inputValue: initialAnswer?.toString() ?? '',
+      // inputValue: initialAnswer?.toString() ?? '',
       controller: controller,
       focusNode: focusNode,
       onChanged: onChanged,

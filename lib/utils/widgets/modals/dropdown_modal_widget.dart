@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../dropdown_option.dart';
+
 class DropdownModalWidget extends StatelessWidget {
-  final List<String> options;
+  final List<DropdownOption> options;
   final String? selectedValue;
   final void Function(String) onSelected;
 
@@ -23,7 +25,7 @@ class DropdownModalWidget extends StatelessWidget {
 
   static Future<void> show({
     required BuildContext context,
-    required List<String> options,
+    required List<DropdownOption> options,
     required String? selectedValue,
     required void Function(String) onSelected,
     Color selectedTextColor = const Color(0xFF1565C0),
@@ -103,33 +105,37 @@ class DropdownModalWidget extends StatelessWidget {
       itemCount: options.length,
       itemBuilder: (context, index) {
         final opt = options[index];
-        final bool isSelected = opt == selectedValue;
+        final bool isSelected = opt.id == selectedValue; // ✅ 여기를 이렇게!
 
         return GestureDetector(
           onTap: () {
             Navigator.pop(context);
-            onSelected(opt);
+            onSelected(opt.id);
           },
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
             decoration: BoxDecoration(
-              color: isSelected ? selectedBackgroundColor : const Color(0xFFF7FAFC),
+              color:
+                  isSelected
+                      ? selectedBackgroundColor
+                      : const Color(0xFFF7FAFC),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isSelected ? selectedBorderColor : Colors.grey.shade300,
                 width: isSelected ? 2 : 1,
               ),
-              boxShadow: isSelected
-                  ? [
-                BoxShadow(
-                  color: selectedBorderColor.withOpacity(0.4),
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
-                )
-              ]
-                  : [],
+              boxShadow:
+                  isSelected
+                      ? [
+                        BoxShadow(
+                          color: selectedBorderColor.withOpacity(0.4),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
+                        ),
+                      ]
+                      : [],
             ),
             child: Row(
               children: [
@@ -139,17 +145,7 @@ class DropdownModalWidget extends StatelessWidget {
                   size: 20,
                 ),
                 const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    opt,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: isSelected ? selectedTextColor : Colors.black87,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
+                Expanded(child: opt.display),
               ],
             ),
           ),

@@ -25,6 +25,7 @@ class TransportationItem {
   final String updatedAt;
   final String fromStation;
   final String employeeId;
+  final String via;
 
   TransportationItem({
     this.id,
@@ -53,6 +54,7 @@ class TransportationItem {
     required this.updatedAt,
     required this.fromStation,
     required this.employeeId,
+    required this.via,
   });
 
   factory TransportationItem.fromJson(Map<String, dynamic> json) {
@@ -83,6 +85,7 @@ class TransportationItem {
       updatedAt: json['updated_at'] ?? '',
       fromStation: json['from_station'] ?? '',
       employeeId: json['employee_id'] ?? '',
+      via: json['via'] ?? '',
     );
   }
 
@@ -114,6 +117,7 @@ class TransportationItem {
       'updated_at': updatedAt,
       'from_station': fromStation,
       'employee_id': employeeId,
+      'via': via,
     };
   }
 }

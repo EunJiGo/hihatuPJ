@@ -18,7 +18,7 @@ class CommuterTextField extends StatelessWidget {
     required this.answerStatus,
     this.controller,
     this.focusNode,
-    required this.initialAnswer,
+    this.initialAnswer,
     required this.onChanged,
     required this.hintText,
     this.keyboardType,
@@ -31,7 +31,6 @@ class CommuterTextField extends StatelessWidget {
 
     return TextFieldWidget(
       isReadOnly: isReadOnly,
-      inputValue: initialAnswer?.toString() ?? '',
       controller: controller,
       focusNode: focusNode,
       onChanged: onChanged,

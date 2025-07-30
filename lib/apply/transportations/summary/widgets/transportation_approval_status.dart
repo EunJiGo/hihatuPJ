@@ -5,30 +5,34 @@ class StatusExplanation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: const [
-          StatusItem(
-            icon: Icons.hourglass_top,
-            text: '確認中',
-            color: Color(0xFFeece01),
-            bgColor: Color(0xFFFFF3E0),
-          ),
-          StatusItem(
-            icon: Icons.check_circle_outline,
-            text: '承認済',
-            color: Color(0xFF33A1FD),
-            bgColor: Color(0xFFE8F5E9),
-          ),
-          StatusItem(
-            icon: Icons.cancel_outlined,
-            text: '差戻し',
-            color: Color(0xFFE53935),
-            bgColor: Color(0xFFFFEBEE),
-          ),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: const [
+        StatusItem(
+          icon: Icons.edit,
+          text: '臨時保存',
+          color: Color(0xFF616161),
+          bgColor: Color(0xFFFFF3E0),
+        ),
+        StatusItem(
+          icon: Icons.hourglass_top,
+          text: '確認中',
+          color: Color(0xFFeece01),
+          bgColor: Color(0xFFFFF3E0),
+        ),
+        StatusItem(
+          icon: Icons.check_circle_outline,
+          text: '確認完',
+          color: Color(0xFF33A1FD),
+          bgColor: Color(0xFFE8F5E9),
+        ),
+        StatusItem(
+          icon: Icons.cancel_outlined,
+          text: '差戻し',
+          color: Color(0xFFE53935),
+          bgColor: Color(0xFFFFEBEE),
+        ),
+      ],
     );
   }
 }

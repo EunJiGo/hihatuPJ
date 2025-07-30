@@ -49,7 +49,7 @@ class ViaStationsEditor extends StatelessWidget {
           CommuterTextField(
             answerStatus: 0,
             controller: controllers[i],
-            initialAnswer: controllers[i].text,
+            // initialAnswer: controllers[i].text,
             onChanged: (_) {}, // 부모에서 이미 controller로 값 접근 가능
             hintText: '例）品川',
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../../../utils/widgets/dropdown_option.dart';
 import '../../../../../../utils/widgets/dropdown_widget.dart';
 import '../../../../../../utils/widgets/modals/dropdown_modal_widget.dart';
 
@@ -20,6 +21,11 @@ class QuestionDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDisabled = answerStatus == 1;
 
+    // ✅ List<String> → List<DropdownOption>
+    final dropdownOptions = options
+        .map((str) => DropdownOption.fromText(str))
+        .toList();
+
     return DropdownTextFieldWidget(
       selectedValue: selectedValue,
       isDisabled: isDisabled,
@@ -27,7 +33,7 @@ class QuestionDropdown extends StatelessWidget {
         FocusScope.of(context).requestFocus(FocusNode());
         DropdownModalWidget.show(
           context: context,
-          options: options,
+          options: dropdownOptions,
           selectedValue: selectedValue,
           onSelected: (val) => onChanged(val),
           selectedTextColor: const Color(0xFF1565C0),

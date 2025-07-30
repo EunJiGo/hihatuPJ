@@ -365,10 +365,10 @@ class _TransportationInputScreenState extends State<TransportationInputScreen> {
                           );
 
                           // 서버에 전송
-                          bool success = await fetchTransportationSave(
-                              saveData);
+                          // bool success = await fetchTransportationSave(
+                          //     saveData);
 
-                          if (success) {
+                          if (true) {
                             await successDialog(
                               context,
                               '登録完了',

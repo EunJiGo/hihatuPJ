@@ -2,9 +2,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../domian/transportation_save.dart';
+import '../domian/transportation_update.dart';
 
 // 교통비 등록 요청 (PUT)
-Future<bool> fetchTransportationSave(TransportationSave data) async {
+Future<bool> fetchTransportationSaveUpload(TransportationSave? saveData, TransportationUpdate? uploadData, bool isSave) async {
   final url = Uri.parse('http://192.168.1.8:19021/transportation/');
 
   final response = await http.put(
@@ -15,7 +16,7 @@ Future<bool> fetchTransportationSave(TransportationSave data) async {
     },
     // body: json.encode(data.toJson()), // 여기에 JSON 바디 넣기
     body: json.encode({
-      "data": data.toJson(), //  중요: 이렇게 감싸야 함!
+      "data": isSave ? saveData!.toJson() : uploadData!.toJson(), //  중요: 이렇게 감싸야 함!
     }),
   );
 
@@ -30,7 +31,7 @@ Future<bool> fetchTransportationSave(TransportationSave data) async {
     if (body['code'] == 0) {
       return true;
     }
-    // return responseObj.data;
+    // retu rn responseObj.data;
   } else {
     throw Exception('交通費の登録に失敗しました（HTTP ${response.statusCode}');
   }

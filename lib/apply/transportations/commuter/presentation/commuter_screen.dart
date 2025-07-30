@@ -2,32 +2,40 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hihatu_project/apply/transportations/commuter/presentation/widgets/commuter_drop_down.dart';
 import 'package:hihatu_project/apply/transportations/commuter/presentation/widgets/commuter_duration.dart';
 import 'package:hihatu_project/apply/transportations/commuter/presentation/widgets/commuter_image_upload.dart';
 import 'package:hihatu_project/apply/transportations/commuter/presentation/widgets/commuter_text_field.dart';
 import 'package:hihatu_project/apply/transportations/summary/widgets/form_label.dart';
+import 'package:hihatu_project/apply/transportations/transportation/domian/transportation_update.dart';
 import 'package:hihatu_project/apply/transportations/transportation_screen.dart';
 import 'dart:io';
 
 import '../../../../../../utils/dialog/attention_dialog.dart';
-import '../../../../../../utils/dialog/confirmation_dialog.dart';
 import '../../../../../../utils/dialog/success_dialog.dart';
+import '../../../../utils/dialog/confirmation_dialog.dart';
 import '../../../../utils/widgets/common_submit_buttons.dart';
 import '../../summary/widgets/calendar_screen.dart';
 import '../../summary/widgets/date_picker_button.dart';
 import '../../transportation/constants/transportation_transport_options.dart';
+import '../../transportation/data/fetch_image_upload.dart';
 import '../../transportation/data/fetch_transportation_save.dart';
+import '../../transportation/data/fetch_transportation_submit.dart';
 import '../../transportation/domian/transportation_save.dart';
+import '../../transportation/presentation/detail/widgets/transportation_image_upload.dart';
+import '../../transportation/state/transportation_provider.dart';
 
-class CommuterScreen extends StatefulWidget {
-  const CommuterScreen({super.key});
+class CommuterScreen extends ConsumerStatefulWidget {
+  final int? commuteId;
+
+  const CommuterScreen({this.commuteId, super.key});
 
   @override
-  State<CommuterScreen> createState() => _CommuterScreenState();
+  ConsumerState<CommuterScreen> createState() => _CommuterScreenState();
 }
 
-class _CommuterScreenState extends State<CommuterScreen> {
+class _CommuterScreenState extends ConsumerState<CommuterScreen> {
   final TextEditingController _departureController = TextEditingController();
 
   final TextEditingController _arrivalController = TextEditingController();
@@ -46,14 +54,12 @@ class _CommuterScreenState extends State<CommuterScreen> {
   String? _customTransport;
   final _costController = TextEditingController();
   int? _cost;
+  String? _imageName;
   File? _imageFile;
   PassDuration _duration = PassDuration.m1;
+  String? _submissionStatus;
 
-  // bool _hasViaStation = false;
-  // final _viaStationController = TextEditingController();
-  // List<String> _viaStationList = [];
   bool _hasViaStation = false;
-
   final List<TextEditingController> _viaCtrls = [];
   final List<String> _viaValues = []; // 서버 전송/검증용
 
@@ -98,7 +104,6 @@ class _CommuterScreenState extends State<CommuterScreen> {
   Widget _arrowDown() =>
       const Center(child: Icon(Icons.south, color: Colors.grey, size: 15));
 
-
   // 정기권 종료일 계산 함수
   DateTime _calculatePassEndDate(DateTime start, PassDuration duration) {
     final monthCount = switch (duration) {
@@ -107,7 +112,11 @@ class _CommuterScreenState extends State<CommuterScreen> {
       PassDuration.m6 => 6,
     };
 
-    final nextMonthSameDay = DateTime(start.year, start.month + monthCount, start.day);
+    final nextMonthSameDay = DateTime(
+      start.year,
+      start.month + monthCount,
+      start.day,
+    );
     return nextMonthSameDay.subtract(const Duration(days: 1)); // 하루 전날까지
   }
 
@@ -122,9 +131,66 @@ class _CommuterScreenState extends State<CommuterScreen> {
     }
   }
 
+  PassDuration _mapStringToDuration(String d) {
+    switch (d) {
+      case '1m':
+        return PassDuration.m1;
+      case '3m':
+        return PassDuration.m3;
+      case '6m':
+        return PassDuration.m6;
+      default:
+        return PassDuration.m1; // 기본값 설정 (에러 방지)
+    }
+  }
+
+  @override
+  @override
+  void initState() {
+    super.initState();
+
+    final commuteIdInt = widget.commuteId;
+    if (commuteIdInt != null) {
+      ref.read(transportationDetailProvider(commuteIdInt).future).then((
+        detail,
+      ) {
+        if (mounted) {
+          setState(() {
+            _departureController.text = detail.fromStation ?? '';
+            _arrivalController.text = detail.toStation ?? '';
+            _costController.text = detail.amount.toString() ?? '';
+            _selectedDate =
+                DateTime.tryParse(detail.durationStart ?? '') ?? DateTime.now();
+            _duration = _mapStringToDuration(detail.commuteDuration ?? '');
+            _transport = detail.railwayName ?? '';
+            _imageName = detail.image ?? '';
+            _submissionStatus = detail.submissionStatus ?? '';
+
+            final viaString = detail.via ?? '';
+            if (viaString.isNotEmpty) {
+              final splitVia = viaString.split('、');
+              for (final via in splitVia) {
+                final controller = TextEditingController(text: via);
+                _viaCtrls.add(controller);
+                _viaValues.add(via);
+              }
+              _hasViaStation = _viaValues.isNotEmpty;
+            }
+          });
+        }
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    // commuteId가 있을 때만 provider 호출
+    final commuteIdInt = widget.commuteId;
+    final detailAsync =
+        commuteIdInt != null
+            ? ref.watch(transportationDetailProvider(commuteIdInt))
+            : null;
+
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () => FocusScope.of(context).unfocus(),
@@ -138,10 +204,12 @@ class _CommuterScreenState extends State<CommuterScreen> {
                 '定期券申請',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF3d3d3d),
+                  // color: Color(0xFF3d3d3d),
+                  color: Colors.teal,
                 ),
               ),
               backgroundColor: Color(0xFF81C784),
+              // backgroundColor: Color(0xFF81C784),
               elevation: 4,
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(
@@ -149,406 +217,515 @@ class _CommuterScreenState extends State<CommuterScreen> {
                 ),
               ),
             ),
-            body: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(24, 24, 24, 36),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  FormLabel(
-                    text: '開始日',
-                    icon: Icons.calendar_today,
-                    iconColor: Color(0xFF81C784),
-                  ),
-                  Center(
-                    child: DatePickerButton(
-                      date: _selectedDate,
-                      backgroundColor: Colors.white,
-                      borderRadius: 20,
-                      shadowColor: const Color(0xFF8e8e8e),
-                      onPick: () async {
-                        print(
-                          'scope(hasFocus): ${FocusScope.of(context).hasFocus}',
-                        );
-                        print(
-                          'primaryFocus: ${FocusManager.instance.primaryFocus}',
-                        );
+            body: Builder(
+              builder: (context) {
+                if (detailAsync?.isLoading == true) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (detailAsync?.hasError == true) {
+                  return Center(child: Text('データ取得エラー: ${detailAsync?.error}'));
+                }
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 36),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      FormLabel(
+                        text: '開始日',
+                        icon: Icons.calendar_today,
+                        iconColor: Color(0xFF81C784),
+                      ),
+                      Center(
+                        child: DatePickerButton(
+                          date: _selectedDate,
+                          backgroundColor: Colors.white,
+                          borderRadius: 20,
+                          shadowColor: const Color(0xFF8e8e8e),
+                          onPick: () async {
+                            print(
+                              'scope(hasFocus): ${FocusScope.of(context).hasFocus}',
+                            );
+                            print(
+                              'primaryFocus: ${FocusManager.instance.primaryFocus}',
+                            );
 
-                        FocusManager.instance.primaryFocus?.unfocus();
+                            FocusManager.instance.primaryFocus?.unfocus();
 
-                        final picked = await Navigator.push<DateTime>(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (_) =>
-                                    CalendarScreen(selectedDay: _selectedDate),
-                          ),
-                        );
-                        if (picked != null) {
-                          setState(() => _selectedDate = picked);
-                        }
-                        return picked;
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-
-                  FormLabel(
-                    text: '定期券期間',
-                    icon: Icons.event_repeat,
-                    iconColor: Color(0xFF81C784),
-                  ),
-                  PassDurationRadioRow(
-                    value: _duration,
-                    onChanged: (newDuration) {
-                      setState(() {
-                        _duration = newDuration;
-                        // 필요 시 종료일 자동 계산
-                        // _endDate = _calcEndDate(_selectedDate, newDuration);
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 28),
-
-                  FormLabel(
-                    text: '出発駅',
-                    icon: Icons.my_location,
-                    iconColor: Color(0xFF81C784),
-                  ),
-                  CommuterTextField(
-                    answerStatus: 0,
-                    controller: _departureController,
-                    initialAnswer: _departure,
-                    onChanged: (val) {
-                      setState(() {
-                        _departure = val;
-                      });
-                    },
-                    hintText: "例）荻窪",
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  if (_hasViaStation) ...[
-                    const SizedBox(height: 3),
-                    _arrowDown(),
-
-                    Row(
-                      children: [
-                        Expanded(
-                          child: FormLabel(
-                            text:
-                                '経由駅${_viaCtrls.isNotEmpty ? '（${_viaCtrls.length}個）' : ''}',
-                            icon: Icons.transfer_within_a_station,
-                            iconColor: const Color(0xFF81C784),
-                          ),
+                            final picked = await Navigator.push<DateTime>(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (_) => CalendarScreen(
+                                      selectedDay: _selectedDate,
+                                    ),
+                              ),
+                            );
+                            if (picked != null) {
+                              setState(() => _selectedDate = picked);
+                            }
+                            return picked;
+                          },
                         ),
-                        GestureDetector(
-                            onTap: () {
-                              FocusScope.of(context).unfocus();
-                              _addVia();
-                            },
-                          child: Icon(Icons.add_circle_outline, size: 22, color: Colors.teal.shade700,),
-                        ),
-                        const SizedBox(width: 15),
-                        GestureDetector(
-                          onTap: _viaCtrls.isNotEmpty
-                              ? () {
-                            FocusScope.of(context).unfocus();
-                            _removeLastVia();
-                          }
-                              : null,
-                          child: Icon(
-                            Icons.remove_circle_outline,
-                            size: 22,
-                            color: Colors.teal.shade700,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 28),
 
-                    // 필드들
-                    for (int i = 0; i < _viaCtrls.length; i++) ...[
-                      if (i != 0) ...[const SizedBox(height: 15)],
-                      CommuterTextField(
-                        answerStatus: 0,
-                        controller: _viaCtrls[i],
-                        initialAnswer: _viaValues[i],
-                        onChanged: (val) {
+                      FormLabel(
+                        text: '定期券期間',
+                        icon: Icons.event_repeat,
+                        iconColor: Color(0xFF81C784),
+                      ),
+                      PassDurationRadioRow(
+                        value: _duration,
+                        onChanged: (newDuration) {
                           setState(() {
-                            _viaValues[i] = val;
+                            _duration = newDuration;
+                            // 필요 시 종료일 자동 계산
+                            // _endDate = _calcEndDate(_selectedDate, newDuration);
                           });
                         },
-                        hintText: '例）新宿',
                       ),
-                      const SizedBox(height: 15),
-                      _arrowDown(), // #1, #5: 각 필드 뒤에 아래 화살표 넣는다면
-                    ],
-                  ],
+                      const SizedBox(height: 28),
 
-                  // const SizedBox(height: 12),
-                  FormLabel(
-                    text: '到着駅',
-                    icon: Icons.location_on,
-                    iconColor: Color(0xFF81C784),
-                  ),
-                  CommuterTextField(
-                    answerStatus: 0,
-                    controller: _arrivalController,
-                    initialAnswer: _arrival,
-                    onChanged: (val) {
-                      setState(() {
-                        _arrival = val;
-                      });
-                    },
-                    hintText: "例）品川",
-                  ),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.center, // 변경
-                    children: [
-                      Icon(
-                        Icons.transfer_within_a_station,
-                        size: 16,
-                        color:
-                            _hasViaStation ? Colors.teal.shade700 : Colors.grey,
+                      FormLabel(
+                        text: '出発駅',
+                        icon: Icons.my_location,
+                        iconColor: Color(0xFF81C784),
                       ),
-                      SizedBox(width: 3),
-                      Text(
-                        _hasViaStation ? '経由あり' : '経由なし',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color:
-                              _hasViaStation
-                                  ? Colors.teal.shade700
-                                  : Colors.grey,
+                      CommuterTextField(
+                        answerStatus: 0,
+                        controller: _departureController,
+                        // initialAnswer: _departureController.text,
+                        onChanged: (val) {
+                          setState(() {
+                            _departure = val;
+                          });
+                        },
+                        hintText: "例）荻窪",
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      if (_hasViaStation) ...[
+                        const SizedBox(height: 3),
+                        _arrowDown(),
+
+                        Row(
+                          children: [
+                            Expanded(
+                              child: FormLabel(
+                                text:
+                                    '経由駅${_viaCtrls.isNotEmpty ? '（${_viaCtrls.length}個）' : ''}',
+                                icon: Icons.transfer_within_a_station,
+                                iconColor: const Color(0xFF81C784),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                FocusScope.of(context).unfocus();
+                                _addVia();
+                              },
+                              child: Icon(
+                                Icons.add_circle_outline,
+                                size: 22,
+                                color: Colors.teal.shade700,
+                              ),
+                            ),
+                            const SizedBox(width: 15),
+                            GestureDetector(
+                              onTap:
+                                  _viaCtrls.isNotEmpty
+                                      ? () {
+                                        FocusScope.of(context).unfocus();
+                                        _removeLastVia();
+                                      }
+                                      : null,
+                              child: Icon(
+                                Icons.remove_circle_outline,
+                                size: 22,
+                                color: Colors.teal.shade700,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 3),
-                      Transform.translate(
-                        offset: const Offset(0, -2), // 위로 약간 이동시킴
-                        child: Transform.scale(
-                          // 스위치 크기 조절 위함
-                          scale: 0.8, // 크기를 80%로 줄임 (1.0이 기본)
-                          child: Switch.adaptive(
-                            value: _hasViaStation,
-                            onChanged: (v) {
-                              FocusScope.of(context).unfocus();
-                              _toggleVia(v);
+
+                        // 필드들
+                        for (int i = 0; i < _viaCtrls.length; i++) ...[
+                          if (i != 0) ...[const SizedBox(height: 15)],
+                          CommuterTextField(
+                            answerStatus: 0,
+                            controller: _viaCtrls[i],
+                            initialAnswer: _viaValues[i],
+                            onChanged: (val) {
+                              setState(() {
+                                _viaValues[i] = val;
+                              });
                             },
-                            activeColor: Colors.teal.shade700,
-                            inactiveThumbColor: Colors.grey,
+                            hintText: '例）新宿',
                           ),
+                          const SizedBox(height: 15),
+                          _arrowDown(), // #1, #5: 각 필드 뒤에 아래 화살표 넣는다면
+                        ],
+                      ],
+
+                      // const SizedBox(height: 12),
+                      FormLabel(
+                        text: '到着駅',
+                        icon: Icons.location_on,
+                        iconColor: Color(0xFF81C784),
+                      ),
+                      CommuterTextField(
+                        answerStatus: 0,
+                        controller: _arrivalController,
+                        // initialAnswer: _arrivalController.text,
+                        onChanged: (val) {
+                          setState(() {
+                            _arrival = val;
+                          });
+                        },
+                        hintText: "例）品川",
+                      ),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.center, // 변경
+                        children: [
+                          Icon(
+                            Icons.transfer_within_a_station,
+                            size: 16,
+                            color:
+                                _hasViaStation
+                                    ? Colors.teal.shade700
+                                    : Colors.grey,
+                          ),
+                          SizedBox(width: 3),
+                          Text(
+                            _hasViaStation ? '経由あり' : '経由なし',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color:
+                                  _hasViaStation
+                                      ? Colors.teal.shade700
+                                      : Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(width: 3),
+                          Transform.translate(
+                            offset: const Offset(0, -2), // 위로 약간 이동시킴
+                            child: Transform.scale(
+                              // 스위치 크기 조절 위함
+                              scale: 0.8, // 크기를 80%로 줄임 (1.0이 기본)
+                              child: Switch.adaptive(
+                                value: _hasViaStation,
+                                onChanged: (v) {
+                                  FocusScope.of(context).unfocus();
+                                  _toggleVia(v);
+                                },
+                                activeColor: Colors.teal.shade700,
+                                inactiveThumbColor: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 22),
+
+                      FormLabel(
+                        text: '交通手段',
+                        icon: Icons.directions_transit,
+                        iconColor: Color(0xFF81C784),
+                      ),
+                      CommuterDropDown(
+                        options: transportationTransportOptions,
+                        answerStatus: 0, // 비활성화면 1 넣기
+                        selectedValue: _transport,
+                        onChanged: (val) {
+                          setState(() {
+                            _transport = val ?? '';
+                            _customTransport = null;
+
+                            if (_transport != 'その他') {
+                              _customTransportController.clear();
+                            }
+                          });
+                        },
+                      ),
+
+                      if (_transport == 'その他') ...[
+                        const SizedBox(height: 12),
+                        CommuterTextField(
+                          answerStatus: 0,
+                          controller: _customTransportController,
+                          initialAnswer: _customTransport,
+                          onChanged: (val) {
+                            setState(() {
+                              _customTransport = val;
+                            });
+                          },
+                          hintText: '交通手段を入力してください。',
                         ),
+                      ],
+                      const SizedBox(height: 22),
+
+                      FormLabel(
+                        text: '金額 (\u5186)',
+                        icon: Icons.attach_money,
+                        iconColor: Color(0xFF81C784),
+                      ),
+                      CommuterTextField(
+                        answerStatus: 0,
+                        controller: _costController,
+                        // initialAnswer: _cost,
+                        onChanged: (val) {
+                          setState(() {
+                            _cost = int.tryParse(val);
+                          });
+                        },
+                        hintText: '金額を入力してください',
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                      ),
+
+                      const SizedBox(height: 22),
+
+                      FormLabel(
+                        text: '領収書/チケット添付',
+                        icon: Icons.receipt_long,
+                        iconColor: Color(0xFF81C784),
+                      ),
+
+                      // 이미 저장된 걸 가지고 옴
+                      if (commuteIdInt != null) ...[
+                        CommuterImageUpload(
+                          focusNode: FocusNode(),
+                          imagePath: _imageName,
+                          isDisabled: false, // 업로드 활성화
+                          onImageSelected: (path) {
+                            setState(() {
+                              _imageFile = File(path);
+                              _imageName = path.split('/').last;
+                            });
+                          },
+                        ),
+                      ],
+
+                      if (commuteIdInt == null) ...[
+                        TransportationImageUpload(
+                          focusNode: FocusNode(),
+                          imagePath: _imageFile?.path,
+                          onImageSelected: (path) {
+                            setState(() {
+                              _imageFile = File(path);
+                            });
+                          },
+                        ),
+                      ],
+
+                      const SizedBox(height: 36),
+
+                      // ✅ 하단 버튼 영역
+                      CommonSubmitButtons(
+                        // 보존
+                        onSavePressed: () async {
+                          print('🔁 onSavePressed triggered');
+                          FocusScope.of(context).unfocus();
+
+                          final durationEnd = _calculatePassEndDate(
+                            _selectedDate,
+                            _duration,
+                          );
+                          final commuteDurationStr = _mapDurationToString(
+                            _duration,
+                          );
+
+                          print('선택한 파일 경로: ${_imageFile?.path}');
+
+                          if (_imageFile != null) {
+                            final uploadedFileName = await fetchImageUpload(
+                              'admins',
+                              _imageFile!,
+                            );
+                            if (uploadedFileName == null) {
+                              attentionDialog(
+                                context,
+                                'アップロード失敗',
+                                '画像アップロードに失敗しました。',
+                              );
+                              return;
+                            }
+                            _imageName = uploadedFileName; // 서버에서 받은 이미지 파일명 저장
+                            print(_imageName);
+                          }
+
+                          final saveData =
+                              widget.commuteId == null
+                                  ? TransportationSave(
+                                    date: _selectedDate,
+                                    expenseType: 'commute',
+                                    fromStation: _departure,
+                                    toStation: _arrival,
+                                    via:
+                                        _hasViaStation
+                                            ? _viaValues
+                                                .where(
+                                                  (v) => v.trim().isNotEmpty,
+                                                )
+                                                .join('、')
+                                            : '',
+                                    twice: false,
+                                    railwayName:
+                                        _transport == 'その他'
+                                            ? (_customTransport ?? '')
+                                            : _transport,
+                                    amount: int.tryParse(
+                                      _costController.text.trim(),
+                                    ),
+                                    image: _imageName ?? '',
+                                    durationStart:
+                                        _selectedDate
+                                            .toIso8601String()
+                                            .split('T')
+                                            .first,
+                                    durationEnd:
+                                        durationEnd
+                                            .toIso8601String()
+                                            .split('T')
+                                            .first,
+                                    commuteDuration: commuteDurationStr,
+                                    submissionStatus: 'draft',
+                                    // ✅ 보존은 null
+                                    reviewStatus: '',
+                                    id: widget.commuteId,
+                                  )
+                                  : TransportationUpdate(
+                                    date: _selectedDate,
+                                    id: widget.commuteId!,
+                                    employeeId: "admins",
+                                    // 임시
+                                    expenseType: "commute",
+                                    amount: int.tryParse(
+                                      _costController.text.trim(),
+                                    ),
+                                    commuteDuration: commuteDurationStr,
+                                    durationStart:
+                                        _selectedDate
+                                            .toIso8601String()
+                                            .split('T')
+                                            .first,
+                                    durationEnd:
+                                        durationEnd
+                                            .toIso8601String()
+                                            .split('T')
+                                            .first,
+                                    fromStation: _departureController.text,
+                                    toStation: _arrivalController.text,
+                                    twice: false,
+                                    via:
+                                        _hasViaStation
+                                            ? _viaValues
+                                                .where(
+                                                  (v) => v.trim().isNotEmpty,
+                                                )
+                                                .join('、')
+                                            : '',
+                                    railwayName:
+                                        _transport == 'その他'
+                                            ? (_customTransport ?? '')
+                                            : _transport,
+                                    image: _imageName ?? '',
+                                    submissionStatus: 'draft',
+                                    reviewStatus: '',
+                                  );
+
+                          if (widget.commuteId == null) {
+                            final success = await fetchTransportationSaveUpload(
+                              saveData as TransportationSave?,
+                              null,
+                              true,
+                            );
+
+                            if (success) {
+                              print('_imageFile : ${_imageFile}');
+                              await successDialog(
+                                context,
+                                '保存完了',
+                                '交通費保存が完了しました。',
+                              );
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const TransportationScreen(),
+                                ),
+                                (route) => false,
+                              );
+                            } else {
+                              attentionDialog(
+                                context,
+                                '保存エラー',
+                                '交通費保存に失敗しました。',
+                              );
+                            }
+                          } else {
+                            final success = await fetchTransportationSaveUpload(
+                              null,
+                              saveData as TransportationUpdate?,
+                              false,
+                            );
+                            if (success) {
+                              print('_imageFile : ${_imageFile}');
+                              await successDialog(
+                                context,
+                                '保存完了',
+                                '交通費保存が完了しました。',
+                              );
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const TransportationScreen(),
+                                ),
+                                (route) => false,
+                              );
+                            } else {
+                              attentionDialog(
+                                context,
+                                '保存エラー',
+                                '交通費保存に失敗しました。',
+                              );
+                            }
+                          }
+                        },
+
+                        // 취소
+                        onSubmitPressed: widget.commuteId != null
+                            ? () async {
+                          // 여기에 삭제 로직 작성 또는 확인창만 띄워도 됨
+                          final confirmed = await ConfirmationDialog.show(
+                            context,
+                            message: 'この定期券申請を削除しますか？',
+                          );
+                          if (confirmed == true) {
+                            // 실제 삭제 로직 or 화면 이동
+                            Navigator.pop(context);
+                          }
+                        }
+                            : () {},
+
+                        // 🧑‍🎨 옵션 설정 (텍스트/색상)
+                        saveText: '保　　存',
+                        submitText: '削　　除',
+                        saveConfirmMessage: '交通費を保存しますか？',
+                        submitConfirmMessage: '交通費を削除しますか？',
+                        showSubmitButton: widget.commuteId != null, // ← 조건부로 삭제 버튼 숨김
+                        themeColor: Colors.teal.shade700,
+                        padding: 0.0, // 원하는 색상
                       ),
                     ],
                   ),
-
-                  const SizedBox(height: 22),
-
-                  FormLabel(
-                    text: '交通手段',
-                    icon: Icons.directions_transit,
-                    iconColor: Color(0xFF81C784),
-                  ),
-                  CommuterDropDown(
-                    options: transportationTransportOptions,
-                    answerStatus: 0, // 비활성화면 1 넣기
-                    selectedValue: _transport,
-                    onChanged: (val) {
-                      setState(() {
-                        _transport = val ?? '';
-                        _customTransport = null;
-
-                        if (_transport != 'その他') {
-                          _customTransportController.clear();
-                        }
-                      });
-                    },
-                  ),
-
-                  if (_transport == 'その他') ...[
-                    const SizedBox(height: 12),
-                    CommuterTextField(
-                      answerStatus: 0,
-                      controller: _customTransportController,
-                      initialAnswer: _customTransport,
-                      onChanged: (val) {
-                        setState(() {
-                          _customTransport = val;
-                        });
-                      },
-                      hintText: '交通手段を入力してください。',
-                    ),
-                  ],
-                  const SizedBox(height: 22),
-
-                  FormLabel(
-                    text: '金額 (\u5186)',
-                    icon: Icons.attach_money,
-                    iconColor: Color(0xFF81C784),
-                  ),
-                  CommuterTextField(
-                    answerStatus: 0,
-                    controller: _costController,
-                    initialAnswer: _cost,
-                    onChanged: (val) {
-                      setState(() {
-                        _cost = int.tryParse(val);
-                      });
-                    },
-                    hintText: '金額を入力してください',
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  ),
-
-                  const SizedBox(height: 22),
-
-                  FormLabel(
-                    text: '領収書/チケット添付',
-                    icon: Icons.receipt_long,
-                    iconColor: Color(0xFF81C784),
-                  ),
-
-                  CommuterImageUpload(
-                    focusNode: FocusNode(),
-                    imagePath: _imageFile?.path,
-                    onImageSelected: (path) {
-                      setState(() {
-                        _imageFile = File(path);
-                      });
-                    },
-                  ),
-
-                  const SizedBox(height: 36),
-
-                  // ✅ 하단 버튼 영역
-                  CommonSubmitButtons(
-                    onSavePressed: () async {
-                      FocusScope.of(context).unfocus();
-
-                      final bool? confirm = await ConfirmationDialog.show(
-                        context,
-                        message: '交通費を保存しますか？',
-                      );
-                      if (confirm != true) return;
-
-                      final String? base64Image = _imageFile != null
-                          ? base64Encode(await _imageFile!.readAsBytes())
-                          : null;
-
-                      final durationEnd = _calculatePassEndDate(_selectedDate, _duration);
-                      final commuteDurationStr = _mapDurationToString(_duration);
-
-                      final saveData = TransportationSave(
-                        date: _selectedDate,
-                        expenseType: 'commute',
-                        fromStation: _departure,
-                        toStation: _arrival,
-                        twice: false,
-                        railwayName: _transport == 'その他' ? (_customTransport ?? '') : _transport,
-                        amount: int.tryParse(_costController.text.trim()) ?? 0,
-                        image: base64Image ?? '',
-                        durationStart: _selectedDate.toIso8601String().split('T').first,
-                        durationEnd: durationEnd.toIso8601String().split('T').first,
-                        commuteDuration: commuteDurationStr,
-                        submissionStatus: 'draft', // ✅ 보존은 null
-                        reviewStatus: '',
-                      );
-
-                      final success = await fetchTransportationSave(saveData);
-
-                      if (success) {
-                        await successDialog(context, '保存完了', '交通費保存が完了しました。');
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(builder: (_) => const TransportationScreen()),
-                              (route) => false,
-                        );
-                      } else {
-                        attentionDialog(context, '保存エラー', '交通費保存に失敗しました。');
-                      }
-                    },
-
-                    onSubmitPressed: () async {
-                      FocusScope.of(context).unfocus();
-
-                      if (_hasViaStation && _viaValues.any((v) => v.trim().isEmpty)) {
-                        attentionDialog(
-                          context,
-                          '未入力の経由駅があります',
-                          'すべての経由駅を入力してください。',
-                        );
-                        return;
-                      }
-
-                      if (_departure.isEmpty ||
-                          _arrival.isEmpty ||
-                          (_transport == 'その他' &&
-                              (_customTransport == null || _customTransport!.trim().isEmpty)) ||
-                          _costController.text.trim().isEmpty) {
-                        attentionDialog(
-                          context,
-                          '未入力の項目がある',
-                          '未入力の項目を入力してください。',
-                        );
-                        return;
-                      }
-
-                      final bool? confirm = await ConfirmationDialog.show(
-                        context,
-                        message: '交通費を申請しますか？',
-                      );
-                      if (confirm != true) return;
-
-                      final String? base64Image = _imageFile != null
-                          ? base64Encode(await _imageFile!.readAsBytes())
-                          : null;
-
-                      final durationEnd = _calculatePassEndDate(_selectedDate, _duration);
-                      final commuteDurationStr = _mapDurationToString(_duration);
-
-                      final saveData = TransportationSave(
-                        date: _selectedDate,
-                        expenseType: "commute",
-                        fromStation: _departure,
-                        toStation: _arrival,
-                        twice: false,
-                        railwayName: _transport == 'その他' ? (_customTransport ?? '') : _transport,
-                        amount: int.tryParse(_costController.text.trim()) ?? 0,
-                        image: base64Image ?? '',
-                        durationStart: _selectedDate.toIso8601String().split('T').first,
-                        durationEnd: durationEnd.toIso8601String().split('T').first,
-                        commuteDuration: commuteDurationStr,
-                        submissionStatus: 'submitted', // ✅ 등록은 submitted
-                        reviewStatus: 'pending',
-                      );
-
-                      final success = await fetchTransportationSave(saveData);
-
-                      if (success) {
-                        await successDialog(context, '登録完了', '交通費申請が完了しました。');
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(builder: (_) => const TransportationScreen()),
-                              (route) => false,
-                        );
-                      } else {
-                        attentionDialog(context, '登録エラー', '交通費申請が失敗しました。');
-                      }
-                    },
-
-                    // 🧑‍🎨 옵션 설정 (텍스트/색상)
-                    saveText: '保　　存',
-                    submitText: '登　　録',
-                    saveConfirmMessage: '交通費を保存しますか？',
-                    submitConfirmMessage: '交通費を申請しますか？',
-                    themeColor: Colors.teal.shade700,
-                    padding: 0.0, // 원하는 색상
-                  )
-                ],
-              ),
+                );
+              },
             ),
           ),
         ),
