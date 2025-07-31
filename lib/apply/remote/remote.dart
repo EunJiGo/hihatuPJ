@@ -18,7 +18,7 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent, // 상태바 배경 투명
         statusBarIconBrightness: Brightness.dark, // Android
-        statusBarBrightness: Brightness.light,    // iOS
+        statusBarBrightness: Brightness.light, // iOS
       ),
     );
   }
@@ -40,24 +40,43 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
 
           // 커스텀 AppBar
           Container(
-            height: kToolbarHeight,
-            color: Colors.pink,
-            alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: const Text(
-              '在宅勤務手当',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
+            height: kToolbarHeight, // 기본 AppBar의 높이를 나타내는 상수
+            decoration: BoxDecoration(
+              color: Color(0xFFfeaaa9),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(0), // 왼쪽 위는 직각
+                topRight: Radius.circular(0), // 오른쪽 위는 직각
+                bottomLeft: Radius.circular(20), // 왼쪽 아래만 둥글게
+                bottomRight: Radius.circular(20), // 오른쪽 아래만 둥글게
               ),
+            ),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // ✅ 가운데 제목
+                const Text(
+                  '在宅勤務手当',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+                ),
+                // ✅ 왼쪽 뒤로가기 버튼
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.arrow_back_ios),
+                    color: Colors.black, // 아이콘 색
+                  ),
+                ),
+              ],
             ),
           ),
 
           // 본문
-          const Expanded(
-            child: Center(child: Text('본문')),
-          ),
+          const Expanded(child: Center(child: Text('본문'))),
         ],
       ),
     );

@@ -914,7 +914,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                       DropdownOption.fromText(
                         '在宅勤務手当',
                         icon: FontAwesomeIcons.houseLaptop,
-                        iconColor: Color(0xFFfdab94),
+                        iconColor: Color(0xFFfeaaa9),
                       ),
                     ];
 
