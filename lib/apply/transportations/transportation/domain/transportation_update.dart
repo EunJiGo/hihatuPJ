@@ -8,9 +8,9 @@ class TransportationUpdate {
   final String? durationEnd;
 
   final DateTime date;
-  final String fromStation;
-  final String toStation;
-  final String railwayName;
+  final String? fromStation;
+  final String? toStation;
+  final String? railwayName;
   final String? image;
   final String? projectName;
   final String? via;
@@ -42,9 +42,9 @@ class TransportationUpdate {
     this.durationStart,
     this.durationEnd,
     this.payDay,
-    required this.fromStation,
-    required this.toStation,
-    required this.railwayName,
+    this.fromStation,
+    this.toStation,
+    this.railwayName,
     this.image,
     this.projectName,
     this.via,

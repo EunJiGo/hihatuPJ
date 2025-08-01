@@ -1,14 +1,14 @@
 class TransportationSave {
   final DateTime date;
   final String expenseType;
-  final String fromStation;
-  final String toStation;
+  final String? fromStation;
+  final String? toStation;
   final String? via;
   final bool twice;
-  final String railwayName;
+  final String? railwayName;
   final int? amount;
   final String? goals;
-  final String image;
+  final String? image;
   final String? durationStart;
   final String? durationEnd;
   final String? commuteDuration;
@@ -20,14 +20,14 @@ class TransportationSave {
   TransportationSave({
     required this.date,
     required this.expenseType,
-    required this.fromStation,
-    required this.toStation,
+    this.fromStation,
+    this.toStation,
     this.via,
     required this.twice,
-    required this.railwayName,
+    this.railwayName,
     this.amount,
     this.goals,
-    required this.image,
+    this.image,
     this.durationStart,
     this.durationEnd,
     this.commuteDuration,
@@ -48,8 +48,8 @@ class TransportationSave {
       "pay_day": todayStr,
       "goals": goals ?? "",
       "destination": "", // 임의 값 지정 railwayName
-      "railway_name": railwayName,
-      "from_station": fromStation,
+      "railway_name": railwayName ?? "",
+      "from_station": fromStation ?? "",
       "to_station": toStation,
       "from": "", // 누락된 항목 추가
       "to": "",   // 누락된 항목 추가
@@ -61,7 +61,7 @@ class TransportationSave {
       "duration_end": durationEnd,
       "pay_to": "",
       "amount": amount,
-      "image": image,
+      "image": image ?? "",
       "submission_status": submissionStatus,
       "review_status": reviewStatus ?? "",
       "update": false,

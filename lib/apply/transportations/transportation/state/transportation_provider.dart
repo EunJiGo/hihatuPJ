@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hihatu_project/apply/transportations/transportation/data/fetch_transportation.dart';
-import 'package:hihatu_project/apply/transportations/transportation/domian/transportation_item.dart';
+import 'package:hihatu_project/apply/transportations/transportation/domain/transportation_item.dart';
 
 import '../data/fetch_transportation_detail.dart';
-import '../domian/TransportationDetailResponse.dart';
+import '../domain/TransportationDetailResponse.dart';
 
 
 // API 호출을 위한 FutureProvider

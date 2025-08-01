@@ -6,7 +6,7 @@ import 'package:hihatu_project/apply/transportations/commuter/presentation/widge
 import 'package:hihatu_project/apply/transportations/commuter/presentation/widgets/commuter_image_upload.dart';
 import 'package:hihatu_project/apply/transportations/commuter/presentation/widgets/commuter_text_field.dart';
 import 'package:hihatu_project/apply/transportations/summary/widgets/form_label.dart';
-import 'package:hihatu_project/apply/transportations/transportation/domian/transportation_update.dart';
+import 'package:hihatu_project/apply/transportations/transportation/domain/transportation_update.dart';
 import 'package:hihatu_project/apply/transportations/transportation_screen.dart';
 import 'dart:io';
 
@@ -20,7 +20,7 @@ import '../../transportation/constants/transportation_transport_options.dart';
 import '../../transportation/data/fetch_image_upload.dart';
 import '../../transportation/data/fetch_transportation_delete.dart';
 import '../../transportation/data/fetch_transportation_save.dart';
-import '../../transportation/domian/transportation_save.dart';
+import '../../transportation/domain/transportation_save.dart';
 import '../../transportation/presentation/detail/widgets/transportation_image_upload.dart';
 import '../../transportation/state/transportation_provider.dart';
 
@@ -153,17 +153,26 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
       ) {
         if (mounted) {
           setState(() {
-            _departureController.text = detail.fromStation ?? '';
-            _arrivalController.text = detail.toStation ?? '';
-            _costController.text = detail.amount.toString() ?? '';
+            _departureController.text = detail.fromStation;
+            _arrivalController.text = detail.toStation;
+            _costController.text = detail.amount.toString();
             _selectedDate =
-                DateTime.tryParse(detail.durationStart ?? '') ?? DateTime.now();
-            _duration = _mapStringToDuration(detail.commuteDuration ?? '');
-            _transport = detail.railwayName ?? '';
-            _imageName = detail.image ?? '';
-            _submissionStatus = detail.submissionStatus ?? '';
+                DateTime.tryParse(detail.durationStart) ?? DateTime.now();
+            _duration = _mapStringToDuration(detail.commuteDuration);
+            final isPresetTransport = transportationTransportOptions.contains(detail.railwayName);
 
-            final viaString = detail.via ?? '';
+            if (isPresetTransport) {
+              _transport = detail.railwayName;
+              _customTransport = null;
+            } else {
+              _transport = 'その他'; // 드롭다운에 표시
+              _customTransport = detail.railwayName; // 입력 필드에 표시할 사용자 정의 값
+              _customTransportController.text = detail.railwayName;
+            }
+            _imageName = detail.image;
+            _submissionStatus = detail.submissionStatus;
+
+            final viaString = detail.via;
             if (viaString.isNotEmpty) {
               final splitVia = viaString.split('、');
               for (final via in splitVia) {
@@ -236,6 +245,7 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                         child: _submissionStatus == "submitted"
                                 ? DatePickerButton(
                           date: _selectedDate,
+                          isFullDate: true,
                           backgroundColor: Colors.grey.shade200, // 비활성화 스타일
                           borderRadius: 20,
                           shadowColor: const Color(0xFF8e8e8e),
@@ -245,17 +255,11 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                         )
                             :DatePickerButton(
                           date: _selectedDate,
+                          isFullDate: true,
                           backgroundColor: Colors.white,
                           borderRadius: 20,
                           shadowColor: const Color(0xFF8e8e8e),
                           onPick:  () async {
-                            print(
-                              'scope(hasFocus): ${FocusScope.of(context).hasFocus}',
-                            );
-                            print(
-                              'primaryFocus: ${FocusManager.instance.primaryFocus}',
-                            );
-
                             FocusManager.instance.primaryFocus?.unfocus();
 
                             final picked = await Navigator.push<DateTime>(
@@ -455,7 +459,7 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                       CommuterDropDown(
                         options: transportationTransportOptions,
                         answerStatus: _submissionStatus == 'submitted' ? 1 : 0, // 비활성화면 1 넣기
-                        selectedValue: _transport,
+                        selectedValue: transportationTransportOptions.contains(_transport) ? _transport : 'その他',
                         onChanged: (val) {
                           setState(() {
                             _transport = val ?? '';

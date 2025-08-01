@@ -5,6 +5,7 @@ class DatePickerButton extends StatelessWidget {
   const DatePickerButton({
     super.key,
     required this.date,
+    required this.isFullDate, // false = isYearMonthOnly
     required this.onPick,
     required this.borderRadius,
     required this.shadowColor,
@@ -12,6 +13,7 @@ class DatePickerButton extends StatelessWidget {
   });
 
   final DateTime date;
+  final bool isFullDate;
   final Future<DateTime?> Function() onPick; // 눌렀을 때 날짜를 받아오는 액션
   final double borderRadius;
   final Color shadowColor;
@@ -40,7 +42,7 @@ class DatePickerButton extends StatelessWidget {
         ),
         child: Center(
           child: Text(
-            '${date.year}年${date.month}月${date.day}日',
+            isFullDate == true ? '${date.year}年${date.month}月${date.day}日' : '${date.year}年 ${date.month}月' ,
             style: const TextStyle(
               fontSize: 16,
               color: Color(0xFF263238),

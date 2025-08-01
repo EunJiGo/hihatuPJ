@@ -3,7 +3,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hihatu_project/apply/transportations/commuter/presentation/commuter_screen.dart';
+import 'package:hihatu_project/apply/transportations/summary/widgets/remote_and_other_history.dart';
+import 'package:hihatu_project/apply/transportations/summary/widgets/transportation_history_list.dart';
+import 'package:hihatu_project/apply/transportations/summary/widgets/transportation_title_section.dart';
 import 'package:hihatu_project/apply/transportations/transportation/data/fetch_transportation_submit.dart';
+import 'package:hihatu_project/apply/transportations/transportation/domain/transportation_item.dart';
 import 'package:hihatu_project/apply/transportations/transportation/presentation/detail/transportation_detail_screen.dart';
 import 'package:hihatu_project/apply/transportations/summary/widgets/transportation_approval_status.dart';
 import 'package:intl/intl.dart';
@@ -12,10 +16,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../tabbar/htt_tabbar.dart';
 import '../../utils/dialog/attention_dialog.dart';
 import '../../utils/dialog/success_dialog.dart';
+import '../../utils/dialog/warning_dialog.dart';
 import '../../utils/widgets/common_submit_buttons.dart';
 import '../../utils/widgets/dropdown_option.dart';
 import '../../utils/widgets/modals/dropdown_modal_widget.dart';
-import '../remote/remote.dart';
+import '../remote/remoteScreen.dart';
 import 'transportation/state/transportation_provider.dart';
 
 // ➊ ConsumerStatefulWidget 으로 변경
@@ -40,6 +45,8 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
 
   bool showCommuteList = true;
   bool showSingleList = true;
+  bool showRemote = true;
+  bool showotherExpenseList = true;
 
   void moveMonth(int diff) {
     setState(() {
@@ -220,6 +227,28 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                   .toList();
 
           final singleTotal = singleList.fold(
+            0,
+            (sum, item) => sum + item.amount,
+          );
+
+          // 재택근무수당 -> 당월에 한개밖에 없음
+          final remoteList =
+              transportationItem
+                  .where((item) => item.expenseType == 'home_office_expenses')
+                  .toList();
+
+          final TransportationItem? remote =
+              remoteList.isNotEmpty ? remoteList.first : null;
+
+          final remoteTotal = remote?.amount ?? 0;
+
+          // 그 외 경비
+          final otherExpenseList =
+              transportationItem
+                  .where((item) => item.expenseType == 'travel')
+                  .toList();
+
+          final otherExpenseTotal = otherExpenseList.fold(
             0,
             (sum, item) => sum + item.amount,
           );
@@ -483,6 +512,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                   ),
                 ),
 
+                // 제출상황, 승인상태
                 StatusExplanation(),
 
                 const SizedBox(height: 10),
@@ -496,401 +526,197 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // 정기권 신청 내역
-                        Column(
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.confirmation_number,
-                                  color: Color(0xFF81C784),
-                                ),
-                                const SizedBox(width: 8),
-                                const Text(
-                                  '定期券申請履歴',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    // color: Color(0xFF004D40),
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                const Spacer(),
-                                IconButton(
-                                  icon: Icon(
-                                    showCommuteList
-                                        ? Icons.keyboard_arrow_down_rounded
-                                        : Icons.keyboard_arrow_up_rounded,
-                                    color: Colors.grey.shade700,
-                                    size: 24,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      showCommuteList = !showCommuteList;
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        if (commuteList.isEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10.0),
-                            child: const Text(
-                              '申請履歴がありません。',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          )
-                        else if (showCommuteList)
-                          ListView.builder(
-                            //shrinkWrap: true를 주면 ListView가 자식 위젯 크기에 맞춰 높이를 최소로 잡아줌
-                            // 대신 성능은 약간 떨어질 수 있으니 리스트 아이템 수가 많지 않을 때 권장
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            // 스크롤 안 되도록 (SingleChildScrollView 내에 있으므로)
-                            itemCount: commuteList.length,
-                            // transportationAsync 리스트에서  expenseType이 타입이 "commute"인 것만 그 길이
-                            itemBuilder: (context, index) {
-                              final item = commuteList[index];
-                              final parsedDate = DateTime.tryParse(
-                                item.updatedAt,
-                              );
-                              final dateText =
-                                  parsedDate != null
-                                      ? DateFormat('MM/dd').format(parsedDate)
-                                      : '-';
-
-                              return GestureDetector(
-                                onTap: () {
-                                  print('commute ID: ${item.id}');
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder:
-                                          (_) => CommuterScreen(
-                                            commuteId: item.id,
-                                          ),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  margin: const EdgeInsets.only(bottom: 12),
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(16),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
-                                        blurRadius: 6,
-                                        offset: const Offset(1, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.confirmation_number,
-                                            color: Color(0xFF81C784),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            commuteList[index].fromStation,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 5),
-                                          Icon(Icons.remove_rounded, size: 15),
-                                          const SizedBox(width: 5),
-                                          Text(
-                                            commuteList[index].toStation,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-                                          const Spacer(),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                '￥',
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 16,
-                                                  // color: Color(0xFF282828),
-                                                  color: Color(0xFF81C784),
-                                                ),
-                                              ),
-                                              Text(
-                                                formatCurrency(
-                                                  commuteList[index].amount,
-                                                ),
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 16,
-                                                  color: Color(0xFF424242),
-                                                  // color: Color(0xFF81C784),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.date_range,
-                                            size: 16,
-                                            color: Color(0xFFfe673e),
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            '申請日：$dateText',
-                                            style: const TextStyle(
-                                              fontSize: 13,
-                                              color: Color(0xFF515151),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 16),
-                                          const Icon(
-                                            Icons.timelapse,
-                                            size: 16,
-                                            color: Color(0xFFfa6a23),
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            formatCommuteDuration(
-                                              commuteList[index]
-                                                  .commuteDuration,
-                                            ),
-                                            style: const TextStyle(
-                                              fontSize: 13,
-                                              color: Color(0xFF515151),
-                                            ),
-                                          ),
-                                          const Spacer(),
-                                          getStatusIcon(
-                                            commuteList[index].submissionStatus,
-                                            commuteList[index].reviewStatus,
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                        if (commuteList.isNotEmpty) ...[
+                          TransportationTitleSection(
+                            icon: Icons.confirmation_number,
+                            iconColor: Color(0xFF81C784),
+                            title: '定期券の申請履歴',
+                            isExpanded: showCommuteList,
+                            isData: commuteList.isEmpty,
+                            onToggle: () {
+                              setState(
+                                () => showCommuteList = !showCommuteList,
                               );
                             },
                           ),
-                        const SizedBox(height: 30),
+
+                          if (showCommuteList)
+                            TransportationHistoryList(
+                              items:
+                                  commuteList
+                                      .map(
+                                        (item) => TransportationUiItem(
+                                          id: item.id!,
+                                          fromStation: item.fromStation,
+                                          toStation: item.toStation,
+                                          amount: item.amount,
+                                          isCommuter: true,
+                                          twice: false,
+                                          updatedAt: item.updatedAt,
+                                          commuteDuration: item.commuteDuration,
+                                          submissionStatus:
+                                              item.submissionStatus,
+                                          reviewStatus: item.reviewStatus,
+                                        ),
+                                      )
+                                      .toList(),
+                              onTap: (id) async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => CommuterScreen(commuteId: id),
+                                  ),
+                                );
+
+                                if (result == true) {
+                                  ref.invalidate(transportationProvider(currentMonth)); // ✅ 최신 데이터 가져오기
+                                }
+                              },
+
+                              getStatusIcon: getStatusIcon,
+
+                              // 🎨 스타일
+                              leadingIcon: Icons.confirmation_number,
+                              leadingIconColor: Color(0xFF81C784),
+                              amountColor: Color(0xFF81C784),
+                              separatorIconColor: Colors.black54,
+                            ),
+                        ],
 
                         // 교통비 신청 내역
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.directions_bus,
-                              color: Color(0xFFFFB74D),
-                            ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              '交通費申請履歴',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                // color: Color(0xFFBF360C),
-                                color: Colors.black,
-                              ),
-                            ),
-                            const Spacer(),
-                            IconButton(
-                              icon: Icon(
-                                showSingleList
-                                    ? Icons.keyboard_arrow_down_rounded
-                                    : Icons.keyboard_arrow_up_rounded,
-                                color: Colors.grey.shade700,
-                                size: 24,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  showSingleList = !showSingleList;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        if (singleList.isEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10.0),
-                            child: const Text(
-                              '申請履歴がありません。',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          )
-                        else if (showSingleList)
-                          ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            // 스크롤 안 되도록 (SingleChildScrollView 내에 있으므로)
-                            itemCount: singleList.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              final item = singleList[index];
-                              final parsedDate = DateTime.tryParse(
-                                item.updatedAt,
-                              );
-                              final dateText =
-                                  parsedDate != null
-                                      ? DateFormat('MM/dd').format(parsedDate)
-                                      : '-';
-
-                              return GestureDetector(
-                                onTap: () {
-                                  print('single ID: ${item.id}');
-                                  Navigator.push(
+                        if (singleList.isNotEmpty) ...[
+                          TransportationTitleSection(
+                            icon: Icons.directions_bus,
+                            iconColor: Color(0xFFFFB74D),
+                            title: '交通費の申請履歴',
+                            isExpanded: showSingleList,
+                            isData: singleList.isEmpty,
+                            onToggle: () {
+                              setState(() => showSingleList = !showSingleList);
+                            },
+                          ),
+                          if (showSingleList)
+                            TransportationHistoryList(
+                              items:
+                                  singleList
+                                      .map(
+                                        (item) => TransportationUiItem(
+                                          id: item.id!,
+                                          fromStation: item.fromStation,
+                                          toStation: item.toStation,
+                                          amount: item.amount,
+                                          isCommuter: false,
+                                          twice: item.twice,
+                                          updatedAt: item.updatedAt,
+                                          goals: item.goals,
+                                          submissionStatus:
+                                              item.submissionStatus,
+                                          reviewStatus: item.reviewStatus,
+                                        ),
+                                      )
+                                      .toList(),
+                              onTap:
+                                  (id) => Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder:
                                           (_) => TransportationInputScreen(
-                                            transportationId: item.id,
+                                            transportationId: id,
                                           ),
                                     ),
-                                  );
-                                },
-                                child: Container(
-                                  margin: const EdgeInsets.only(bottom: 12),
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(16),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
-                                        blurRadius: 6,
-                                        offset: const Offset(1, 2),
-                                      ),
-                                    ],
                                   ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.directions_bus,
-                                            color: Color(0xFFFFB74D),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            singleList[index].fromStation,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          singleList[index].twice
-                                              ? Icon(
-                                                Icons.repeat,
-                                                size: 20,
-                                                color: Color(0xFF0125f3),
-                                              )
-                                              : Icon(
-                                                Icons.arrow_right_alt,
-                                                size: 18,
-                                                color: Color(0xFFf30101),
-                                              ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            singleList[index].toStation,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-                                          const Spacer(),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                '￥',
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 16,
-                                                  // color: Color(0xFF282828),
-                                                  color: Color(0xFFFFB74D),
-                                                ),
-                                              ),
-                                              Text(
-                                                formatCurrency(
-                                                  singleList[index].amount,
-                                                ),
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 16,
-                                                  color: Color(0xFF424242),
-                                                  // color: Color(0xFF81C784),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 10),
+                              getStatusIcon: getStatusIcon,
 
-                                      Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.date_range,
-                                            size: 16,
-                                            color: Color(0xFFfe673e),
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            '申請日：$dateText',
-                                            style: const TextStyle(
-                                              fontSize: 13,
-                                              color: Color(0xFF515151),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 16),
-                                          const Icon(
-                                            Icons.info_outline,
-                                            size: 14,
-                                            color: Color(0xFF5b0075),
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            singleList[index].goals ?? '-',
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Color(0xFF515151),
-                                            ),
-                                          ),
-                                          const Spacer(),
-                                          getStatusIcon(
-                                            singleList[index].submissionStatus,
-                                            singleList[index].reviewStatus,
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
+                              // 🎨 스타일
+                              leadingIcon: Icons.directions_bus,
+                              leadingIconColor: Color(0xFFFFB74D),
+                              amountColor: Color(0xFFFFB74D),
+                              separatorIconColor: Color(0xFFf30101),
+                            ),
+                        ],
+
+                        // 재택 수당 신청 내역
+                        if (remote != null) ...[
+                          TransportationTitleSection(
+                            icon: FontAwesomeIcons.houseLaptop,
+                            iconColor: Color(0xFFfeaaa9),
+                            iconSize: 22,
+                            title: '在宅勤務手当の申請履歴',
+                            isExpanded: showRemote,
+                            isData: singleList.isEmpty,
+                            gap: 15,
+                            onToggle: () {
+                              setState(() => showRemote = !showRemote);
                             },
                           ),
 
+                          if(showRemote)
+                            RemoteAndOtherItemHistoryList(
+                              items: remoteList.map((item) => RemoteAndOtherItem(
+                                id: item.id!,
+                                isRemote: true,
+                                amount: item.amount,
+                                updatedAt: item.updatedAt,
+                                goals: item.goals,
+                                submissionStatus: item.submissionStatus,
+                                reviewStatus: item.reviewStatus,
+                              ),).toList(),
+                              onTap:
+                                  (id) => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => RemoteScreen(),
+                                ),
+                              ),
+                              getStatusIcon: getStatusIcon,
+                              leadingIcon: FontAwesomeIcons.houseLaptop,
+                              leadingIconColor: Color(0xFFfeaaa9),
+                              amountColor: Color(0xFFfeaaa9),
+                              separatorIconColor: Color(0xFFf30101),
+                            ),
+                        ],
+
+                        // 그 외 경비 신청 내역
+                        if (otherExpenseList.isNotEmpty) ...[
+                          TransportationTitleSection(
+                            // icon: FontAwesomeIcons.sackDollar,
+                            icon: Icons.receipt_long,
+                            iconColor: Color(0xFF89e6f4),
+                            iconSize: 25,
+                            title: '立替金の申請履歴',
+                            isExpanded: showotherExpenseList,
+                            isData: singleList.isEmpty,
+                            gap: 8,
+                            onToggle: () {
+                              setState(() => showotherExpenseList = !showotherExpenseList);
+                            },
+                          ),
+
+                          if(showotherExpenseList)
+                            RemoteAndOtherItemHistoryList(
+                              items: otherExpenseList.map((item) => RemoteAndOtherItem(
+                                id: item.id!,
+                                isRemote: false,
+                                amount: item.amount,
+                                updatedAt: item.updatedAt,
+                                goals: item.goals,
+                                submissionStatus: item.submissionStatus,
+                                reviewStatus: item.reviewStatus,
+                              ),).toList(),
+                              onTap:
+                                  (id) => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => RemoteScreen(),
+                                ),
+                              ),
+                              getStatusIcon: getStatusIcon,
+                              leadingIcon: Icons.receipt_long,
+                              leadingIconColor: Color(0xFF89e6f4),
+                              amountColor: Color(0xFF89e6f4),
+                              separatorIconColor: Color(0xFFf30101),
+                            ),
+                        ],
                         const SizedBox(height: 10),
                       ],
                     ),
@@ -939,12 +765,20 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                             ),
                           );
                         } else if (val == '在宅勤務手当') {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const RemoteScreen(),
-                            ),
-                          );
+                          if (remote != null) {
+                            warningDialog(
+                              context,
+                              'エラー',
+                              '在宅勤務手当は月に1回まで申請できます。',
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const RemoteScreen(),
+                              ),
+                            );
+                          }
                         }
                       },
                       selectedTextColor: const Color(0xFF1565C0),
@@ -995,23 +829,6 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
     final icon = getStatusText(submissionStatus, reviewStatus);
 
     if (submissionStatus == 'draft') {
-      // return Transform.rotate(
-      //   angle: math.pi / 4, // 45도 회전
-      //   child: icon,
-      // );
-      // return AnimatedBuilder(
-      //   animation: _animationController!,
-      //   builder: (context, child) {
-      //     // // -45도 ~ +45도 사이를 왔다갔다
-      //     // final angle = math.sin(_animationController!.value * 2 * math.pi) * (math.pi / 4);
-      //     // 좌우로 20도만 흔들기 => 20도 = pi / 9  // 36은 5도
-      //     final angle = math.sin(_animationController!.value * 2 * math.pi) * (math.pi / 56);
-      //     return Transform.rotate(
-      //       angle: angle,
-      //       child: icon,
-      //     );
-      //   },
-      // );
       return AnimatedBuilder(
         animation: _animationController!,
         builder: (context, child) {

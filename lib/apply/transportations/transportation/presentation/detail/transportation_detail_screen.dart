@@ -15,13 +15,13 @@ import '../../../summary/widgets/date_picker_button.dart';
 import '../../data/fetch_image_upload.dart';
 import '../../data/fetch_transportation_delete.dart';
 import '../../data/fetch_transportation_save.dart';
-import '../../domian/transportation_update.dart';
+import '../../domain/transportation_update.dart';
 import '../../state/transportation_provider.dart';
 import 'widgets/transportation_drop_down.dart';
 import 'widgets/transportation_text_field.dart';
 import '../../constants/transportation_purpose_options.dart';
 import '../../constants/transportation_transport_options.dart';
-import '../../domian/transportation_save.dart';
+import '../../domain/transportation_save.dart';
 import '../../../summary/widgets/calendar_screen.dart';
 
 class TransportationInputScreen extends ConsumerStatefulWidget {
@@ -69,34 +69,51 @@ class _TransportationInputScreenState
   void initState() {
     super.initState();
     final transportationId = widget.transportationId;
-    print('initState transportationId ${transportationId}');
+    print('initState transportationId $transportationId');
     if (transportationId != null) {
       ref.read(transportationDetailProvider(transportationId).future).then((
         detail,
       ) {
         if (mounted) {
           setState(() {
-            _departureController.text = detail.fromStation ?? '';
-            _arrivalController.text = detail.toStation ?? '';
-            _costController.text = detail.amount.toString() ?? '';
+            _departureController.text = detail.fromStation;
+            _arrivalController.text = detail.toStation;
+            _costController.text = detail.amount.toString();
             _selectedDate =
-                DateTime.tryParse(detail.durationStart ?? '') ?? DateTime.now();
-            _transport = detail.railwayName ?? '';
-            _imageName = detail.image ?? '';
-            _submissionStatus = detail.submissionStatus ?? '';
+                DateTime.tryParse(detail.durationStart) ?? DateTime.now();
+
+            final isPresetTransport = transportationTransportOptions.contains(detail.railwayName);
+            if (isPresetTransport) {
+              _transport = detail.railwayName;
+              _customTransport = null;
+            } else {
+              _transport = 'その他'; // 드롭다운에 표시
+              _customTransport = detail.railwayName; // 입력 필드에 표시할 사용자 정의 값
+              _customTransportController.text = detail.railwayName;
+            }
+
+            final isPresetPurpose = transportationTransportOptions.contains(detail.goals);
+            if (isPresetPurpose) {
+              _purpose = detail.goals;
+              _customPurpose = null;
+            } else {
+              _purpose = 'その他'; // 드롭다운에 표시
+              _customPurpose = detail.goals; // 입력 필드에 표시할 사용자 정의 값
+              _customPurposeController.text = detail.goals;
+            }
+
+            _imageName = detail.image;
+            _submissionStatus = detail.submissionStatus;
 
             // 추가된 상태 업데이트 (CommuterScreen 스타일)
-            _departure = detail.fromStation ?? '';
-            _arrival = detail.toStation ?? '';
-            _cost = detail.amount ?? 0;
-            _roundTrip = detail.twice ?? false;
+            _departure = detail.fromStation;
+            _arrival = detail.toStation;
+            _cost = detail.amount;
+            _roundTrip = detail.twice;
           });
         }
       });
     }
-    print('-------------');
-    print(_imageName);
-    print('-------------');
   }
 
   @override
@@ -157,6 +174,7 @@ class _TransportationInputScreenState
                               _submissionStatus == "submitted"
                                   ? DatePickerButton(
                                     date: _selectedDate,
+                                isFullDate: true,
                                     backgroundColor: Colors.grey.shade200,
                                     // 비활성화 스타일
                                     borderRadius: 20,
@@ -167,6 +185,7 @@ class _TransportationInputScreenState
                                   )
                                   : DatePickerButton(
                                     date: _selectedDate,
+                                isFullDate: true,
                                     backgroundColor: Colors.white,
                                     borderRadius: 20,
                                     shadowColor: const Color(0xFF8e8e8e),
@@ -308,7 +327,7 @@ class _TransportationInputScreenState
                               _submissionStatus == 'submitted'
                                   ? 1
                                   : 0, // 비활성화면 1 넣기
-                          selectedValue: _transport,
+                          selectedValue: transportationTransportOptions.contains(_transport) ? _transport : 'その他',
                           onChanged: (val) {
                             setState(() {
                               _transport = val ?? '';
@@ -373,7 +392,7 @@ class _TransportationInputScreenState
                               _submissionStatus == 'submitted'
                                   ? 1
                                   : 0, // 비활성화면 1 넣기
-                          selectedValue: _purpose,
+                          selectedValue: transportationPurposeOptions.contains(_purpose) ? _purpose : 'その他',
                           onChanged: (val) {
                             setState(() {
                               _purpose = val ?? '';
@@ -414,7 +433,7 @@ class _TransportationInputScreenState
                             focusNode: FocusNode(),
                             imagePath: _imageName,
                             themeColor: const Color(0xFFfea643),
-                            shadowColor: const Color(0x33FEA643),
+                            shadowColor: const Color(0xFFfea643),
                             isDisabled:
                                 _submissionStatus == 'submitted'
                                     ? true
@@ -480,6 +499,10 @@ class _TransportationInputScreenState
                                           _transport == 'その他'
                                               ? (_customTransport ?? '')
                                               : _transport,
+                                  goals:
+                                  _purpose == 'その他'
+                                      ? (_customPurpose ?? '')
+                                      : _purpose,
                                       amount: int.tryParse(
                                         _costController.text.trim(),
                                       ),
@@ -515,6 +538,10 @@ class _TransportationInputScreenState
                                           _transport == 'その他'
                                               ? (_customTransport ?? '')
                                               : _transport,
+                                  goals:
+                                  _purpose == 'その他'
+                                      ? (_customPurpose ?? '')
+                                      : _purpose,
                                       image: _imageName ?? '',
                                       submissionStatus: 'draft',
                                       reviewStatus: '',
