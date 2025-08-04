@@ -561,13 +561,14 @@ class _TransportationInputScreenState
                                   '保存完了',
                                   '交通費保存が完了しました。',
                                 );
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => TransportationScreen(initialDate: _selectedDate,),
-                                  ),
-                                  (route) => false,
-                                );
+                                // Navigator.pushAndRemoveUntil(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //     builder: (_) => TransportationScreen(initialDate: _selectedDate,),
+                                //   ),
+                                //   (route) => false,
+                                // );
+                                Navigator.pop(context, true);
                               } else {
                                 attentionDialog(
                                   context,

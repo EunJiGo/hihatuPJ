@@ -51,10 +51,13 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
   bool showOtherExpenseList = true;
 
   void moveMonth(int diff) {
+    final newMonth = DateTime(currentMonth.year, currentMonth.month + diff);
     setState(() {
-      currentMonth = DateTime(currentMonth.year, currentMonth.month + diff);
+      currentMonth = newMonth;
     });
+    ref.invalidate(transportationProvider(newMonth));
   }
+
 
   void _scrollListener() {
     final offset = _scrollController.offset;
@@ -139,7 +142,8 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
           Padding(
             padding: const EdgeInsets.only(right: 12.0),
             child: ElevatedButton(
-              onPressed: () => setState(() => currentMonth = DateTime.now()),
+              // onPressed: () => setState(() => currentMonth = DateTime.now()),
+              onPressed: () => moveMonth(0),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
@@ -158,19 +162,10 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
               ),
               child: Ink(
                 decoration: BoxDecoration(
-                  // gradient: const LinearGradient(
-                  //   colors: [Color(0xFF81C784), Color(0xFF4DB6AC)],
-                  //   begin: Alignment.bottomCenter,
-                  //   end: Alignment.topCenter,
-                  // ),
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: Container(
                   alignment: Alignment.center,
-                  // constraints: const BoxConstraints(
-                  //   minWidth: 50,
-                  //   minHeight: 30,
-                  // ),
                   child: const Text(
                     '今月',
                     style: TextStyle(
@@ -619,16 +614,28 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                                         ),
                                       )
                                       .toList(),
-                              onTap:
-                                  (id) => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder:
-                                          (_) => TransportationInputScreen(
-                                            transportationId: id,
-                                          ),
-                                    ),
+                              // onTap:
+                              //     (id) => Navigator.push(
+                              //       context,
+                              //       MaterialPageRoute(
+                              //         builder:
+                              //             (_) => TransportationInputScreen(
+                              //               transportationId: id,
+                              //             ),
+                              //       ),
+                              //     ),
+                              onTap: (id) async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => TransportationInputScreen(transportationId: id),
                                   ),
+                                );
+
+                                if (result == true) {
+                                  ref.invalidate(transportationProvider(currentMonth));
+                                }
+                              },
                               getStatusIcon: getStatusIcon,
 
                               // 🎨 스타일
