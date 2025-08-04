@@ -57,7 +57,7 @@ class _TransportationInputScreenState
   String _transport = '電車';
   String? _customTransport;
   bool _roundTrip = false;
-  String _purpose = '出勤';
+  String _purpose = '通勤';
   String? _customPurpose;
   final _costController = TextEditingController();
   int? _cost;
@@ -92,7 +92,7 @@ class _TransportationInputScreenState
               _customTransportController.text = detail.railwayName;
             }
 
-            final isPresetPurpose = transportationTransportOptions.contains(detail.goals);
+            final isPresetPurpose = transportationPurposeOptions.contains(detail.goals);
             if (isPresetPurpose) {
               _purpose = detail.goals;
               _customPurpose = null;
@@ -433,7 +433,7 @@ class _TransportationInputScreenState
                             focusNode: FocusNode(),
                             imagePath: _imageName,
                             themeColor: const Color(0xFFfea643),
-                            shadowColor: const Color(0xFFfea643),
+                            shadowColor: const Color(0xFFfdf1e6),
                             isDisabled:
                                 _submissionStatus == 'submitted'
                                     ? true
@@ -547,6 +547,8 @@ class _TransportationInputScreenState
                                       reviewStatus: '',
                                     );
 
+                            print('input transportation detail _selectedDate : ${_selectedDate}');
+
                             if (widget.transportationId == null) {
                               final success = await fetchTransportationSaveUpload(
                                 saveData as TransportationSave?,
@@ -558,7 +560,7 @@ class _TransportationInputScreenState
                                 print('_imageFile : ${_imageFile}');
                                 await successDialog(
                                   context,
-                                  '保存完了',
+                                  '保存 完了',
                                   '交通費保存が完了しました。',
                                 );
                                 // Navigator.pushAndRemoveUntil(
@@ -568,7 +570,7 @@ class _TransportationInputScreenState
                                 //   ),
                                 //   (route) => false,
                                 // );
-                                Navigator.pop(context, true);
+                                Navigator.pop(context, _selectedDate);
                               } else {
                                 attentionDialog(
                                   context,
@@ -589,13 +591,16 @@ class _TransportationInputScreenState
                                   '保存完了',
                                   '交通費保存が完了しました。',
                                 );
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => TransportationScreen(initialDate: _selectedDate,),
-                                  ),
-                                  (route) => false,
-                                );
+                                print('update transportation detail _selectedDate : ${_selectedDate}');
+                                // Navigator.pushAndRemoveUntil(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //     builder: (_) => TransportationScreen(initialDate: _selectedDate,),
+                                //   ),
+                                //   (route) => false,
+                                // );
+                                // print('update transportation detail _selectedDate : ${_selectedDate}');
+                                Navigator.pop(context, _selectedDate);
                               } else {
                                 warningDialog(context, 'エラー', '交通費保存に失敗しました。');
                               }

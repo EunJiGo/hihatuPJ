@@ -58,7 +58,6 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
     ref.invalidate(transportationProvider(newMonth));
   }
 
-
   void _scrollListener() {
     final offset = _scrollController.offset;
 
@@ -101,6 +100,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
 
   @override
   Widget build(BuildContext context) {
+    print('build');
     // ➌ Riverpod provider 구독
     final transportationAsync = ref.watch(transportationProvider(currentMonth));
     // final ym = DateFormat('yyyy年 MM月').format(currentMonth); // 7월이면 07월이됨
@@ -144,22 +144,23 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
             child: ElevatedButton(
               // onPressed: () => setState(() => currentMonth = DateTime.now()),
               onPressed: () => moveMonth(0),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                shadowColor: Colors.transparent,
-              ).copyWith(
-                overlayColor: WidgetStateProperty.all(
-                  Colors.transparent,
-                ), // 👈 요게 핵심! (터치 시 회색/물결 효과 제거)
-              ),
+              style:
+                  ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    shadowColor: Colors.transparent,
+                  ).copyWith(
+                    overlayColor: WidgetStateProperty.all(
+                      Colors.transparent,
+                    ), // 👈 요게 핵심! (터치 시 회색/물결 효과 제거)
+                  ),
               child: Ink(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(50),
@@ -209,10 +210,9 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
 
           // transportationItem에서 "commute" 타입 필터링
           // 정기권
-          final commuteList =
-              transportationItem
-                  .where((item) => item.expenseType == 'commute')
-                  .toList();
+          final commuteList = transportationItem
+              .where((item) => item.expenseType == 'commute')
+              .toList();
 
           final commuteTotal = commuteList.fold(
             0,
@@ -220,10 +220,9 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
           );
 
           // 교통비
-          final singleList =
-              transportationItem
-                  .where((item) => item.expenseType == 'single')
-                  .toList();
+          final singleList = transportationItem
+              .where((item) => item.expenseType == 'single')
+              .toList();
 
           final singleTotal = singleList.fold(
             0,
@@ -231,21 +230,20 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
           );
 
           // 재택근무수당 -> 당월에 한개밖에 없음
-          final remoteList =
-              transportationItem
-                  .where((item) => item.expenseType == 'home_office_expenses')
-                  .toList();
+          final remoteList = transportationItem
+              .where((item) => item.expenseType == 'home_office_expenses')
+              .toList();
 
-          final TransportationItem? remote =
-              remoteList.isNotEmpty ? remoteList.first : null;
+          final TransportationItem? remote = remoteList.isNotEmpty
+              ? remoteList.first
+              : null;
 
           final remoteTotal = remote?.amount ?? 0;
 
           // 그 외 경비
-          final otherExpenseList =
-              transportationItem
-                  .where((item) => item.expenseType == 'travel')
-                  .toList();
+          final otherExpenseList = transportationItem
+              .where((item) => item.expenseType == 'travel')
+              .toList();
 
           final otherExpenseTotal = otherExpenseList.fold(
             0,
@@ -267,22 +265,23 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                       // 이전 달 버튼 (내부 그라데이션 유지, 주변 그림자 제거)
                       ElevatedButton(
                         onPressed: () => moveMonth(-1),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 10,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          backgroundColor: Colors.transparent,
-                          elevation: 0,
-                          shadowColor: Colors.transparent,
-                        ).copyWith(
-                          overlayColor: WidgetStateProperty.all(
-                            Colors.transparent,
-                          ), // 👈 요게 핵심! (터치 시 회색/물결 효과 제거)
-                        ),
+                        style:
+                            ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 10,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              backgroundColor: Colors.transparent,
+                              elevation: 0,
+                              shadowColor: Colors.transparent,
+                            ).copyWith(
+                              overlayColor: WidgetStateProperty.all(
+                                Colors.transparent,
+                              ), // 👈 요게 핵심! (터치 시 회색/물결 효과 제거)
+                            ),
                         child: Ink(
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
@@ -330,22 +329,23 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                       // 다음 달 버튼 (내부 그라데이션 유지, 주변 그림자 제거)
                       ElevatedButton(
                         onPressed: () => moveMonth(1),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 10,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          backgroundColor: Colors.transparent,
-                          elevation: 0,
-                          shadowColor: Colors.transparent,
-                        ).copyWith(
-                          overlayColor: WidgetStateProperty.all(
-                            Colors.transparent,
-                          ),
-                        ),
+                        style:
+                            ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 10,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              backgroundColor: Colors.transparent,
+                              elevation: 0,
+                              shadowColor: Colors.transparent,
+                            ).copyWith(
+                              overlayColor: WidgetStateProperty.all(
+                                Colors.transparent,
+                              ),
+                            ),
                         child: Ink(
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
@@ -541,34 +541,41 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
 
                           if (showCommuteList)
                             TransportationHistoryList(
-                              items:
-                                  commuteList
-                                      .map(
-                                        (item) => TransportationUiItem(
-                                          id: item.id!,
-                                          fromStation: item.fromStation,
-                                          toStation: item.toStation,
-                                          amount: item.amount,
-                                          isCommuter: true,
-                                          twice: false,
-                                          updatedAt: item.updatedAt,
-                                          commuteDuration: item.commuteDuration,
-                                          submissionStatus:
-                                              item.submissionStatus,
-                                          reviewStatus: item.reviewStatus,
-                                        ),
-                                      )
-                                      .toList(),
+                              items: commuteList
+                                  .map(
+                                    (item) => TransportationUiItem(
+                                      id: item.id!,
+                                      fromStation: item.fromStation,
+                                      toStation: item.toStation,
+                                      amount: item.amount,
+                                      isCommuter: true,
+                                      twice: false,
+                                      updatedAt: item.updatedAt,
+                                      commuteDuration: item.commuteDuration,
+                                      submissionStatus: item.submissionStatus,
+                                      reviewStatus: item.reviewStatus,
+                                    ),
+                                  )
+                                  .toList(),
                               onTap: (id) async {
-                                final result = await Navigator.push(
+                                final result = await Navigator.push<DateTime?>(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => CommuterScreen(commuteId: id),
+                                    builder: (_) =>
+                                        CommuterScreen(commuteId: id),
                                   ),
                                 );
 
-                                if (result == true) {
-                                  ref.invalidate(transportationProvider(currentMonth)); // ✅ 최신 데이터 가져오기
+                                if (result != null) {
+                                  setState(() {
+                                    currentMonth = DateTime(
+                                      result.year,
+                                      result.month,
+                                    );
+                                  });
+                                  ref.invalidate(
+                                    transportationProvider(currentMonth),
+                                  );
                                 }
                               },
 
@@ -596,44 +603,42 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                           ),
                           if (showSingleList)
                             TransportationHistoryList(
-                              items:
-                                  singleList
-                                      .map(
-                                        (item) => TransportationUiItem(
-                                          id: item.id!,
-                                          fromStation: item.fromStation,
-                                          toStation: item.toStation,
-                                          amount: item.amount,
-                                          isCommuter: false,
-                                          twice: item.twice,
-                                          updatedAt: item.updatedAt,
-                                          goals: item.goals,
-                                          submissionStatus:
-                                              item.submissionStatus,
-                                          reviewStatus: item.reviewStatus,
-                                        ),
-                                      )
-                                      .toList(),
-                              // onTap:
-                              //     (id) => Navigator.push(
-                              //       context,
-                              //       MaterialPageRoute(
-                              //         builder:
-                              //             (_) => TransportationInputScreen(
-                              //               transportationId: id,
-                              //             ),
-                              //       ),
-                              //     ),
+                              items: singleList
+                                  .map(
+                                    (item) => TransportationUiItem(
+                                      id: item.id!,
+                                      fromStation: item.fromStation,
+                                      toStation: item.toStation,
+                                      amount: item.amount,
+                                      isCommuter: false,
+                                      twice: item.twice,
+                                      updatedAt: item.updatedAt,
+                                      goals: item.goals,
+                                      submissionStatus: item.submissionStatus,
+                                      reviewStatus: item.reviewStatus,
+                                    ),
+                                  )
+                                  .toList(),
                               onTap: (id) async {
-                                final result = await Navigator.push(
+                                final result = await Navigator.push<DateTime?>(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => TransportationInputScreen(transportationId: id),
+                                    builder: (_) => TransportationInputScreen(
+                                      transportationId: id,
+                                    ),
                                   ),
                                 );
 
-                                if (result == true) {
-                                  ref.invalidate(transportationProvider(currentMonth));
+                                if (result != null) {
+                                  setState(() {
+                                    currentMonth = DateTime(
+                                      result.year,
+                                      result.month,
+                                    );
+                                  });
+                                  ref.invalidate(
+                                    transportationProvider(currentMonth),
+                                  );
                                 }
                               },
                               getStatusIcon: getStatusIcon,
@@ -661,19 +666,22 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                             },
                           ),
 
-                          if(showRemote)
+                          if (showRemote)
                             RemoteAndOtherItemHistoryList(
-                              items: remoteList.map((item) => RemoteAndOtherItem(
-                                id: item.id!,
-                                isRemote: true,
-                                amount: item.amount,
-                                updatedAt: item.updatedAt,
-                                goals: item.goals,
-                                submissionStatus: item.submissionStatus,
-                                reviewStatus: item.reviewStatus,
-                              ),).toList(),
-                              onTap:
-                                  (id) => Navigator.push(
+                              items: remoteList
+                                  .map(
+                                    (item) => RemoteAndOtherItem(
+                                      id: item.id!,
+                                      isRemote: true,
+                                      amount: item.amount,
+                                      updatedAt: item.updatedAt,
+                                      goals: item.goals,
+                                      submissionStatus: item.submissionStatus,
+                                      reviewStatus: item.reviewStatus,
+                                    ),
+                                  )
+                                  .toList(),
+                              onTap: (id) => Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => RemoteScreen(),
@@ -699,23 +707,29 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                             isData: singleList.isEmpty,
                             gap: 8,
                             onToggle: () {
-                              setState(() => showOtherExpenseList = !showOtherExpenseList);
+                              setState(
+                                () => showOtherExpenseList =
+                                    !showOtherExpenseList,
+                              );
                             },
                           ),
 
-                          if(showOtherExpenseList)
+                          if (showOtherExpenseList)
                             RemoteAndOtherItemHistoryList(
-                              items: otherExpenseList.map((item) => RemoteAndOtherItem(
-                                id: item.id!,
-                                isRemote: false,
-                                amount: item.amount,
-                                updatedAt: item.updatedAt,
-                                goals: item.goals,
-                                submissionStatus: item.submissionStatus,
-                                reviewStatus: item.reviewStatus,
-                              ),).toList(),
-                              onTap:
-                                  (id) => Navigator.push(
+                              items: otherExpenseList
+                                  .map(
+                                    (item) => RemoteAndOtherItem(
+                                      id: item.id!,
+                                      isRemote: false,
+                                      amount: item.amount,
+                                      updatedAt: item.updatedAt,
+                                      goals: item.goals,
+                                      submissionStatus: item.submissionStatus,
+                                      reviewStatus: item.reviewStatus,
+                                    ),
+                                  )
+                                  .toList(),
+                              onTap: (id) => Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => RemoteScreen(),
@@ -760,34 +774,60 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                       context: context,
                       options: options,
                       selectedValue: null,
-                      onSelected: (val) {
+                      onSelected: (val) async {
                         if (val == '定期券申請') {
-                          Navigator.push(
+                          final result = await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (_) => const CommuterScreen(),
                             ),
                           );
+                          print('aaaa: $result');
+                          if (result != null && result is DateTime) {
+                            setState(() {
+                              currentMonth = DateTime(
+                                result.year,
+                                result.month,
+                              );
+                            });
+                            ref.invalidate(
+                              transportationProvider(currentMonth),
+                            );
+                          }
                         } else if (val == '交通費申請') {
-                          Navigator.push(
+                          final result = await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (_) => const TransportationInputScreen(),
                             ),
                           );
-                        } else if (val == '在宅勤務手当') {
-                          if (remote != null) {
-                            warningDialog(
-                              context,
-                              'エラー',
-                              '在宅勤務手当は月に1回まで申請できます。',
+                          if (result != null && result is DateTime) {
+                            setState(() {
+                              currentMonth = DateTime(
+                                result.year,
+                                result.month,
+                              );
+                            });
+                            ref.invalidate(
+                              transportationProvider(currentMonth),
                             );
-                          } else {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const RemoteScreen(),
-                              ),
+                          }
+                        } else if (val == '在宅勤務手当') {
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const RemoteScreen(),
+                            ),
+                          );
+                          if (result != null && result is DateTime) {
+                            setState(() {
+                              currentMonth = DateTime(
+                                result.year,
+                                result.month,
+                              );
+                            });
+                            ref.invalidate(
+                              transportationProvider(currentMonth),
                             );
                           }
                         }
@@ -810,7 +850,8 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => TransportationScreen(initialDate: currentMonth,),
+                          builder: (_) =>
+                              TransportationScreen(initialDate: currentMonth),
                         ),
                         (route) => false,
                       );

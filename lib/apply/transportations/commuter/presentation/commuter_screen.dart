@@ -677,13 +677,14 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                                 '保存完了',
                                 '交通費保存が完了しました。',
                               );
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => TransportationScreen(initialDate: _selectedDate,),
-                                ),
-                                (route) => false,
-                              );
+                              // Navigator.pushAndRemoveUntil(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (_) => TransportationScreen(initialDate: _selectedDate,),
+                              //   ),
+                              //   (route) => false,
+                              // );
+                              Navigator.pop(context, _selectedDate);
                             } else {
                               attentionDialog(
                                 context,
@@ -704,13 +705,14 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                                 '保存完了',
                                 '交通費保存が完了しました。',
                               );
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => TransportationScreen(initialDate: _selectedDate,),
-                                ),
-                                (route) => false,
-                              );
+                              // Navigator.pushAndRemoveUntil(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (_) => TransportationScreen(initialDate: _selectedDate,),
+                              //   ),
+                              //   (route) => false,
+                              // );
+                              Navigator.pop(context, _selectedDate);
                             } else {
                               warningDialog(context, 'エラー', '交通費保存に失敗しました。');
                             }

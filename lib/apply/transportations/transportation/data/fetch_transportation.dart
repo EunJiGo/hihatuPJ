@@ -12,8 +12,10 @@ Future<List<TransportationItem>> fetchTransportation(int year, int month) async 
     'month': month.toString(),
   });
 
-  print('url');
-  print(url);
+  print('fetchTransportation url : ${url}');
+  print('fetchTransportation year : ${year}');
+  print('fetchTransportation month : ${month}');
+
   final response = await http.get(
     url,
     headers: {

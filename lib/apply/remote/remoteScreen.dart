@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hihatu_project/apply/remote/widgets/remoteAllowanceRulesRadioColumn.dart';
+import 'package:hihatu_project/apply/remote/widgets/show_year_month_picker.dart';
 import 'package:hihatu_project/apply/transportations/summary/widgets/form_label.dart';
 
 import '../../utils/dialog/attention_dialog.dart';
@@ -31,6 +32,7 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
   Map<String, dynamic> _remoteAllowanceRule = remoteAllowanceRules[0];
   int? _cost;
   String? _submissionStatus;
+  DateTime _selectedDate = DateTime.now();
 
 
   @override
@@ -62,7 +64,17 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
 
   @override
   Widget build(BuildContext context) {
-    DateTime _selectedDate = DateTime.now();
+    final transportationAsync = ref.watch(transportationProvider(_selectedDate));
+    bool isRemoteExists = false;
+
+    if (transportationAsync.hasValue) {
+      final items = transportationAsync.value!;
+      isRemoteExists = items.any((item) => item.expenseType == 'home_office_expenses');
+    }
+
+    print('isRemoteExists: $isRemoteExists');
+
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -138,7 +150,13 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
                               borderRadius: 20,
                               shadowColor: const Color(0xFF8e8e8e),
                               onPick: () async {
-                                return _selectedDate; // 그냥 현재 날짜 리턴, 아무것도 안 바꿈
+                                final picked = await showYearMonthPicker(context);
+                                if (picked != null) {
+                                  setState(() {
+                                    _selectedDate = picked;
+                                  });
+                                }
+                                return picked ?? _selectedDate;
                               },
                             ),
                           ),
@@ -183,6 +201,12 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
                     child: CommonSubmitButtons(
                       // 보존
                       onSavePressed: () async {
+                        if(isRemoteExists) {
+                          warningDialog(context, 'エラー', 'この月には在宅勤務手当はすでに申請済みです。');
+                        }
+
+                        print('_selectedDate; $_selectedDate');
+
                         if (widget.transportationId == null) {
                           // && submissionStatus != 'submitted'
                           final saveData = TransportationSave(
@@ -192,7 +216,7 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
                             amount: _remoteAllowanceRule['amount'],
                             submissionStatus: 'draft',
                             reviewStatus: '', // 보존은 null
-                            id: widget.transportationId!,
+                            id: widget.transportationId,
                           );
                           final success = await fetchTransportationSaveUpload(
                             saveData as TransportationSave?,
@@ -200,13 +224,7 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
                             true,
                           );
                           if (success) {
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => TransportationScreen(initialDate: _selectedDate,),
-                              ),
-                                  (route) => false,
-                            );
+                            Navigator.pop(context, _selectedDate);
                           } else {
                             warningDialog(
                               context,

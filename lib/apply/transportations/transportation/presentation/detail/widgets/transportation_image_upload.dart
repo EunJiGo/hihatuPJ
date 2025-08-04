@@ -30,7 +30,8 @@ class TransportationImageUpload extends StatelessWidget {
         // 2. 이미지 선택 모달
         final result = await ImagePickerBottomSheet.showImagePicker(
           context,
-          const Color(0xFFfea643), // 초록색 계열 테마
+            themeColor // 초록색 계열 테마
+          // const Color(0xFFfea643), // 초록색 계열 테마
         );
 
         WidgetsBinding.instance.addPostFrameCallback((_) {
