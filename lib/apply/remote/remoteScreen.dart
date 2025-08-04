@@ -203,7 +203,7 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
                             Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const TransportationScreen(),
+                                builder: (_) => TransportationScreen(initialDate: _selectedDate,),
                               ),
                                   (route) => false,
                             );
@@ -234,7 +234,7 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
                             Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const TransportationScreen(),
+                                builder: (_) => TransportationScreen(initialDate: _selectedDate,),
                               ),
                                   (route) => false,
                             );
@@ -266,7 +266,7 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
                             context,
                             MaterialPageRoute(
                               builder:
-                                  (_) => const TransportationScreen(),
+                                  (_) => TransportationScreen(initialDate: _selectedDate,),
                             ),
                                 (route) => false,
                           );

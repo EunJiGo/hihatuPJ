@@ -24,6 +24,7 @@ class ApplicationListScreen extends ConsumerWidget {
   @override
   // Widget build(BuildContext context) {
   Widget build(BuildContext context, WidgetRef ref) {
+    DateTime _selectedDate = DateTime.now();
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       // backgroundColor: const Color(0xFFF5F7FA),
@@ -90,7 +91,7 @@ class ApplicationListScreen extends ConsumerWidget {
                       if (label == '休暇管理') {
                         // Navigator.push(context, MaterialPageRoute(builder: (_) => VacationScreen()));
                       } else if (label == '交通費・定期券') {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => TransportationScreen()));
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => TransportationScreen(initialDate: _selectedDate,)));
 
                         // // 로딩 다이얼로그 표시
                         // showDialog(

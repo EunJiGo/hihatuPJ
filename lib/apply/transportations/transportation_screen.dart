@@ -25,7 +25,9 @@ import 'transportation/state/transportation_provider.dart';
 
 // ➊ ConsumerStatefulWidget 으로 변경
 class TransportationScreen extends ConsumerStatefulWidget {
-  const TransportationScreen({super.key});
+  final DateTime initialDate;
+
+  const TransportationScreen({super.key, required this.initialDate});
 
   @override
   ConsumerState<TransportationScreen> createState() =>
@@ -46,7 +48,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
   bool showCommuteList = true;
   bool showSingleList = true;
   bool showRemote = true;
-  bool showotherExpenseList = true;
+  bool showOtherExpenseList = true;
 
   void moveMonth(int diff) {
     setState(() {
@@ -76,6 +78,8 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
   @override
   void initState() {
     super.initState();
+    currentMonth = widget.initialDate;
+    print('currentMonth : $currentMonth');
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
     _animationController = AnimationController(
@@ -684,15 +688,15 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                             iconColor: Color(0xFF89e6f4),
                             iconSize: 25,
                             title: '立替金の申請履歴',
-                            isExpanded: showotherExpenseList,
+                            isExpanded: showOtherExpenseList,
                             isData: singleList.isEmpty,
                             gap: 8,
                             onToggle: () {
-                              setState(() => showotherExpenseList = !showotherExpenseList);
+                              setState(() => showOtherExpenseList = !showOtherExpenseList);
                             },
                           ),
 
-                          if(showotherExpenseList)
+                          if(showOtherExpenseList)
                             RemoteAndOtherItemHistoryList(
                               items: otherExpenseList.map((item) => RemoteAndOtherItem(
                                 id: item.id!,
@@ -799,7 +803,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const TransportationScreen(),
+                          builder: (_) => TransportationScreen(initialDate: currentMonth,),
                         ),
                         (route) => false,
                       );

@@ -680,7 +680,7 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                               Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => const TransportationScreen(),
+                                  builder: (_) => TransportationScreen(initialDate: _selectedDate,),
                                 ),
                                 (route) => false,
                               );
@@ -707,7 +707,7 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                               Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => const TransportationScreen(),
+                                  builder: (_) => TransportationScreen(initialDate: _selectedDate,),
                                 ),
                                 (route) => false,
                               );
@@ -734,8 +734,8 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                                     Navigator.pushAndRemoveUntil(
                                       context,
                                       MaterialPageRoute(
-                                        builder:
-                                            (_) => const TransportationScreen(),
+                                        builder: (_) => TransportationScreen(initialDate: _selectedDate,),
+
                                       ),
                                       (route) => false,
                                     );
