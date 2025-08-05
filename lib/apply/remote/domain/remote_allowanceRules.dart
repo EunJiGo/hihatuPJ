@@ -7,7 +7,7 @@ final List<Map<String, dynamic>> remoteAllowanceRules = [
   {
     'label': '10日以上の在宅勤務',
     'minDays': 10,
-    'amount': 2000,
+      'amount': 2000,
   },
   {
     'label': '15日以上の在宅勤務',

@@ -13,6 +13,7 @@ class TransportationSave {
   final String? durationEnd;
   final String? commuteDuration;
   final int? id;
+  final String? payTo;
 
   final String submissionStatus;
   final String? reviewStatus;
@@ -32,6 +33,7 @@ class TransportationSave {
     this.durationEnd,
     this.commuteDuration,
     this.id,
+    this.payTo,
     required this.submissionStatus,
     this.reviewStatus,
   });
@@ -59,7 +61,7 @@ class TransportationSave {
       "project_name": "",
       "duration_start": durationStart,
       "duration_end": durationEnd,
-      "pay_to": "",
+      "pay_to": payTo ?? "",
       "amount": amount,
       "image": image ?? "",
       "submission_status": submissionStatus,

@@ -80,7 +80,7 @@ class _TransportationInputScreenState
             _arrivalController.text = detail.toStation;
             _costController.text = detail.amount.toString();
             _selectedDate =
-                DateTime.tryParse(detail.durationStart) ?? DateTime.now();
+                DateTime.tryParse(detail.durationStart) ?? DateTime.now(); //durationStart: 정기권시작일
 
             final isPresetTransport = transportationTransportOptions.contains(detail.railwayName);
             if (isPresetTransport) {
@@ -560,7 +560,7 @@ class _TransportationInputScreenState
                                 print('_imageFile : ${_imageFile}');
                                 await successDialog(
                                   context,
-                                  '保存 完了',
+                                  '保存完了',
                                   '交通費保存が完了しました。',
                                 );
                                 // Navigator.pushAndRemoveUntil(
@@ -621,13 +621,14 @@ class _TransportationInputScreenState
                                         '削除完了',
                                         '交通費削除が完了しました。',
                                       );
-                                      Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => TransportationScreen(initialDate: _selectedDate,),
-                                        ),
-                                        (route) => false,
-                                      );
+                                      // Navigator.pushAndRemoveUntil(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //     builder: (_) => TransportationScreen(initialDate: _selectedDate,),
+                                      //   ),
+                                      //   (route) => false,
+                                      // );
+                                      Navigator.pop(context, _selectedDate);
                                     } else {
                                       warningDialog(context, 'エラー', '送信に失敗しました。');
                                     }

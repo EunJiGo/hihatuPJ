@@ -16,10 +16,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../tabbar/htt_tabbar.dart';
 import '../../utils/dialog/attention_dialog.dart';
 import '../../utils/dialog/success_dialog.dart';
-import '../../utils/dialog/warning_dialog.dart';
 import '../../utils/widgets/common_submit_buttons.dart';
 import '../../utils/widgets/dropdown_option.dart';
 import '../../utils/widgets/modals/dropdown_modal_widget.dart';
+import '../others/other_expense_screen.dart';
 import '../remote/remoteScreen.dart';
 import 'transportation/state/transportation_provider.dart';
 
@@ -250,7 +250,8 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
             (sum, item) => sum + item.amount,
           );
 
-          final grandTotal = commuteTotal + singleTotal;
+          final grandTotal =
+              commuteTotal + singleTotal + remoteTotal + otherExpenseTotal;
 
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -383,370 +384,519 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                   ),
                 ),
 
-                // 합계 영역
-                Visibility(
-                  visible: isSummaryVisible,
-                  replacement: const SizedBox.shrink(),
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 10,
-                          horizontal: 20,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          // color: Color(0xFFd8d8d8),
-                          // border: Border.all(
-                          // color: Color(0xFF37474F),
-                          // ),
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.8),
-                              // 회색 그림자
-                              blurRadius: 8,
-                              offset: Offset(3, 4), // 👉 오른쪽 3, 아래 4 픽셀로 그림자 위치
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.confirmation_number,
-                                  color: Color(0xFF81C784),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    '定期券(${commuteList.length}件)',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
-                                      color: Colors.black,
-                                      // color: Color(0xFF1565C0),
+                // 합계 영역, 제출상황, 승인상태
+                if (commuteList.isNotEmpty ||
+                    singleList.isNotEmpty ||
+                    remoteList.isNotEmpty ||
+                    otherExpenseList.isNotEmpty) ...[
+                  // 합계 영역
+                  Visibility(
+                    visible: isSummaryVisible,
+                    replacement: const SizedBox.shrink(),
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 10,
+                            horizontal: 20,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            // color: Color(0xFFd8d8d8),
+                            // border: Border.all(
+                            // color: Color(0xFF37474F),
+                            // ),
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.8),
+                                // 회색 그림자
+                                blurRadius: 8,
+                                offset: Offset(
+                                  3,
+                                  4,
+                                ), // 👉 오른쪽 3, 아래 4 픽셀로 그림자 위치
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              if (commuteList.isNotEmpty) ...[
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.confirmation_number,
+                                      color: Color(0xFF81C784),
                                     ),
-                                  ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        '定期券(${commuteList.length}件)',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                          // color: Color(0xFF1565C0),
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      '￥${formatCurrency(commuteTotal)}',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: Color(0xFF81C784),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  '￥${formatCurrency(commuteTotal)}',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Color(0xFF81C784),
-                                  ),
-                                ),
+                                const SizedBox(height: 10),
                               ],
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.directions_bus,
-                                  color: Color(0xFFFFB74D),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    '交通費(${singleList.length}件)',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
-                                      color: Colors.black,
-                                      // color: Color(0xFF1B5E20),
+                              if (singleList.isNotEmpty) ...[
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.directions_bus,
+                                      color: Color(0xFFFFB74D),
                                     ),
-                                  ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        '交通費(${singleList.length}件)',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                          // color: Color(0xFF1B5E20),
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      '￥${formatCurrency(singleTotal)}',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: Color(0xFFFFB74D),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  '￥${formatCurrency(singleTotal)}',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Color(0xFFFFB74D),
-                                  ),
-                                ),
+                                const SizedBox(height: 10),
                               ],
-                            ),
-                            const Divider(
-                              height: 10,
-                              thickness: 1,
-                              color: Colors.black54,
-                              // color: Color(0xFF2E7D32),
-                            ),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.attach_money,
-                                  color: Color(0xFF37474F),
-                                ),
-                                const SizedBox(width: 8),
-                                const Expanded(
-                                  child: Text(
-                                    '総合計',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 16,
-                                      // color: Color(0xFF004D40),
-                                      color: Colors.black,
+                              if (remoteList.isNotEmpty) ...[
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      FontAwesomeIcons.houseLaptop,
+                                      color: Color(0xFFfeaaa9),
                                     ),
-                                  ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        '在宅勤務手当(${remoteList.length}件)',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                          // color: Color(0xFF1B5E20),
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      '￥${formatCurrency(remoteTotal)}',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: Color(0xFFfeaaa9),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  '￥${formatCurrency(grandTotal)}',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 18,
+                                const SizedBox(height: 10),
+                              ],
+                              if (otherExpenseList.isNotEmpty) ...[
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.receipt_long,
+                                      color: Color(0xFF89e6f4),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        '立替金(${otherExpenseList.length}件)',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                          // color: Color(0xFF1B5E20),
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      '￥${formatCurrency(otherExpenseTotal)}',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: Color(0xFF89e6f4),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                              ],
+
+                              const Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: Colors.black54,
+                                // color: Color(0xFF2E7D32),
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.attach_money,
                                     color: Color(0xFF37474F),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
+                                  const SizedBox(width: 8),
+                                  const Expanded(
+                                    child: Text(
+                                      '総合計',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16,
+                                        // color: Color(0xFF004D40),
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    '￥${formatCurrency(grandTotal)}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 18,
+                                      color: Color(0xFF37474F),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                  ),
-                ),
-
-                // 제출상황, 승인상태
-                StatusExplanation(),
-
-                const SizedBox(height: 10),
-
-                // 신청 내역들 영역 (스크롤 가능)
-                Expanded(
-                  child: SingleChildScrollView(
-                    controller: _scrollController,
-                    physics: const ClampingScrollPhysics(), // ← 바운스 제거
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 정기권 신청 내역
-                        if (commuteList.isNotEmpty) ...[
-                          TransportationTitleSection(
-                            icon: Icons.confirmation_number,
-                            iconColor: Color(0xFF81C784),
-                            title: '定期券の申請履歴',
-                            isExpanded: showCommuteList,
-                            isData: commuteList.isEmpty,
-                            onToggle: () {
-                              setState(
-                                () => showCommuteList = !showCommuteList,
-                              );
-                            },
-                          ),
-
-                          if (showCommuteList)
-                            TransportationHistoryList(
-                              items: commuteList
-                                  .map(
-                                    (item) => TransportationUiItem(
-                                      id: item.id!,
-                                      fromStation: item.fromStation,
-                                      toStation: item.toStation,
-                                      amount: item.amount,
-                                      isCommuter: true,
-                                      twice: false,
-                                      updatedAt: item.updatedAt,
-                                      commuteDuration: item.commuteDuration,
-                                      submissionStatus: item.submissionStatus,
-                                      reviewStatus: item.reviewStatus,
-                                    ),
-                                  )
-                                  .toList(),
-                              onTap: (id) async {
-                                final result = await Navigator.push<DateTime?>(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        CommuterScreen(commuteId: id),
-                                  ),
-                                );
-
-                                if (result != null) {
-                                  setState(() {
-                                    currentMonth = DateTime(
-                                      result.year,
-                                      result.month,
-                                    );
-                                  });
-                                  ref.invalidate(
-                                    transportationProvider(currentMonth),
-                                  );
-                                }
-                              },
-
-                              getStatusIcon: getStatusIcon,
-
-                              // 🎨 스타일
-                              leadingIcon: Icons.confirmation_number,
-                              leadingIconColor: Color(0xFF81C784),
-                              amountColor: Color(0xFF81C784),
-                              separatorIconColor: Colors.black54,
-                            ),
-                        ],
-
-                        // 교통비 신청 내역
-                        if (singleList.isNotEmpty) ...[
-                          TransportationTitleSection(
-                            icon: Icons.directions_bus,
-                            iconColor: Color(0xFFFFB74D),
-                            title: '交通費の申請履歴',
-                            isExpanded: showSingleList,
-                            isData: singleList.isEmpty,
-                            onToggle: () {
-                              setState(() => showSingleList = !showSingleList);
-                            },
-                          ),
-                          if (showSingleList)
-                            TransportationHistoryList(
-                              items: singleList
-                                  .map(
-                                    (item) => TransportationUiItem(
-                                      id: item.id!,
-                                      fromStation: item.fromStation,
-                                      toStation: item.toStation,
-                                      amount: item.amount,
-                                      isCommuter: false,
-                                      twice: item.twice,
-                                      updatedAt: item.updatedAt,
-                                      goals: item.goals,
-                                      submissionStatus: item.submissionStatus,
-                                      reviewStatus: item.reviewStatus,
-                                    ),
-                                  )
-                                  .toList(),
-                              onTap: (id) async {
-                                final result = await Navigator.push<DateTime?>(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => TransportationInputScreen(
-                                      transportationId: id,
-                                    ),
-                                  ),
-                                );
-
-                                if (result != null) {
-                                  setState(() {
-                                    currentMonth = DateTime(
-                                      result.year,
-                                      result.month,
-                                    );
-                                  });
-                                  ref.invalidate(
-                                    transportationProvider(currentMonth),
-                                  );
-                                }
-                              },
-                              getStatusIcon: getStatusIcon,
-
-                              // 🎨 스타일
-                              leadingIcon: Icons.directions_bus,
-                              leadingIconColor: Color(0xFFFFB74D),
-                              amountColor: Color(0xFFFFB74D),
-                              separatorIconColor: Color(0xFFf30101),
-                            ),
-                        ],
-
-                        // 재택 수당 신청 내역
-                        if (remote != null) ...[
-                          TransportationTitleSection(
-                            icon: FontAwesomeIcons.houseLaptop,
-                            iconColor: Color(0xFFfeaaa9),
-                            iconSize: 22,
-                            title: '在宅勤務手当の申請履歴',
-                            isExpanded: showRemote,
-                            isData: singleList.isEmpty,
-                            gap: 15,
-                            onToggle: () {
-                              setState(() => showRemote = !showRemote);
-                            },
-                          ),
-
-                          if (showRemote)
-                            RemoteAndOtherItemHistoryList(
-                              items: remoteList
-                                  .map(
-                                    (item) => RemoteAndOtherItem(
-                                      id: item.id!,
-                                      isRemote: true,
-                                      amount: item.amount,
-                                      updatedAt: item.updatedAt,
-                                      goals: item.goals,
-                                      submissionStatus: item.submissionStatus,
-                                      reviewStatus: item.reviewStatus,
-                                    ),
-                                  )
-                                  .toList(),
-                              onTap: (id) => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => RemoteScreen(),
-                                ),
-                              ),
-                              getStatusIcon: getStatusIcon,
-                              leadingIcon: FontAwesomeIcons.houseLaptop,
-                              leadingIconColor: Color(0xFFfeaaa9),
-                              amountColor: Color(0xFFfeaaa9),
-                              separatorIconColor: Color(0xFFf30101),
-                            ),
-                        ],
-
-                        // 그 외 경비 신청 내역
-                        if (otherExpenseList.isNotEmpty) ...[
-                          TransportationTitleSection(
-                            // icon: FontAwesomeIcons.sackDollar,
-                            icon: Icons.receipt_long,
-                            iconColor: Color(0xFF89e6f4),
-                            iconSize: 25,
-                            title: '立替金の申請履歴',
-                            isExpanded: showOtherExpenseList,
-                            isData: singleList.isEmpty,
-                            gap: 8,
-                            onToggle: () {
-                              setState(
-                                () => showOtherExpenseList =
-                                    !showOtherExpenseList,
-                              );
-                            },
-                          ),
-
-                          if (showOtherExpenseList)
-                            RemoteAndOtherItemHistoryList(
-                              items: otherExpenseList
-                                  .map(
-                                    (item) => RemoteAndOtherItem(
-                                      id: item.id!,
-                                      isRemote: false,
-                                      amount: item.amount,
-                                      updatedAt: item.updatedAt,
-                                      goals: item.goals,
-                                      submissionStatus: item.submissionStatus,
-                                      reviewStatus: item.reviewStatus,
-                                    ),
-                                  )
-                                  .toList(),
-                              onTap: (id) => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => RemoteScreen(),
-                                ),
-                              ),
-                              getStatusIcon: getStatusIcon,
-                              leadingIcon: Icons.receipt_long,
-                              leadingIconColor: Color(0xFF89e6f4),
-                              amountColor: Color(0xFF89e6f4),
-                              separatorIconColor: Color(0xFFf30101),
-                            ),
-                        ],
                         const SizedBox(height: 10),
                       ],
                     ),
                   ),
-                ),
+                  // 제출상황, 승인상태
+                  StatusExplanation(),
+
+                  const SizedBox(height: 10),
+
+                  // 신청 내역들 영역 (스크롤 가능)
+                  Expanded(
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      physics: const ClampingScrollPhysics(), // ← 바운스 제거
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 정기권 신청 내역
+                          if (commuteList.isNotEmpty) ...[
+                            TransportationTitleSection(
+                              icon: Icons.confirmation_number,
+                              iconColor: Color(0xFF81C784),
+                              title: '定期券の申請履歴',
+                              isExpanded: showCommuteList,
+                              isData: commuteList.isEmpty,
+                              onToggle: () {
+                                setState(
+                                  () => showCommuteList = !showCommuteList,
+                                );
+                              },
+                            ),
+
+                            if (showCommuteList)
+                              TransportationHistoryList(
+                                items: commuteList
+                                    .map(
+                                      (item) => TransportationUiItem(
+                                        id: item.id!,
+                                        fromStation: item.fromStation,
+                                        toStation: item.toStation,
+                                        amount: item.amount,
+                                        isCommuter: true,
+                                        twice: false,
+                                        updatedAt: item.updatedAt,
+                                        commuteDuration: item.commuteDuration,
+                                        submissionStatus: item.submissionStatus,
+                                        reviewStatus: item.reviewStatus,
+                                      ),
+                                    )
+                                    .toList(),
+                                onTap: (id) async {
+                                  final result =
+                                      await Navigator.push<DateTime?>(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              CommuterScreen(commuteId: id),
+                                        ),
+                                      );
+
+                                  if (result != null) {
+                                    setState(() {
+                                      currentMonth = DateTime(
+                                        result.year,
+                                        result.month,
+                                      );
+                                    });
+                                    ref.invalidate(
+                                      transportationProvider(currentMonth),
+                                    );
+                                  }
+                                },
+
+                                getStatusIcon: getStatusIcon,
+
+                                // 🎨 스타일
+                                leadingIcon: Icons.confirmation_number,
+                                leadingIconColor: Color(0xFF81C784),
+                                amountColor: Color(0xFF81C784),
+                                separatorIconColor: Colors.black54,
+                              ),
+                          ],
+
+                          // 교통비 신청 내역
+                          if (singleList.isNotEmpty) ...[
+                            TransportationTitleSection(
+                              icon: Icons.directions_bus,
+                              iconColor: Color(0xFFFFB74D),
+                              title: '交通費の申請履歴',
+                              isExpanded: showSingleList,
+                              isData: singleList.isEmpty,
+                              onToggle: () {
+                                setState(
+                                  () => showSingleList = !showSingleList,
+                                );
+                              },
+                            ),
+                            if (showSingleList)
+                              TransportationHistoryList(
+                                items: singleList
+                                    .map(
+                                      (item) => TransportationUiItem(
+                                        id: item.id!,
+                                        fromStation: item.fromStation,
+                                        toStation: item.toStation,
+                                        amount: item.amount,
+                                        isCommuter: false,
+                                        twice: item.twice,
+                                        updatedAt: item.updatedAt,
+                                        goals: item.goals,
+                                        submissionStatus: item.submissionStatus,
+                                        reviewStatus: item.reviewStatus,
+                                      ),
+                                    )
+                                    .toList(),
+                                onTap: (id) async {
+                                  final result =
+                                      await Navigator.push<DateTime?>(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              TransportationInputScreen(
+                                                transportationId: id,
+                                              ),
+                                        ),
+                                      );
+
+                                  if (result != null) {
+                                    setState(() {
+                                      currentMonth = DateTime(
+                                        result.year,
+                                        result.month,
+                                      );
+                                    });
+                                    ref.invalidate(
+                                      transportationProvider(currentMonth),
+                                    );
+                                  }
+                                },
+                                getStatusIcon: getStatusIcon,
+
+                                // 🎨 스타일
+                                leadingIcon: Icons.directions_bus,
+                                leadingIconColor: Color(0xFFFFB74D),
+                                amountColor: Color(0xFFFFB74D),
+                                separatorIconColor: Color(0xFFf30101),
+                              ),
+                          ],
+
+                          // 재택 수당 신청 내역
+                          if (remote != null) ...[
+                            TransportationTitleSection(
+                              icon: FontAwesomeIcons.houseLaptop,
+                              iconColor: Color(0xFFfeaaa9),
+                              iconSize: 22,
+                              title: '在宅勤務手当の申請履歴',
+                              isExpanded: showRemote,
+                              isData: singleList.isEmpty,
+                              gap: 15,
+                              onToggle: () {
+                                setState(() => showRemote = !showRemote);
+                              },
+                            ),
+
+                            if (showRemote)
+                              RemoteAndOtherItemHistoryList(
+                                items: remoteList
+                                    .map(
+                                      (item) => RemoteAndOtherItem(
+                                        id: item.id!,
+                                        isRemote: true,
+                                        amount: item.amount,
+                                        updatedAt: item.updatedAt,
+                                        goals: item.goals,
+                                        submissionStatus: item.submissionStatus,
+                                        reviewStatus: item.reviewStatus,
+                                      ),
+                                    )
+                                    .toList(),
+                                onTap: (id) async {
+                                  final result =
+                                      await Navigator.push<DateTime?>(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => RemoteScreen(
+                                            transportationId: id,
+                                          ),
+                                        ),
+                                      );
+
+                                  if (result != null) {
+                                    setState(() {
+                                      currentMonth = DateTime(
+                                        result.year,
+                                        result.month,
+                                      );
+                                    });
+                                    ref.invalidate(
+                                      transportationProvider(currentMonth),
+                                    );
+                                  }
+                                },
+                                getStatusIcon: getStatusIcon,
+                                leadingIcon: FontAwesomeIcons.houseLaptop,
+                                leadingIconColor: Color(0xFFfeaaa9),
+                                amountColor: Color(0xFFfeaaa9),
+                                separatorIconColor: Color(0xFFf30101),
+                              ),
+                          ],
+
+                          // 그 외 경비 신청 내역
+                          if (otherExpenseList.isNotEmpty) ...[
+                            TransportationTitleSection(
+                              // icon: FontAwesomeIcons.sackDollar,
+                              icon: Icons.receipt_long,
+                              iconColor: Color(0xFF89e6f4),
+                              iconSize: 25,
+                              title: '立替金の申請履歴',
+                              isExpanded: showOtherExpenseList,
+                              isData: singleList.isEmpty,
+                              gap: 8,
+                              onToggle: () {
+                                setState(
+                                  () => showOtherExpenseList =
+                                      !showOtherExpenseList,
+                                );
+                              },
+                            ),
+
+                            if (showOtherExpenseList)
+                              RemoteAndOtherItemHistoryList(
+                                items: otherExpenseList
+                                    .map(
+                                      (item) => RemoteAndOtherItem(
+                                        id: item.id!,
+                                        isRemote: false,
+                                        amount: item.amount,
+                                        updatedAt: item.updatedAt,
+                                        goals: item.goals,
+                                        submissionStatus: item.submissionStatus,
+                                        reviewStatus: item.reviewStatus,
+                                      ),
+                                    )
+                                    .toList(),
+                                onTap: (id) async {
+                                  final result =
+                                  await Navigator.push<DateTime?>(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          OtherExpenseScreen(
+                                            transportationId: id,
+                                          ),
+                                    ),
+                                  );
+
+                                  if (result != null) {
+                                    setState(() {
+                                      currentMonth = DateTime(
+                                        result.year,
+                                        result.month,
+                                      );
+                                    });
+                                    ref.invalidate(
+                                      transportationProvider(currentMonth),
+                                    );
+                                  }
+                                },
+                                getStatusIcon: getStatusIcon,
+                                leadingIcon: Icons.receipt_long,
+                                leadingIconColor: Color(0xFF89e6f4),
+                                amountColor: Color(0xFF89e6f4),
+                                separatorIconColor: Color(0xFFf30101),
+                              ),
+                          ],
+                          const SizedBox(height: 10),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+
+                // 합계 영역, 제출상황, 승인상태 없음
+                if (commuteList.isEmpty &&
+                    singleList.isEmpty &&
+                    remoteList.isEmpty &&
+                    otherExpenseList.isEmpty) ...[
+                  Expanded(
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.history, // 👈 아이콘 변경 가능
+                            color: Colors.grey.shade400,
+                            size: 48,
+                          ),
+                          const SizedBox(height: 12),
+                          const Text(
+                            '申請履歴がないです。\n交通費及び定期券を申請してください。',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                              height: 1.5, // 줄 간격
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
 
                 // 신청버튼 / 제출버튼
                 CommonSubmitButtons(
@@ -763,9 +913,14 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                         iconColor: Color(0xFFFFB74D),
                       ),
                       DropdownOption.fromText(
-                        '在宅勤務手当',
+                        '在宅勤務手当申請',
                         icon: FontAwesomeIcons.houseLaptop,
                         iconColor: Color(0xFFfeaaa9),
+                      ),
+                      DropdownOption.fromText(
+                        '立替金申請',
+                        icon: Icons.receipt_long,
+                        iconColor: Color(0xFF89e6f4),
                       ),
                     ];
 
@@ -782,7 +937,6 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                               builder: (_) => const CommuterScreen(),
                             ),
                           );
-                          print('aaaa: $result');
                           if (result != null && result is DateTime) {
                             setState(() {
                               currentMonth = DateTime(
@@ -830,6 +984,24 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                               transportationProvider(currentMonth),
                             );
                           }
+                        } else if (val == '立替金申請') {
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const OtherExpenseScreen(),
+                            ),
+                          );
+                          if (result != null && result is DateTime) {
+                            setState(() {
+                              currentMonth = DateTime(
+                                result.year,
+                                result.month,
+                              );
+                            });
+                            ref.invalidate(
+                              transportationProvider(currentMonth),
+                            );
+                          }
                         }
                       },
                       selectedTextColor: const Color(0xFF1565C0),
@@ -860,13 +1032,13 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                     }
                   },
                   saveText: '申　請',
-                  submitText: '提　出',
-                  submitConfirmMessage: '提出しますか？\n提出したら、修正ができないです。',
+                  submitText: '一括提出',
+                  submitConfirmMessage:
+                      '${currentMonth.year}年${currentMonth.month}月の申請内訳を提出しますか？\n提出したら、修正ができないです。',
                   padding: 0,
                   // 원하는 여백
                   themeColor: const Color(0xFF0253B3), // 기본색 그대로 사용
                 ),
-
                 const SizedBox(height: 16),
               ],
             ),

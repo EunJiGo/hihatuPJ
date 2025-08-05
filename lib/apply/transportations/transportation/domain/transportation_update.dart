@@ -74,7 +74,7 @@ class TransportationUpdate {
       "commute_duration": commuteDuration,
       "duration_start": durationStart,
       "duration_end": durationEnd,
-      "pay_day": payDay,
+      "pay_day": todayStr,
       "month": date.month,
       "year": date.year,
       "from_station": fromStation,

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hihatu_project/apply/remote/widgets/remoteAllowanceRulesRadioColumn.dart';
+import 'package:hihatu_project/apply/remote/widgets/remote_allowance_rules_radio_column.dart';
 import 'package:hihatu_project/apply/remote/widgets/show_year_month_picker.dart';
 import 'package:hihatu_project/apply/transportations/summary/widgets/form_label.dart';
 
-import '../../utils/dialog/attention_dialog.dart';
 import '../../utils/dialog/success_dialog.dart';
 import '../../utils/dialog/warning_dialog.dart';
 import '../../utils/widgets/common_submit_buttons.dart';
@@ -15,8 +14,7 @@ import '../transportations/transportation/data/fetch_transportation_save.dart';
 import '../transportations/transportation/domain/transportation_save.dart';
 import '../transportations/transportation/domain/transportation_update.dart';
 import '../transportations/transportation/state/transportation_provider.dart';
-import '../transportations/transportation_screen.dart';
-import 'domain/remoteAllowanceRules.dart';
+import 'domain/remote_allowanceRules.dart';
 
 class RemoteScreen extends ConsumerStatefulWidget {
   final int? transportationId;
@@ -32,13 +30,13 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
   Map<String, dynamic> _remoteAllowanceRule = remoteAllowanceRules[0];
   int? _cost;
   String? _submissionStatus;
+  int? _year;
+  int? _month;
   DateTime _selectedDate = DateTime.now();
-
 
   @override
   void initState() {
     super.initState();
-
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent, // 상태바 배경 투명
@@ -46,16 +44,22 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
         statusBarBrightness: Brightness.light, // iOS
       ),
     );
+
     transportationId = widget.transportationId;
     if (transportationId != null) {
       ref.read(transportationDetailProvider(transportationId!).future).then((
-          detail,
-          ) {
+        detail,
+      ) {
         if (mounted) {
           setState(() {
             _submissionStatus = detail.submissionStatus;
-
-            // _remoteAllowanceRule = detail.amount;
+            _year = detail.year;
+            _month = detail.month;
+            _selectedDate = DateTime(detail.year, detail.month, 1);
+            _remoteAllowanceRule = remoteAllowanceRules.firstWhere(
+              (rule) => rule['amount'] == detail.amount,
+              orElse: () => remoteAllowanceRules[0], //기본값
+            );
           });
         }
       });
@@ -64,16 +68,17 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final transportationAsync = ref.watch(transportationProvider(_selectedDate));
+    final transportationAsync = ref.watch(
+      transportationProvider(_selectedDate),
+    );
     bool isRemoteExists = false;
 
     if (transportationAsync.hasValue) {
       final items = transportationAsync.value!;
-      isRemoteExists = items.any((item) => item.expenseType == 'home_office_expenses');
+      isRemoteExists = items.any(
+        (item) => item.expenseType == 'home_office_expenses',
+      );
     }
-
-    print('isRemoteExists: $isRemoteExists');
-
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -145,18 +150,24 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
                             child: DatePickerButton(
                               date: _selectedDate,
                               isFullDate: false,
-                              backgroundColor: Colors.white,
+                              backgroundColor:_submissionStatus == 'draft' ? Colors.white : Colors.grey.shade200,
                               // 비활성화 스타일
                               borderRadius: 20,
                               shadowColor: const Color(0xFF8e8e8e),
-                              onPick: () async {
-                                final picked = await showYearMonthPicker(context);
+                              onPick: _submissionStatus == 'draft' ? () async {
+                                final picked = await showYearMonthPicker(
+                                  context,
+                                  _selectedDate.year,
+                                  _selectedDate.month,
+                                );
                                 if (picked != null) {
                                   setState(() {
                                     _selectedDate = picked;
                                   });
                                 }
                                 return picked ?? _selectedDate;
+                              } : () async {
+                                return _selectedDate; // 그냥 현재 날짜 리턴, 아무것도 안 바꿈
                               },
                             ),
                           ),
@@ -189,7 +200,8 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
                                   _remoteAllowanceRule = rule;
                                 });
                               },
-                              isDisabled: false,
+                              isDisabled: _submissionStatus == 'draft' ? false : true,
+                              inactiveColor: Color(0xFF6b6b6b),
                             ),
                           ),
                         ],
@@ -201,11 +213,13 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
                     child: CommonSubmitButtons(
                       // 보존
                       onSavePressed: () async {
-                        if(isRemoteExists) {
-                          warningDialog(context, 'エラー', 'この月には在宅勤務手当はすでに申請済みです。');
+                        if (isRemoteExists && _submissionStatus != "draft") {
+                          warningDialog(
+                            context,
+                            'エラー',
+                            'この月には在宅勤務手当はすでに申請済みです。',
+                          );
                         }
-
-                        print('_selectedDate; $_selectedDate');
 
                         if (widget.transportationId == null) {
                           // && submissionStatus != 'submitted'
@@ -215,7 +229,8 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
                             twice: false,
                             amount: _remoteAllowanceRule['amount'],
                             submissionStatus: 'draft',
-                            reviewStatus: '', // 보존은 null
+                            reviewStatus: '',
+                            // 보존은 null
                             id: widget.transportationId,
                           );
                           final success = await fetchTransportationSaveUpload(
@@ -226,73 +241,49 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
                           if (success) {
                             Navigator.pop(context, _selectedDate);
                           } else {
-                            warningDialog(
-                              context,
-                              '保存エラー',
-                              '交通費保存に失敗しました。',
-                            );
+                            warningDialog(context, '保存エラー', '交通費保存に失敗しました。');
                           }
                         } else {
                           final saveData = TransportationUpdate(
                             date: _selectedDate,
-                            expenseType: 'home_office_expenses',
-                            twice: false,
-                            amount: _remoteAllowanceRule['amount'],
-                            submissionStatus: 'draft',
-                            reviewStatus: '', // 보존은 null
                             id: widget.transportationId!,
                             employeeId: 'admins',
+                            expenseType: 'home_office_expenses',
+                            amount: _remoteAllowanceRule['amount'],
+                            twice: false,
+                            submissionStatus: 'draft',
+                            reviewStatus: '',
                           );
                           final success = await fetchTransportationSaveUpload(
                             null,
                             saveData,
-                            true,
+                            false,
                           );
                           if (success) {
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => TransportationScreen(initialDate: _selectedDate,),
-                              ),
-                                  (route) => false,
-                            );
+                            Navigator.pop(context, _selectedDate);
                           } else {
-                            warningDialog(
-                              context,
-                              '修正エラー',
-                              '交通費修正に失敗しました。',
-                            );
+                            warningDialog(context, '修正エラー', '交通費修正に失敗しました。');
                           }
                         }
                       },
 
                       // 삭제
-                      onSubmitPressed:
-                      widget.transportationId != null
+                      onSubmitPressed: widget.transportationId != null
                           ? () async {
-                        final success =
-                        await fetchTransportationDelete(
-                          widget.transportationId!,
-                        );
-                        if (success) {
-                          await successDialog(
-                            context,
-                            '削除完了',
-                            '交通費削除が完了しました。',
-                          );
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (_) => TransportationScreen(initialDate: _selectedDate,),
-                            ),
-                                (route) => false,
-                          );
-                        } else {
-                          warningDialog(context, 'エラー',
-                              '送信に失敗しました。');
-                        }
-                      }
+                              final success = await fetchTransportationDelete(
+                                widget.transportationId!,
+                              );
+                              if (success) {
+                                await successDialog(
+                                  context,
+                                  '削除完了',
+                                  '交通費削除が完了しました。',
+                                );
+                                Navigator.pop(context, _selectedDate);
+                              } else {
+                                warningDialog(context, 'エラー', '送信に失敗しました。');
+                              }
+                            }
                           : () {},
 
                       // 🧑‍🎨 옵션 설정 (텍스트/색상)
@@ -300,17 +291,17 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
                       saveConfirmMessage: '交通費を保存しますか？',
                       submitConfirmMessage: '交通費を削除しますか？',
                       showSubmitButton:
-                      widget.transportationId != null &&
+                          widget.transportationId != null &&
                           _submissionStatus == 'draft',
                       showSaveButton:
-                      widget.transportationId == null ||
+                          widget.transportationId == null ||
                           _submissionStatus == 'draft',
                       // ← 조건부로 삭제 버튼 숨김
                       themeColor: const Color(0xFFfe6966),
                       padding: 0.0, // 원하는 색상
                     ),
                   ),
-                  SizedBox(height: 20,),
+                  SizedBox(height: 20),
                 ],
               ),
             ),

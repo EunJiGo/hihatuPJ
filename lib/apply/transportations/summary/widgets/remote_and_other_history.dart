@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../remote/domain/remoteAllowanceRules.dart';
+import '../../../remote/domain/remote_allowanceRules.dart';
 
 /// 공통 모델: 정기권/교통비 항목 통합
 class RemoteAndOtherItem {

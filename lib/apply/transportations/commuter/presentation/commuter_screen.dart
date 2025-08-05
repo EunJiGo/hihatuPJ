@@ -733,14 +733,15 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                                       '削除完了',
                                       '交通費削除が完了しました。',
                                     );
-                                    Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => TransportationScreen(initialDate: _selectedDate,),
-
-                                      ),
-                                      (route) => false,
-                                    );
+                                    // Navigator.pushAndRemoveUntil(
+                                    //   context,
+                                    //   MaterialPageRoute(
+                                    //     builder: (_) => TransportationScreen(initialDate: _selectedDate,),
+                                    //
+                                    //   ),
+                                    //   (route) => false,
+                                    // );
+                                    Navigator.pop(context, _selectedDate);
                                   } else {
                                     warningDialog(context, 'エラー', '送信に失敗しました。');
                                   }

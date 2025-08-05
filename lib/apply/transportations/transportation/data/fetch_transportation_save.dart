@@ -8,6 +8,8 @@ import '../domain/transportation_update.dart';
 Future<bool> fetchTransportationSaveUpload(TransportationSave? saveData, TransportationUpdate? uploadData, bool isSave) async {
   final url = Uri.parse('http://192.168.1.8:19021/transportation/');
 
+  print(uploadData == null);
+  print('123456789');
   final response = await http.put(
     url,
     headers: {
