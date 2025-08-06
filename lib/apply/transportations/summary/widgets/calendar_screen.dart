@@ -3,8 +3,15 @@ import 'package:table_calendar/table_calendar.dart';
 
 class CalendarScreen extends StatefulWidget {
   final DateTime selectedDay;
+  final Color titleColor;
+  final Color contentColor;
 
-  const CalendarScreen({super.key, required this.selectedDay});
+  const CalendarScreen({
+    super.key,
+    required this.selectedDay,
+    required this.titleColor,
+    required this.contentColor,
+  });
 
   @override
   State<CalendarScreen> createState() => _CalendarScreenState();
@@ -29,13 +36,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
       color: Colors.white,
       child: SafeArea(
         child: Scaffold(
-          backgroundColor: const Color(0xFFFFF8F0), // 아주 연한 베이지톤 배경
+          backgroundColor: widget.contentColor, // 아주 연한 베이지톤 배경
           appBar: AppBar(
             title: Text(
               '${_selectedDay.year}年 ${_selectedDay.month}月 ${_selectedDay.day}日',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            backgroundColor: const Color(0xFF81C784),
+            backgroundColor: widget.titleColor,
           ),
           body: Padding(
             padding: const EdgeInsets.all(16.0),

@@ -121,7 +121,7 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: IconButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => Navigator.pop(context, _selectedDate),
                     icon: const Icon(Icons.arrow_back_ios),
                     color: Colors.black, // 아이콘 색
                   ),
@@ -150,11 +150,15 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
                             child: DatePickerButton(
                               date: _selectedDate,
                               isFullDate: false,
-                              backgroundColor:_submissionStatus == 'draft' ? Colors.white : Colors.grey.shade200,
+                              backgroundColor:_submissionStatus == 'submitted' ? Colors.grey.shade200 : Colors.white,
                               // 비활성화 스타일
                               borderRadius: 20,
                               shadowColor: const Color(0xFF8e8e8e),
-                              onPick: _submissionStatus == 'draft' ? () async {
+                              onPick: _submissionStatus == 'submitted' ?
+                                  () async {
+                                return _selectedDate; // 그냥 현재 날짜 리턴, 아무것도 안 바꿈
+                              } :
+                                () async {
                                 final picked = await showYearMonthPicker(
                                   context,
                                   _selectedDate.year,
@@ -166,9 +170,7 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
                                   });
                                 }
                                 return picked ?? _selectedDate;
-                              } : () async {
-                                return _selectedDate; // 그냥 현재 날짜 리턴, 아무것도 안 바꿈
-                              },
+                              }
                             ),
                           ),
                           const SizedBox(height: 30),
@@ -200,7 +202,7 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
                                   _remoteAllowanceRule = rule;
                                 });
                               },
-                              isDisabled: _submissionStatus == 'draft' ? false : true,
+                              isDisabled: _submissionStatus == 'submitted' ? true : false,
                               inactiveColor: Color(0xFF6b6b6b),
                             ),
                           ),
@@ -213,7 +215,7 @@ class _RemoteScreenState extends ConsumerState<RemoteScreen> {
                     child: CommonSubmitButtons(
                       // 보존
                       onSavePressed: () async {
-                        if (isRemoteExists && _submissionStatus != "draft") {
+                        if (isRemoteExists) {
                           warningDialog(
                             context,
                             'エラー',

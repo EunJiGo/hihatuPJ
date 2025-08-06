@@ -15,6 +15,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../tabbar/htt_tabbar.dart';
 import '../../utils/dialog/attention_dialog.dart';
+import '../../utils/dialog/confirmation_dialog.dart';
 import '../../utils/dialog/success_dialog.dart';
 import '../../utils/widgets/common_submit_buttons.dart';
 import '../../utils/widgets/dropdown_option.dart';
@@ -101,6 +102,16 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
   @override
   Widget build(BuildContext context) {
     print('build');
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        final canScroll = _scrollController.position.maxScrollExtent > 0;
+        if (!canScroll && !isSummaryVisible) {
+          setState(() => isSummaryVisible = true);
+        }
+      }
+    });
+
     // ➌ Riverpod provider 구독
     final transportationAsync = ref.watch(transportationProvider(currentMonth));
     // final ym = DateFormat('yyyy年 MM月').format(currentMonth); // 7월이면 07월이됨
@@ -130,7 +141,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
           ),
         ),
         title: const Text(
-          '交通費・定期券',
+          '交通費・立替金',
           style: TextStyle(
             color: Colors.black87,
             fontSize: 18,
@@ -143,7 +154,18 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
             padding: const EdgeInsets.only(right: 12.0),
             child: ElevatedButton(
               // onPressed: () => setState(() => currentMonth = DateTime.now()),
-              onPressed: () => moveMonth(0),
+              onPressed: () {
+                final now = DateTime.now();
+                final thisMonth = DateTime(now.year, now.month);
+
+                if (currentMonth.year != thisMonth.year || currentMonth.month != thisMonth.month) {
+                  setState(() => currentMonth = thisMonth);
+                  ref.invalidate(transportationProvider(thisMonth));
+                } else {
+                  // 현재 월과 같더라도 강제로 invalidate
+                  ref.invalidate(transportationProvider(thisMonth));
+                }
+              },
               style:
                   ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
@@ -216,7 +238,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
 
           final commuteTotal = commuteList.fold(
             0,
-            (sum, item) => sum + item.amount, //
+            (sum, item) => sum + item.amount,
           );
 
           // 교통비
@@ -741,7 +763,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                               iconSize: 22,
                               title: '在宅勤務手当の申請履歴',
                               isExpanded: showRemote,
-                              isData: singleList.isEmpty,
+                              isData: remoteList.isEmpty,
                               gap: 15,
                               onToggle: () {
                                 setState(() => showRemote = !showRemote);
@@ -803,7 +825,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                               iconSize: 25,
                               title: '立替金の申請履歴',
                               isExpanded: showOtherExpenseList,
-                              isData: singleList.isEmpty,
+                              isData: otherExpenseList.isEmpty,
                               gap: 8,
                               onToggle: () {
                                 setState(
@@ -966,7 +988,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                               transportationProvider(currentMonth),
                             );
                           }
-                        } else if (val == '在宅勤務手当') {
+                        } else if (val == '在宅勤務手当申請') {
                           final result = await Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -1012,29 +1034,62 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                   },
                   onSubmitPressed: () async {
                     // 提出 버튼 클릭 시 로직
+                    
+                    // 신청내역이 없을 때 
+                    if (commuteList.isEmpty &&
+                        singleList.isEmpty &&
+                        remoteList.isEmpty &&
+                        otherExpenseList.isEmpty) {
+                      attentionDialog(context, '注意', '申請内訳がありません。');
+                      return;
+                    }
+
+                    // 전부 제출 상황일 떄(submission_status == submitted)
+                    final allItems = [...commuteList, ...singleList, ...remoteList, ...otherExpenseList];
+                    final isAllSubmitted = allItems.every((item) => item.submissionStatus == 'submitted');
+
+                    if (isAllSubmitted) {
+                      attentionDialog(context, '注意', '既に申請内訳を全て提出しました。');
+                      return;
+                    }
+
+                    // ✅ 신청 내역이 있을 때만 confirm 다이얼로그
+                    final confirmed = await ConfirmationDialog.show(
+                      context,
+                      message: '${currentMonth.year}年${currentMonth.month}月の申請内訳を提出しますか？\n提出したら、修正ができないです。',
+                    );
+
+                    if (!confirmed!) return;
+
+
                     final finalSuccess = await fetchTransportationSubmit(
                       'admins',
                       currentMonth,
                     );
 
                     if (finalSuccess) {
-                      await successDialog(context, '申請完了', '交通費申請を完了しました。');
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              TransportationScreen(initialDate: currentMonth),
-                        ),
-                        (route) => false,
-                      );
+                      await successDialog(context, '一括提出完了', '${currentMonth.year}年${currentMonth.month}月の申請内訳を一括提出しました。');
+
+                      // ✅ Provider 강제 갱신
+                      ref.invalidate(transportationProvider(currentMonth));
+
+                      // Navigatorr.pushAndRemoveUntil(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (_) =>
+                      //         TransportationScreen(initialDate: currentMonth),
+                      //   ),
+                      //   (route) => false,
+                      // );
                     } else {
-                      attentionDialog(context, '登録エラー', '交通費申請が失敗しました。');
+                      attentionDialog(context, 'エラー', '${currentMonth.year}年${currentMonth.month}月の申請内訳の一括提出を失敗しました。');
                     }
                   },
                   saveText: '申　請',
                   submitText: '一括提出',
-                  submitConfirmMessage:
-                      '${currentMonth.year}年${currentMonth.month}月の申請内訳を提出しますか？\n提出したら、修正ができないです。',
+                  submitConfirmMessage: null,
+                  // submitConfirmMessage:
+                  //     '${currentMonth.year}年${currentMonth.month}月の申請内訳を提出しますか？\n提出したら、修正ができないです。',
                   padding: 0,
                   // 원하는 여백
                   themeColor: const Color(0xFF0253B3), // 기본색 그대로 사용

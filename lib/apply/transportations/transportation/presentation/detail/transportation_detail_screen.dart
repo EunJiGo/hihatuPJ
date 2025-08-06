@@ -134,6 +134,12 @@ class _TransportationInputScreenState
         child: SafeArea(
           child: Scaffold(
             appBar: AppBar(
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back_ios),
+                onPressed: () {
+                  Navigator.pop(context, _selectedDate);
+                },
+              ),
               title: const Text(
                 '交通費申請',
                 style: TextStyle(
@@ -207,6 +213,8 @@ class _TransportationInputScreenState
                                               builder:
                                                   (_) => CalendarScreen(
                                                     selectedDay: _selectedDate,
+                                                    titleColor: Color(0xFFFFB74D),
+                                                    contentColor: Color(0xFFffffff),
                                                   ),
                                             ),
                                           );

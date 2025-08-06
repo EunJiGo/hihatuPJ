@@ -32,9 +32,11 @@ class OtherExpenseScreen extends ConsumerStatefulWidget {
 }
 
 class _OtherExpenseScreenState extends ConsumerState<OtherExpenseScreen> {
-  final TextEditingController _paymentRecipientController = TextEditingController();
+  final TextEditingController _paymentRecipientController =
+      TextEditingController();
   final _costController = TextEditingController();
-  final TextEditingController _customPurposeController = TextEditingController();
+  final TextEditingController _customPurposeController =
+      TextEditingController();
 
   // _purpose
 
@@ -48,27 +50,24 @@ class _OtherExpenseScreenState extends ConsumerState<OtherExpenseScreen> {
   File? _imageFile;
   String? _submissionStatus;
 
-
   @override
   void initState() {
     super.initState();
 
     final transportationId = widget.transportationId;
-    print('transportationId');
-    print('transportationId');
-    print('transportationId');
-    print(transportationId);
 
     if (transportationId != null) {
       ref.read(transportationDetailProvider(transportationId).future).then((
-          detail,
-          ) {
+        detail,
+      ) {
         if (mounted) {
           setState(() {
             _paymentRecipientController.text = detail.payTo;
             _costController.text = detail.amount.toString();
             _selectedDate = DateTime.parse(detail.payDay);
-            final isPresetTransport = otherExpensePurposeOptions.contains(detail.goals);
+            final isPresetTransport = otherExpensePurposeOptions.contains(
+              detail.goals,
+            );
 
             if (isPresetTransport) {
               _purpose = detail.goals;
@@ -90,8 +89,7 @@ class _OtherExpenseScreenState extends ConsumerState<OtherExpenseScreen> {
   Widget build(BuildContext context) {
     // transportationId가 있을 때만 provider 호출
     final commuteIdInt = widget.transportationId;
-    final detailAsync =
-    commuteIdInt != null
+    final detailAsync = commuteIdInt != null
         ? ref.watch(transportationDetailProvider(commuteIdInt))
         : null;
 
@@ -104,6 +102,12 @@ class _OtherExpenseScreenState extends ConsumerState<OtherExpenseScreen> {
           child: Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back_ios),
+                onPressed: () {
+                  Navigator.pop(context, _selectedDate);
+                },
+              ),
               title: const Text(
                 '立替金申請',
                 style: TextStyle(
@@ -141,39 +145,41 @@ class _OtherExpenseScreenState extends ConsumerState<OtherExpenseScreen> {
                       Center(
                         child: _submissionStatus == "submitted"
                             ? DatePickerButton(
-                          date: _selectedDate,
-                          isFullDate: true,
-                          backgroundColor: Colors.grey.shade200, // 비활성화 스타일
-                          borderRadius: 20,
-                          shadowColor: const Color(0xFF8e8e8e),
-                          onPick: () async {
-                            return _selectedDate; // 그냥 현재 날짜 리턴, 아무것도 안 바꿈
-                          },
-                        )
-                            :DatePickerButton(
-                          date: _selectedDate,
-                          isFullDate: true,
-                          backgroundColor: Colors.white,
-                          borderRadius: 20,
-                          shadowColor: const Color(0xFF8e8e8e),
-                          onPick:  () async {
-                            FocusManager.instance.primaryFocus?.unfocus();
+                                date: _selectedDate,
+                                isFullDate: true,
+                                backgroundColor: Colors.grey.shade200,
+                                // 비활성화 스타일
+                                borderRadius: 20,
+                                shadowColor: const Color(0xFF8e8e8e),
+                                onPick: () async {
+                                  return _selectedDate; // 그냥 현재 날짜 리턴, 아무것도 안 바꿈
+                                },
+                              )
+                            : DatePickerButton(
+                                date: _selectedDate,
+                                isFullDate: true,
+                                backgroundColor: Colors.white,
+                                borderRadius: 20,
+                                shadowColor: const Color(0xFF8e8e8e),
+                                onPick: () async {
+                                  FocusManager.instance.primaryFocus?.unfocus();
 
-                            final picked = await Navigator.push<DateTime>(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (_) => CalendarScreen(
-                                  selectedDay: _selectedDate,
-                                ),
+                                  final picked = await Navigator.push<DateTime>(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => CalendarScreen(
+                                        selectedDay: _selectedDate,
+                                        titleColor: Color(0xFF89e6f4),
+                                        contentColor: Color(0xFFffffff),
+                                      ),
+                                    ),
+                                  );
+                                  if (picked != null) {
+                                    setState(() => _selectedDate = picked);
+                                  }
+                                  return picked;
+                                },
                               ),
-                            );
-                            if (picked != null) {
-                              setState(() => _selectedDate = picked);
-                            }
-                            return picked;
-                          },
-                        ),
                       ),
                       const SizedBox(height: 28),
 
@@ -194,7 +200,6 @@ class _OtherExpenseScreenState extends ConsumerState<OtherExpenseScreen> {
                       ),
                       const SizedBox(height: 28),
 
-
                       FormLabel(
                         text: '目的',
                         icon: Icons.flag,
@@ -202,8 +207,12 @@ class _OtherExpenseScreenState extends ConsumerState<OtherExpenseScreen> {
                       ),
                       OtherExpenseDropDown(
                         options: otherExpensePurposeOptions,
-                        answerStatus: _submissionStatus == 'submitted' ? 1 : 0, // 비활성화면 1 넣기
-                        selectedValue: otherExpensePurposeOptions.contains(_purpose) ? _purpose : 'その他',
+                        answerStatus: _submissionStatus == 'submitted' ? 1 : 0,
+                        // 비활성화면 1 넣기
+                        selectedValue:
+                            otherExpensePurposeOptions.contains(_purpose)
+                            ? _purpose
+                            : 'その他',
                         onChanged: (val) {
                           setState(() {
                             _purpose = val ?? '';
@@ -219,7 +228,9 @@ class _OtherExpenseScreenState extends ConsumerState<OtherExpenseScreen> {
                       if (_purpose == 'その他') ...[
                         const SizedBox(height: 12),
                         OtherExpenseTextField(
-                          answerStatus: _submissionStatus == 'submitted' ? 1 : 0,
+                          answerStatus: _submissionStatus == 'submitted'
+                              ? 1
+                              : 0,
                           controller: _customPurposeController,
                           initialAnswer: _customPurpose,
                           onChanged: (val) {
@@ -268,7 +279,10 @@ class _OtherExpenseScreenState extends ConsumerState<OtherExpenseScreen> {
                           imagePath: _imageName,
                           themeColor: const Color(0xFF89e6f4),
                           shadowColor: const Color(0x2281C784),
-                          isDisabled: _submissionStatus == 'submitted' ? true : false, // 업로드 활성화 -- 이상
+                          isDisabled: _submissionStatus == 'submitted'
+                              ? true
+                              : false,
+                          // 업로드 활성화 -- 이상
                           onImageSelected: (path) {
                             setState(() {
                               _imageFile = File(path);
@@ -319,43 +333,44 @@ class _OtherExpenseScreenState extends ConsumerState<OtherExpenseScreen> {
                             print(_imageName);
                           }
 
-                          final saveData =
-                          widget.transportationId == null
+                          final saveData = widget.transportationId == null
                               ? TransportationSave(
-                            date: _selectedDate,
-                            expenseType: 'travel',
-                            twice: false,
-                            amount: int.tryParse(
-                              _costController.text.trim(),
-                            ),
-                            payTo: _paymentRecipientController.text.trim(),
-                            goals: _purpose == 'その他'
-                                ? (_customPurpose ?? '')
-                                : _purpose,
-                            image: _imageName ?? '',
-                            submissionStatus: 'draft',
-                            // ✅ 보존은 null
-                            reviewStatus: '',
-                            id: widget.transportationId,
-                          )
+                                  date: _selectedDate,
+                                  expenseType: 'travel',
+                                  twice: false,
+                                  amount: int.tryParse(
+                                    _costController.text.trim(),
+                                  ),
+                                  payTo: _paymentRecipientController.text
+                                      .trim(),
+                                  goals: _purpose == 'その他'
+                                      ? (_customPurpose ?? '')
+                                      : _purpose,
+                                  image: _imageName ?? '',
+                                  submissionStatus: 'draft',
+                                  // ✅ 보존은 null
+                                  reviewStatus: '',
+                                  id: widget.transportationId,
+                                )
                               : TransportationUpdate(
-                            date: _selectedDate,
-                            id: widget.transportationId!,
-                            employeeId: "admins",
-                            // 임시
-                            expenseType: "travel",
-                            amount: int.tryParse(
-                              _costController.text.trim(),
-                            ),
-                            twice: false,
-                            payTo: _paymentRecipientController.text.trim(),
-                            goals: _purpose == 'その他'
-                                ? (_customPurpose ?? '')
-                                : _purpose,
-                            image: _imageName ?? '',
-                            submissionStatus: 'draft',
-                            reviewStatus: '',
-                          );
+                                  date: _selectedDate,
+                                  id: widget.transportationId!,
+                                  employeeId: "admins",
+                                  // 임시
+                                  expenseType: "travel",
+                                  amount: int.tryParse(
+                                    _costController.text.trim(),
+                                  ),
+                                  twice: false,
+                                  payTo: _paymentRecipientController.text
+                                      .trim(),
+                                  goals: _purpose == 'その他'
+                                      ? (_customPurpose ?? '')
+                                      : _purpose,
+                                  image: _imageName ?? '',
+                                  submissionStatus: 'draft',
+                                  reviewStatus: '',
+                                );
 
                           if (widget.transportationId == null) {
                             final success = await fetchTransportationSaveUpload(
@@ -404,32 +419,34 @@ class _OtherExpenseScreenState extends ConsumerState<OtherExpenseScreen> {
                         },
 
                         // 삭제
-                        onSubmitPressed:
-                        widget.transportationId != null
+                        onSubmitPressed: widget.transportationId != null
                             ? () async {
-                          final success =
-                          await fetchTransportationDelete(
-                            commuteIdInt!,
-                          );
-                          if (success) {
-                            await successDialog(
-                              context,
-                              '削除完了',
-                              '交通費削除が完了しました。',
-                            );
-                            Navigator.pop(context, _selectedDate);
-                          } else {
-                            warningDialog(context, 'エラー', '送信に失敗しました。');
-                          }
-                        }
+                                final success = await fetchTransportationDelete(
+                                  commuteIdInt!,
+                                );
+                                if (success) {
+                                  await successDialog(
+                                    context,
+                                    '削除完了',
+                                    '交通費削除が完了しました。',
+                                  );
+                                  Navigator.pop(context, _selectedDate);
+                                } else {
+                                  warningDialog(context, 'エラー', '送信に失敗しました。');
+                                }
+                              }
                             : () {},
 
                         // 🧑‍🎨 옵션 설정 (텍스트/색상)
                         submitText: '削　　除',
                         saveConfirmMessage: '交通費を保存しますか？',
                         submitConfirmMessage: '交通費を削除しますか？',
-                        showSubmitButton: widget.transportationId != null && _submissionStatus == 'draft',
-                        showSaveButton: widget.transportationId == null || _submissionStatus == 'draft' ,
+                        showSubmitButton:
+                            widget.transportationId != null &&
+                            _submissionStatus == 'draft',
+                        showSaveButton:
+                            widget.transportationId == null ||
+                            _submissionStatus == 'draft',
                         // ← 조건부로 삭제 버튼 숨김
                         themeColor: Color(0xFF008ac1),
                         padding: 0.0, // 원하는 색상

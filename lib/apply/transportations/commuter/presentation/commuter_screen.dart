@@ -206,6 +206,12 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
           child: Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back_ios),
+                onPressed: () {
+                  Navigator.pop(context, _selectedDate);
+                },
+              ),
               title: const Text(
                 '定期券申請',
                 style: TextStyle(
@@ -268,6 +274,8 @@ class _CommuterScreenState extends ConsumerState<CommuterScreen> {
                                 builder:
                                     (_) => CalendarScreen(
                                       selectedDay: _selectedDate,
+                                      titleColor: Color(0xFF81C784),
+                                      contentColor: Color(0xFFFFF8F0),
                                     ),
                               ),
                             );

@@ -38,7 +38,7 @@ class _CommuterImageUploadState extends State<CommuterImageUpload> {
 
     final result = await ImagePickerBottomSheet.showImagePicker(
       context,
-      const Color(0xFF388E3C),
+      widget.themeColor,
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
