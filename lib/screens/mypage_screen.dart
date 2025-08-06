@@ -1,11 +1,33 @@
 import 'package:flutter/material.dart';
 import '../base/base_main_screen.dart';
 import '../header/title_header.dart';
-import '../mypage/profile_card_widget.dart';
+import '../mypage/suggestion/suggestion_screen.dart';
+import '../mypage/widget/profile_card_widget.dart';
 
 class MypageScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // ✅ 메뉴 아이템 정의
+    final List<Map<String, dynamic>> menuItems = [
+      {
+        'label': '目安箱',
+        'icon': Icons.mail_outline,
+        'onTap': () {
+          // TODO: 문의 화면 이동
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => SuggestionListScreen()),
+          );
+        },
+      },
+      {
+        'label': '資産管理',
+        'icon': Icons.devices_other,
+        'onTap': () {
+          // TODO: 자산관리 화면 이동
+        },
+      },
+    ];
     return BaseMainScreen(
       child: Container(
         width: double.infinity,
@@ -132,22 +154,7 @@ class MypageScreen extends StatelessWidget {
       ),
     );
   }
+
 }
 
-// ✅ 메뉴 아이템 정의
-final List<Map<String, dynamic>> menuItems = [
-  {
-    'label': '目安箱',
-    'icon': Icons.mail_outline,
-    'onTap': () {
-      // TODO: 문의 화면 이동
-    },
-  },
-  {
-    'label': '資産管理',
-    'icon': Icons.devices_other,
-    'onTap': () {
-      // TODO: 자산관리 화면 이동
-    },
-  },
-];
+
