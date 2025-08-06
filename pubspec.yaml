@@ -75,10 +75,12 @@ flutter:
     - assets/images/tabbar/apply/apply.png
     - assets/images/home/home_image/home_image.png
     - assets/images/technician/technician_image.png
+    - assets/images/mypage/mypage_image/mypage_image.png
     - assets/images/add/notice_bell.png
     - assets/images/add/title_label.png
     - assets/images/information/correct/correct.png
     - assets/images/information/warning/warning.png
+    - assets/images/add/profile.webp
 
   # To add assets to your application, add an assets section, like this:
   # assets:

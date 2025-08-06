@@ -38,30 +38,33 @@ class WelcomeHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: titleFontSize,
-                    color: const Color(0xFF0253B3),
-                    fontWeight: FontWeight.w600,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: titleFontSize,
+                      color: const Color(0xFF0253B3),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              ),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: subtitleFontSize,
-                  color: const Color(0xFF333333),
-                  fontWeight: FontWeight.w400,
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: subtitleFontSize,
+                    color: const Color(0xFF333333),
+                    fontWeight: FontWeight.w400,
+
+                  ),
+                  maxLines: 3,
                 ),
-                maxLines: 2,
-              ),
-            ],
+              ],
+            ),
           ),
           Image.asset(
             imagePath,
