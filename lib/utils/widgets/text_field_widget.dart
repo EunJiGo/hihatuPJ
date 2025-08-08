@@ -53,7 +53,6 @@ class TextFieldWidget extends StatelessWidget {
       );
     }
 
-    print(' controller?.text.isEmpty = ${controller?.text.isEmpty}');
     return TextField(
       maxLines: null,
       controller: controller,
@@ -65,11 +64,11 @@ class TextFieldWidget extends StatelessWidget {
         hintStyle: TextStyle(color: Colors.grey),
         contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
         enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: editableBorderColor),
+          borderSide: BorderSide(color: controller!.text.isEmpty ? Colors.grey.shade400 : editableBorderColor),
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: selectedBorderColor, width: 1.5),
+          borderSide: BorderSide(color: selectedBorderColor, width: 1.8),
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
         filled: true,

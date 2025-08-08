@@ -14,8 +14,8 @@ class ApplyScreen extends StatelessWidget {
           WelcomeHeader(
             title: '申請・承認',
             subtitle: '休暇や交通費などの各種申請は\nこちらから行えます。',
-            titleFontSize: 18,
-            subtitleFontSize: 12,
+            titleFontSize: 20,
+            subtitleFontSize: 13,
             imagePath: 'assets/images/home/home_image/home_image.png',
           ),
           SizedBox(height: 10,),

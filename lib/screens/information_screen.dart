@@ -21,7 +21,7 @@ class InformationScreen extends StatelessWidget {
         children: [
           WelcomeHeader(
             title: 'お知らせ',
-            subtitle: 'お知らせ・安否確認をお願い致しま\nす。',
+            subtitle: 'お知らせ・安否確認をお願い致します。',
             titleFontSize: 20,
             subtitleFontSize: 14,
             imagePath: 'assets/images/technician/technician_image.png',

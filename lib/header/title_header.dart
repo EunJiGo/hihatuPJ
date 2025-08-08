@@ -19,7 +19,8 @@ class WelcomeHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(15),
+      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+      // padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: const BorderRadius.only(
@@ -31,7 +32,8 @@ class WelcomeHeader extends StatelessWidget {
             color: Colors.black.withOpacity(0.1),
             offset: const Offset(0, 4),
             blurRadius: 8,
-            spreadRadius: 2,
+            // spreadRadius: 2,
+            spreadRadius: -1, // 👉 퍼짐 없음 (좌우 그림자 최소화)
           ),
         ],
       ),
@@ -68,7 +70,7 @@ class WelcomeHeader extends StatelessWidget {
           ),
           Image.asset(
             imagePath,
-            height: 100,
+            height: 80,
             width: 110,
           ),
         ],

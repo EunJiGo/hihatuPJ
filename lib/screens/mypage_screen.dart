@@ -5,6 +5,8 @@ import '../mypage/suggestion/suggestion_screen.dart';
 import '../mypage/widget/profile_card_widget.dart';
 
 class MypageScreen extends StatelessWidget {
+  const MypageScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     // ✅ 메뉴 아이템 정의
@@ -42,8 +44,8 @@ class MypageScreen extends StatelessWidget {
               WelcomeHeader(
                 title: '高さんのマイページ',
                 subtitle: 'アカウント情報やご意見送信はこちらから',
-                titleFontSize: 18,
-                subtitleFontSize: 12,
+                titleFontSize: 20,
+                subtitleFontSize: 14,
                 imagePath: 'assets/images/mypage/mypage_image/mypage_image.png',
               ),
 

@@ -37,10 +37,11 @@ dependencies:
   http: ^1.4.0
   intl: ^0.20.2
   image_picker: ^1.0.4
-  flutter_riverpod: ^2.0.0
+  flutter_riverpod: ^2.5.1
   table_calendar: ^3.2.0
   path_provider: ^2.1.5
   font_awesome_flutter: ^10.8.0
+  flutter_quill: ^11.4.2
 
 
 dev_dependencies:
@@ -76,6 +77,7 @@ flutter:
     - assets/images/home/home_image/home_image.png
     - assets/images/technician/technician_image.png
     - assets/images/mypage/mypage_image/mypage_image.png
+    - assets/images/mypage/suggest/suggest_image/suggest_image.png
     - assets/images/add/notice_bell.png
     - assets/images/add/title_label.png
     - assets/images/information/correct/correct.png
