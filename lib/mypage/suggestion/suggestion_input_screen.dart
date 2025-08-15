@@ -164,9 +164,20 @@ class _SuggestionInputScreenState extends ConsumerState<SuggestionInputScreen> {
                       const SizedBox(height: 20),
 
                       // 내용
-                      const Text(
-                        '提案内容',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      Row(
+                        children: [
+                          Image.asset(
+                            'assets/images/add/content.png',
+                            width: 15,
+                            height: 15,
+                            fit: BoxFit.cover,
+                          ),
+                          const SizedBox(width: 7),
+                          const Text(
+                            '提案内容',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 8),
                       ScrollableTextField(

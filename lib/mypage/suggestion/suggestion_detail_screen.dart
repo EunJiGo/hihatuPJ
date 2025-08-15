@@ -215,9 +215,20 @@ class _SuggestionFormScreenExState
                 //   '🏷 カテゴリ',
                 //   style: TextStyle(fontWeight: FontWeight.w700),
                 // ),
-                const Text(
-                  '🗓 作成日',
-                  style: TextStyle(fontWeight: FontWeight.w700),
+                Row(
+                  children: [
+                    Image.asset(
+                      'assets/images/add/calendar.png', // 본인 이미지로 변경
+                      width: 15,
+                      height: 15,
+                      fit: BoxFit.cover,
+                    ),
+                    const SizedBox(width: 7),
+                    const Text(
+                      '作成日',
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 5),
                 Padding(
@@ -255,9 +266,20 @@ class _SuggestionFormScreenExState
                 //   ],
                 // ),
                 const SizedBox(height: 12),
-                const Text(
-                  '📄 内容',
-                  style: TextStyle(fontWeight: FontWeight.w700),
+                Row(
+                  children: [
+                    Image.asset(
+                      'assets/images/add/content.png',
+                      width: 15,
+                      height: 15,
+                      fit: BoxFit.cover,
+                    ),
+                    const SizedBox(width: 7),
+                    const Text(
+                      '内容',
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 5),
                 Padding(

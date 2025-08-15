@@ -181,17 +181,37 @@ class _SuggestionListScreenState extends ConsumerState<SuggestionListScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              item['content'] ?? '',
-                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                            Row(
+                              children: [
+                                Image.asset(
+                                  'assets/images/add/content.png',
+                                  width: 15,
+                                  height: 15,
+                                  fit: BoxFit.cover,
+                                ),
+                                const SizedBox(width: 7),
+                                Expanded(
+                                  child: Text(
+                                    item['content'] ?? '',
+                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
                             ),
                             const SizedBox(height: 8),
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                const Icon(Icons.calendar_today, size: 15, color: Color(0xFF0253B3)),
-                                const SizedBox(width: 4),
+                                // const Icon(Icons.calendar_today, size: 15, color: Color(0xFF0253B3)),
+                                Image.asset(
+                                  'assets/images/add/calendar.png', // 본인 이미지로 변경
+                                  width: 15,
+                                  height: 15,
+                                  fit: BoxFit.cover,
+                                ),
+                                const SizedBox(width: 7),
                                 Text(
                                   item['date'],
                                   style: const TextStyle(

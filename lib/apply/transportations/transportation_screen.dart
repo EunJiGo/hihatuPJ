@@ -12,6 +12,7 @@ import 'package:hihatu_project/apply/transportations/transportation/presentation
 import 'package:hihatu_project/apply/transportations/summary/widgets/transportation_approval_status.dart';
 import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter/rendering.dart' show RenderBox;
 
 import '../../tabbar/htt_tabbar.dart';
 import '../../utils/dialog/attention_dialog.dart';
@@ -42,7 +43,16 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
 
   late ScrollController _scrollController;
   bool isSummaryVisible = true;
-  double _lastOffset = 0;
+  double _lastOffset = 0.0;
+  double _dirAccum = 0.0;
+  static const double _toggleThreshold = 14.0;     // 토글 임계치
+  static const double _topStickyThreshold = 46.0;  // 맨 위 고정 임계치
+  final _summaryKey = GlobalKey();
+  double get _summaryHeight {
+    final box = _summaryKey.currentContext?.findRenderObject() as RenderBox?;
+    return box?.size.height ?? 0;
+  }
+
 
   AnimationController? _animationController;
 
@@ -51,32 +61,111 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
   bool showRemote = true;
   bool showOtherExpenseList = true;
 
+  void _ensureSummaryVisibleIfCantScroll() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scrollController.hasClients) return;
+      final canScroll = _scrollController.position.maxScrollExtent > 0;
+      if (!canScroll && !isSummaryVisible) {
+        setState(() {
+          isSummaryVisible = true;
+          _dirAccum = 0;
+          _lastOffset = _scrollController.position.pixels;
+        });
+      }
+    });
+  }
+  
+
   void moveMonth(int diff) {
     final newMonth = DateTime(currentMonth.year, currentMonth.month + diff);
     setState(() {
       currentMonth = newMonth;
     });
     ref.invalidate(transportationProvider(newMonth));
+    _ensureSummaryVisibleIfCantScroll(); // ← 추가
   }
 
-  void _scrollListener() {
-    final offset = _scrollController.offset;
+  // double _lastOffset = 0.0;
 
-    if (offset <= 0) {
-      // 스크롤 맨 위일 때 항상 보여줌
-      if (!isSummaryVisible) {
-        setState(() => isSummaryVisible = true);
+
+  void _scrollListener() {
+    if (!_scrollController.hasClients) return;
+
+    final pos = _scrollController.position;
+    final offset = pos.pixels;
+
+    // 1) 콘텐츠가 화면보다 짧으면: 합계 항상 표시 + 상태 리셋
+    if (pos.maxScrollExtent <= 0) {
+      if (!isSummaryVisible) setState(() => isSummaryVisible = true);
+      _lastOffset = offset;
+      _dirAccum = 0;
+      return;
+    }
+
+    // 2) 맨 위 근처에서는 항상 표시 + 상태 리셋(바운스/미세 이동 차단)
+    if (offset < _topStickyThreshold) {
+      if (!isSummaryVisible) setState(() => isSummaryVisible = true);
+      _lastOffset = offset;
+      _dirAccum = 0;
+      return;
+    }
+
+    // 3) 이동량 계산 (노이즈 무시)
+    final delta = offset - _lastOffset;
+    if (delta == 0) return;
+
+    // 4) 같은 방향 누적, 방향 바뀌면 리셋
+    if ((delta > 0 && _dirAccum >= 0) || (delta < 0 && _dirAccum <= 0)) {
+      _dirAccum += delta;
+    } else {
+      _dirAccum = delta;
+    }
+
+    // 5) 숨기기 전 가드: 숨긴 뒤에도 스크롤이 남는지 확인
+    const double remainMargin = 0.0; // 필요하면 8.0 등 여유값
+    final bool summaryMeasured = _summaryHeight > 0;
+    final bool willBeScrollableAfterHide = summaryMeasured
+        ? (pos.maxScrollExtent - _summaryHeight) > remainMargin
+        : false; // 높이 미측정이면 숨기지 않음
+
+    // 6) 임계치 넘을 때만 토글(히스테리시스)
+    if (_dirAccum > _toggleThreshold && isSummaryVisible) {
+      if (willBeScrollableAfterHide) {
+        setState(() => isSummaryVisible = false);
       }
-    } else if (offset > _lastOffset && isSummaryVisible) {
-      // 아래로 스크롤 중 -> 숨김
-      setState(() => isSummaryVisible = false);
-    } else if (offset < _lastOffset && !isSummaryVisible) {
-      // 위로 스크롤 중 -> 다시 표시
+      _dirAccum = 0; // 토글했든 말았든 누적은 리셋
+    } else if (_dirAccum < -_toggleThreshold && !isSummaryVisible) {
       setState(() => isSummaryVisible = true);
+      _dirAccum = 0;
     }
 
     _lastOffset = offset;
   }
+
+
+
+
+
+
+
+  // void _scrollListener() {
+  //   final offset = _scrollController.offset;
+  //
+  //   if (offset <= 0) {
+  //     // 스크롤 맨 위일 때 항상 보여줌
+  //     if (!isSummaryVisible) {
+  //       setState(() => isSummaryVisible = true);
+  //     }
+  //   } else if (offset > _lastOffset && isSummaryVisible) {
+  //     // 아래로 스크롤 중 -> 숨김
+  //     setState(() => isSummaryVisible = false);
+  //   } else if (offset < _lastOffset && !isSummaryVisible) {
+  //     // 위로 스크롤 중 -> 다시 표시
+  //     setState(() => isSummaryVisible = true);
+  //   }
+  //
+  //   _lastOffset = offset;
+  // }
 
   @override
   void initState() {
@@ -102,20 +191,78 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
   @override
   Widget build(BuildContext context) {
     print('build');
+    _ensureSummaryVisibleIfCantScroll();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        final canScroll = _scrollController.position.maxScrollExtent > 0;
-        if (!canScroll && !isSummaryVisible) {
-          setState(() => isSummaryVisible = true);
-        }
-      }
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   if (_scrollController.hasClients) {
+    //     final canScroll = _scrollController.position.maxScrollExtent > 0;
+    //     if (!canScroll && !isSummaryVisible) {
+    //       setState(() => isSummaryVisible = true);
+    //     }
+    //   }
+    // });
 
     // ➌ Riverpod provider 구독
     final transportationAsync = ref.watch(transportationProvider(currentMonth));
     // final ym = DateFormat('yyyy年 MM月').format(currentMonth); // 7월이면 07월이됨
     final ym = '${currentMonth.year}年 ${currentMonth.month}月';
+
+
+    // ❌ final transportationItem = transportationAsync.value!;
+    // ✅ 안전한 가져오기
+    final List<TransportationItem> transportationItem =
+        transportationAsync.asData?.value ?? const <TransportationItem>[];
+
+    // transportationItem에서 "commute" 타입 필터링
+    // 정기권
+    final commuteList = transportationItem
+        .where((item) => item.expenseType == 'commute')
+        .toList();
+
+    final commuteTotal = commuteList.fold(
+      0,
+          (sum, item) => sum + item.amount,
+    );
+
+    // 교통비
+    final singleList = transportationItem
+        .where((item) => item.expenseType == 'single')
+        .toList();
+
+    final singleTotal = singleList.fold(
+      0,
+          (sum, item) => sum + item.amount,
+    );
+
+    // 재택근무수당 -> 당월에 한개밖에 없음
+    final remoteList = transportationItem
+        .where((item) => item.expenseType == 'home_office_expenses')
+        .toList();
+
+    final TransportationItem? remote = remoteList.isNotEmpty
+        ? remoteList.first
+        : null;
+
+    final remoteTotal = remote?.amount ?? 0;
+
+    // 그 외 경비
+    final otherExpenseList = transportationItem
+        .where((item) => item.expenseType == 'travel')
+        .toList();
+
+    final otherExpenseTotal = otherExpenseList.fold(
+      0,
+          (sum, item) => sum + item.amount,
+    );
+
+    final grandTotal =
+        commuteTotal + singleTotal + remoteTotal + otherExpenseTotal;
+
+    // body 안의 Builder 또는 SingleChildScrollView 근처에서:
+    final scaffoldState = Scaffold.maybeOf(context);
+    final hasBottomBar = scaffoldState?.widget.bottomNavigationBar != null;
+
+
 
     // 데이터 있을 때 UI (원래 your data 처리 코드)
     return Scaffold(
@@ -228,52 +375,66 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
             return const Center(child: Text('データが存在しません'));
           }
 
-          final transportationItem = transportationAsync.value!;
-
-          // transportationItem에서 "commute" 타입 필터링
-          // 정기권
-          final commuteList = transportationItem
-              .where((item) => item.expenseType == 'commute')
-              .toList();
-
-          final commuteTotal = commuteList.fold(
-            0,
-            (sum, item) => sum + item.amount,
-          );
-
-          // 교통비
-          final singleList = transportationItem
-              .where((item) => item.expenseType == 'single')
-              .toList();
-
-          final singleTotal = singleList.fold(
-            0,
-            (sum, item) => sum + item.amount,
-          );
-
-          // 재택근무수당 -> 당월에 한개밖에 없음
-          final remoteList = transportationItem
-              .where((item) => item.expenseType == 'home_office_expenses')
-              .toList();
-
-          final TransportationItem? remote = remoteList.isNotEmpty
-              ? remoteList.first
-              : null;
-
-          final remoteTotal = remote?.amount ?? 0;
-
-          // 그 외 경비
-          final otherExpenseList = transportationItem
-              .where((item) => item.expenseType == 'travel')
-              .toList();
-
-          final otherExpenseTotal = otherExpenseList.fold(
-            0,
-            (sum, item) => sum + item.amount,
-          );
-
-          final grandTotal =
-              commuteTotal + singleTotal + remoteTotal + otherExpenseTotal;
+//           final transportationItem = transportationAsync.value!;
+//
+//           // transportationItem에서 "commute" 타입 필터링
+//           // 정기권
+//           final commuteList = transportationItem
+//               .where((item) => item.expenseType == 'commute')
+//               .toList();
+//
+//           final commuteTotal = commuteList.fold(
+//             0,
+//             (sum, item) => sum + item.amount,
+//           );
+//
+//           // 교통비
+//           final singleList = transportationItem
+//               .where((item) => item.expenseType == 'single')
+//               .toList();
+//
+//           final singleTotal = singleList.fold(
+//             0,
+//             (sum, item) => sum + item.amount,
+//           );
+//
+//           // 재택근무수당 -> 당월에 한개밖에 없음
+//           final remoteList = transportationItem
+//               .where((item) => item.expenseType == 'home_office_expenses')
+//               .toList();
+//
+//           final TransportationItem? remote = remoteList.isNotEmpty
+//               ? remoteList.first
+//               : null;
+//
+//           final remoteTotal = remote?.amount ?? 0;
+//
+//           // 그 외 경비
+//           final otherExpenseList = transportationItem
+//               .where((item) => item.expenseType == 'travel')
+//               .toList();
+//
+//           final otherExpenseTotal = otherExpenseList.fold(
+//             0,
+//             (sum, item) => sum + item.amount,
+//           );
+//
+//           final grandTotal =
+//               commuteTotal + singleTotal + remoteTotal + otherExpenseTotal;
+//
+//           // body 안의 Builder 또는 SingleChildScrollView 근처에서:
+//           final scaffoldState = Scaffold.maybeOf(context);
+//           final hasBottomBar = scaffoldState?.widget.bottomNavigationBar != null;
+//
+// // CommonSubmitButtons 예상 높이(프로젝트 위젯에 맞게 조정)
+//           const double actionBarHeight = 72.0;
+// // 마지막 아이템과 바 사이 여유
+//           const double extraSpacing = 16.0;
+//           final double safeBottom = MediaQuery.of(context).padding.bottom;
+//
+//           final double bottomPad = hasBottomBar
+//               ? actionBarHeight + safeBottom + extraSpacing
+//               : 16.0;
 
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -418,6 +579,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                     child: Column(
                       children: [
                         Container(
+                          key: _summaryKey,
                           padding: const EdgeInsets.symmetric(
                             vertical: 10,
                             horizontal: 20,
@@ -606,6 +768,8 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                             ],
                           ),
                         ),
+
+
                         const SizedBox(height: 10),
                       ],
                     ),
@@ -619,7 +783,14 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                   Expanded(
                     child: SingleChildScrollView(
                       controller: _scrollController,
-                      physics: const ClampingScrollPhysics(), // ← 바운스 제거
+                      physics: const AlwaysScrollableScrollPhysics(
+                        parent: ClampingScrollPhysics(), // 안드로이드 튕김 없음
+                      ),
+
+                      // physics: const ClampingScrollPhysics(), // ← 바운스 제거
+                      // padding: EdgeInsets.only(
+                      //   bottom: 448 + MediaQuery.of(context).padding.bottom + 12,
+                      // ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -635,6 +806,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                                 setState(
                                   () => showCommuteList = !showCommuteList,
                                 );
+                                _ensureSummaryVisibleIfCantScroll();
                               },
                             ),
 
@@ -701,6 +873,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                                 setState(
                                   () => showSingleList = !showSingleList,
                                 );
+                                _ensureSummaryVisibleIfCantScroll();
                               },
                             ),
                             if (showSingleList)
@@ -767,6 +940,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                               gap: 15,
                               onToggle: () {
                                 setState(() => showRemote = !showRemote);
+                                _ensureSummaryVisibleIfCantScroll();
                               },
                             ),
 
@@ -832,6 +1006,7 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                                   () => showOtherExpenseList =
                                       !showOtherExpenseList,
                                 );
+                                _ensureSummaryVisibleIfCantScroll();
                               },
                             ),
 
@@ -921,186 +1096,365 @@ class _TransportationScreenState extends ConsumerState<TransportationScreen>
                 ],
 
                 // 신청버튼 / 제출버튼
-                CommonSubmitButtons(
-                  onSavePressed: () {
-                    final options = [
-                      DropdownOption.fromText(
-                        '定期券申請',
-                        icon: Icons.confirmation_number,
-                        iconColor: Color(0xFF81C784),
-                      ),
-                      DropdownOption.fromText(
-                        '交通費申請',
-                        icon: Icons.directions_bus,
-                        iconColor: Color(0xFFFFB74D),
-                      ),
-                      DropdownOption.fromText(
-                        '在宅勤務手当申請',
-                        icon: FontAwesomeIcons.houseLaptop,
-                        iconColor: Color(0xFFfeaaa9),
-                      ),
-                      DropdownOption.fromText(
-                        '立替金申請',
-                        icon: Icons.receipt_long,
-                        iconColor: Color(0xFF89e6f4),
-                      ),
-                    ];
-
-                    // 申請 버튼 클릭 시 로직
-                    DropdownModalWidget.show(
-                      context: context,
-                      options: options,
-                      selectedValue: null,
-                      onSelected: (val) async {
-                        if (val == '定期券申請') {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const CommuterScreen(),
-                            ),
-                          );
-                          if (result != null && result is DateTime) {
-                            setState(() {
-                              currentMonth = DateTime(
-                                result.year,
-                                result.month,
-                              );
-                            });
-                            ref.invalidate(
-                              transportationProvider(currentMonth),
-                            );
-                          }
-                        } else if (val == '交通費申請') {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const TransportationInputScreen(),
-                            ),
-                          );
-                          if (result != null && result is DateTime) {
-                            setState(() {
-                              currentMonth = DateTime(
-                                result.year,
-                                result.month,
-                              );
-                            });
-                            ref.invalidate(
-                              transportationProvider(currentMonth),
-                            );
-                          }
-                        } else if (val == '在宅勤務手当申請') {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const RemoteScreen(),
-                            ),
-                          );
-                          if (result != null && result is DateTime) {
-                            setState(() {
-                              currentMonth = DateTime(
-                                result.year,
-                                result.month,
-                              );
-                            });
-                            ref.invalidate(
-                              transportationProvider(currentMonth),
-                            );
-                          }
-                        } else if (val == '立替金申請') {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const OtherExpenseScreen(),
-                            ),
-                          );
-                          if (result != null && result is DateTime) {
-                            setState(() {
-                              currentMonth = DateTime(
-                                result.year,
-                                result.month,
-                              );
-                            });
-                            ref.invalidate(
-                              transportationProvider(currentMonth),
-                            );
-                          }
-                        }
-                      },
-                      selectedTextColor: const Color(0xFF1565C0),
-                      selectedIconColor: Colors.blueAccent,
-                      selectedBorderColor: const Color(0xFF64B5F6),
-                      selectedBackgroundColor: const Color(0xFFE3F2FD),
-                    );
-                  },
-                  onSubmitPressed: () async {
-                    // 提出 버튼 클릭 시 로직
-                    
-                    // 신청내역이 없을 때 
-                    if (commuteList.isEmpty &&
-                        singleList.isEmpty &&
-                        remoteList.isEmpty &&
-                        otherExpenseList.isEmpty) {
-                      attentionDialog(context, '注意', '申請内訳がありません。');
-                      return;
-                    }
-
-                    // 전부 제출 상황일 떄(submission_status == submitted)
-                    final allItems = [...commuteList, ...singleList, ...remoteList, ...otherExpenseList];
-                    final isAllSubmitted = allItems.every((item) => item.submissionStatus == 'submitted');
-
-                    if (isAllSubmitted) {
-                      attentionDialog(context, '注意', '既に申請内訳を全て提出しました。');
-                      return;
-                    }
-
-                    // ✅ 신청 내역이 있을 때만 confirm 다이얼로그
-                    final confirmed = await ConfirmationDialog.show(
-                      context,
-                      message: '${currentMonth.year}年${currentMonth.month}月の申請内訳を提出しますか？\n提出したら、修正ができないです。',
-                    );
-
-                    if (!confirmed!) return;
-
-
-                    final finalSuccess = await fetchTransportationSubmit(
-                      'admins',
-                      currentMonth,
-                    );
-
-                    if (finalSuccess) {
-                      await successDialog(context, '一括提出完了', '${currentMonth.year}年${currentMonth.month}月の申請内訳を一括提出しました。');
-
-                      // ✅ Provider 강제 갱신
-                      ref.invalidate(transportationProvider(currentMonth));
-
-                      // Navigatorr.pushAndRemoveUntil(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (_) =>
-                      //         TransportationScreen(initialDate: currentMonth),
-                      //   ),
-                      //   (route) => false,
-                      // );
-                    } else {
-                      attentionDialog(context, 'エラー', '${currentMonth.year}年${currentMonth.month}月の申請内訳の一括提出を失敗しました。');
-                    }
-                  },
-                  saveText: '申　請',
-                  submitText: '一括提出',
-                  submitConfirmMessage: null,
-                  // submitConfirmMessage:
-                  //     '${currentMonth.year}年${currentMonth.month}月の申請内訳を提出しますか？\n提出したら、修正ができないです。',
-                  padding: 0,
-                  // 원하는 여백
-                  themeColor: const Color(0xFF0253B3), // 기본색 그대로 사용
-                ),
-                const SizedBox(height: 16),
+                // CommonSubmitButtons(
+                //   onSavePressed: () {
+                //     final options = [
+                //       DropdownOption.fromText(
+                //         '定期券申請',
+                //         icon: Icons.confirmation_number,
+                //         iconColor: Color(0xFF81C784),
+                //       ),
+                //       DropdownOption.fromText(
+                //         '交通費申請',
+                //         icon: Icons.directions_bus,
+                //         iconColor: Color(0xFFFFB74D),
+                //       ),
+                //       DropdownOption.fromText(
+                //         '在宅勤務手当申請',
+                //         icon: FontAwesomeIcons.houseLaptop,
+                //         iconColor: Color(0xFFfeaaa9),
+                //       ),
+                //       DropdownOption.fromText(
+                //         '立替金申請',
+                //         icon: Icons.receipt_long,
+                //         iconColor: Color(0xFF89e6f4),
+                //       ),
+                //     ];
+                //
+                //     // 申請 버튼 클릭 시 로직
+                //     DropdownModalWidget.show(
+                //       context: context,
+                //       options: options,
+                //       selectedValue: null,
+                //       onSelected: (val) async {
+                //         if (val == '定期券申請') {
+                //           final result = await Navigator.push(
+                //             context,
+                //             MaterialPageRoute(
+                //               builder: (_) => const CommuterScreen(),
+                //             ),
+                //           );
+                //           if (result != null && result is DateTime) {
+                //             setState(() {
+                //               currentMonth = DateTime(
+                //                 result.year,
+                //                 result.month,
+                //               );
+                //             });
+                //             ref.invalidate(
+                //               transportationProvider(currentMonth),
+                //             );
+                //           }
+                //         } else if (val == '交通費申請') {
+                //           final result = await Navigator.push(
+                //             context,
+                //             MaterialPageRoute(
+                //               builder: (_) => const TransportationInputScreen(),
+                //             ),
+                //           );
+                //           if (result != null && result is DateTime) {
+                //             setState(() {
+                //               currentMonth = DateTime(
+                //                 result.year,
+                //                 result.month,
+                //               );
+                //             });
+                //             ref.invalidate(
+                //               transportationProvider(currentMonth),
+                //             );
+                //           }
+                //         } else if (val == '在宅勤務手当申請') {
+                //           final result = await Navigator.push(
+                //             context,
+                //             MaterialPageRoute(
+                //               builder: (_) => const RemoteScreen(),
+                //             ),
+                //           );
+                //           if (result != null && result is DateTime) {
+                //             setState(() {
+                //               currentMonth = DateTime(
+                //                 result.year,
+                //                 result.month,
+                //               );
+                //             });
+                //             ref.invalidate(
+                //               transportationProvider(currentMonth),
+                //             );
+                //           }
+                //         } else if (val == '立替金申請') {
+                //           final result = await Navigator.push(
+                //             context,
+                //             MaterialPageRoute(
+                //               builder: (_) => const OtherExpenseScreen(),
+                //             ),
+                //           );
+                //           if (result != null && result is DateTime) {
+                //             setState(() {
+                //               currentMonth = DateTime(
+                //                 result.year,
+                //                 result.month,
+                //               );
+                //             });
+                //             ref.invalidate(
+                //               transportationProvider(currentMonth),
+                //             );
+                //           }
+                //         }
+                //       },
+                //       selectedTextColor: const Color(0xFF1565C0),
+                //       selectedIconColor: Colors.blueAccent,
+                //       selectedBorderColor: const Color(0xFF64B5F6),
+                //       selectedBackgroundColor: const Color(0xFFE3F2FD),
+                //     );
+                //   },
+                //   onSubmitPressed: () async {
+                //     // 提出 버튼 클릭 시 로직
+                //
+                //     // 신청내역이 없을 때
+                //     if (commuteList.isEmpty &&
+                //         singleList.isEmpty &&
+                //         remoteList.isEmpty &&
+                //         otherExpenseList.isEmpty) {
+                //       attentionDialog(context, '注意', '申請内訳がありません。');
+                //       return;
+                //     }
+                //
+                //     // 전부 제출 상황일 떄(submission_status == submitted)
+                //     final allItems = [...commuteList, ...singleList, ...remoteList, ...otherExpenseList];
+                //     final isAllSubmitted = allItems.every((item) => item.submissionStatus == 'submitted');
+                //
+                //     if (isAllSubmitted) {
+                //       attentionDialog(context, '注意', '既に申請内訳を全て提出しました。');
+                //       return;
+                //     }
+                //
+                //     // ✅ 신청 내역이 있을 때만 confirm 다이얼로그
+                //     final confirmed = await ConfirmationDialog.show(
+                //       context,
+                //       message: '${currentMonth.year}年${currentMonth.month}月の申請内訳を提出しますか？\n提出したら、修正ができないです。',
+                //     );
+                //
+                //     if (!confirmed!) return;
+                //
+                //
+                //     final finalSuccess = await fetchTransportationSubmit(
+                //       'admins',
+                //       currentMonth,
+                //     );
+                //
+                //     if (finalSuccess) {
+                //       await successDialog(context, '一括提出完了', '${currentMonth.year}年${currentMonth.month}月の申請内訳を一括提出しました。');
+                //
+                //       // ✅ Provider 강제 갱신
+                //       ref.invalidate(transportationProvider(currentMonth));
+                //
+                //       // Navigatorr.pushAndRemoveUntil(
+                //       //   context,
+                //       //   MaterialPageRoute(
+                //       //     builder: (_) =>
+                //       //         TransportationScreen(initialDate: currentMonth),
+                //       //   ),
+                //       //   (route) => false,
+                //       // );
+                //     } else {
+                //       attentionDialog(context, 'エラー', '${currentMonth.year}年${currentMonth.month}月の申請内訳の一括提出を失敗しました。');
+                //     }
+                //   },
+                //   saveText: '申　請',
+                //   submitText: '一括提出',
+                //   submitConfirmMessage: null,
+                //   // submitConfirmMessage:
+                //   //     '${currentMonth.year}年${currentMonth.month}月の申請内訳を提出しますか？\n提出したら、修正ができないです。',
+                //   padding: 0,
+                //   // 원하는 여백
+                //   themeColor: const Color(0xFF0253B3), // 기본색 그대로 사용
+                // ),
               ],
             ),
           );
         },
       ),
       backgroundColor: const Color(0xFFF5F7FA),
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 3, 16, 3),
+          child: // 신청버튼 / 제출버튼
+          CommonSubmitButtons(
+            onSavePressed: () {
+              final options = [
+                DropdownOption.fromText(
+                  '定期券申請',
+                  icon: Icons.confirmation_number,
+                  iconColor: Color(0xFF81C784),
+                ),
+                DropdownOption.fromText(
+                  '交通費申請',
+                  icon: Icons.directions_bus,
+                  iconColor: Color(0xFFFFB74D),
+                ),
+                DropdownOption.fromText(
+                  '在宅勤務手当申請',
+                  icon: FontAwesomeIcons.houseLaptop,
+                  iconColor: Color(0xFFfeaaa9),
+                ),
+                DropdownOption.fromText(
+                  '立替金申請',
+                  icon: Icons.receipt_long,
+                  iconColor: Color(0xFF89e6f4),
+                ),
+              ];
+
+              // 申請 버튼 클릭 시 로직
+              DropdownModalWidget.show(
+                context: context,
+                options: options,
+                selectedValue: null,
+                onSelected: (val) async {
+                  if (val == '定期券申請') {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const CommuterScreen(),
+                      ),
+                    );
+                    if (result != null && result is DateTime) {
+                      setState(() {
+                        currentMonth = DateTime(
+                          result.year,
+                          result.month,
+                        );
+                      });
+                      ref.invalidate(
+                        transportationProvider(currentMonth),
+                      );
+                    }
+                  } else if (val == '交通費申請') {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const TransportationInputScreen(),
+                      ),
+                    );
+                    if (result != null && result is DateTime) {
+                      setState(() {
+                        currentMonth = DateTime(
+                          result.year,
+                          result.month,
+                        );
+                      });
+                      ref.invalidate(
+                        transportationProvider(currentMonth),
+                      );
+                    }
+                  } else if (val == '在宅勤務手当申請') {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const RemoteScreen(),
+                      ),
+                    );
+                    if (result != null && result is DateTime) {
+                      setState(() {
+                        currentMonth = DateTime(
+                          result.year,
+                          result.month,
+                        );
+                      });
+                      ref.invalidate(
+                        transportationProvider(currentMonth),
+                      );
+                    }
+                  } else if (val == '立替金申請') {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const OtherExpenseScreen(),
+                      ),
+                    );
+                    if (result != null && result is DateTime) {
+                      setState(() {
+                        currentMonth = DateTime(
+                          result.year,
+                          result.month,
+                        );
+                      });
+                      ref.invalidate(
+                        transportationProvider(currentMonth),
+                      );
+                    }
+                  }
+                },
+                selectedTextColor: const Color(0xFF1565C0),
+                selectedIconColor: Colors.blueAccent,
+                selectedBorderColor: const Color(0xFF64B5F6),
+                selectedBackgroundColor: const Color(0xFFE3F2FD),
+              );
+            },
+            onSubmitPressed: () async {
+              // 提出 버튼 클릭 시 로직
+
+              // 신청내역이 없을 때
+              if (commuteList.isEmpty &&
+                  singleList.isEmpty &&
+                  remoteList.isEmpty &&
+                  otherExpenseList.isEmpty) {
+                attentionDialog(context, '注意', '申請内訳がありません。');
+                return;
+              }
+
+              // 전부 제출 상황일 떄(submission_status == submitted)
+              final allItems = [...commuteList, ...singleList, ...remoteList, ...otherExpenseList];
+              final isAllSubmitted = allItems.every((item) => item.submissionStatus == 'submitted');
+
+              if (isAllSubmitted) {
+                attentionDialog(context, '注意', '既に申請内訳を全て提出しました。');
+                return;
+              }
+
+              // ✅ 신청 내역이 있을 때만 confirm 다이얼로그
+              final confirmed = await ConfirmationDialog.show(
+                context,
+                message: '${currentMonth.year}年${currentMonth.month}月の申請内訳を提出しますか？\n提出したら、修正ができないです。',
+              );
+
+              if (!confirmed!) return;
+
+
+              final finalSuccess = await fetchTransportationSubmit(
+                'admins',
+                currentMonth,
+              );
+
+              if (finalSuccess) {
+                await successDialog(context, '一括提出完了', '${currentMonth.year}年${currentMonth.month}月の申請内訳を一括提出しました。');
+
+                // ✅ Provider 강제 갱신
+                ref.invalidate(transportationProvider(currentMonth));
+
+                // Navigatorr.pushAndRemoveUntil(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (_) =>
+                //         TransportationScreen(initialDate: currentMonth),
+                //   ),
+                //   (route) => false,
+                // );
+              } else {
+                attentionDialog(context, 'エラー', '${currentMonth.year}年${currentMonth.month}月の申請内訳の一括提出を失敗しました。');
+              }
+            },
+            saveText: '申　請',
+            submitText: '一括提出',
+            submitConfirmMessage: null,
+            // submitConfirmMessage:
+            //     '${currentMonth.year}年${currentMonth.month}月の申請内訳を提出しますか？\n提出したら、修正ができないです。',
+            padding: 0,
+            // 원하는 여백
+            themeColor: const Color(0xFF0253B3), // 기본색 그대로 사용
+          ),
+        ),
+      ),
     );
   }
 
