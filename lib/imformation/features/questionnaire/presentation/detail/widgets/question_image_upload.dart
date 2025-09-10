@@ -1,8 +1,6 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import '../../../../../../apply/finance/detail/summary/widgets/server_image_upload.dart';
-import '../../../../../../utils/widgets/image_upload_widget.dart';
-import '../../../../../../utils/widgets/modals/image_picker_bottom_sheet.dart';
+import 'package:hihatu_project/apply/finance/detail/summary/widgets/server_image_upload.dart';
+import 'package:hihatu_project/utils/widgets/modals/image_picker_bottom_sheet.dart';
 
 import 'package:image_picker/image_picker.dart';
 

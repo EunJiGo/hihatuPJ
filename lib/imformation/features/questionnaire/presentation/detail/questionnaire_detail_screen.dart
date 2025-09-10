@@ -1,26 +1,24 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hihatu_project/imformation/features/questionnaire/presentation/detail/widgets/question_submit_buttons.dart';
-import '../../../../../apply/finance/api/fetch_image_upload.dart'; // 경로는 너 프로젝트에 맞춰
-import '../../../../../utils/widgets/app_bar/basic_app_bar.dart';
-import '../../../../../base/base_main_screen.dart';
-import '../../../../../tabbar/htt_tabbar.dart';
-import '../../../../../utils/date/date_utils.dart';
-import '../../../../../utils/dialog/attention_dialog.dart';
-import '../../../../../utils/dialog/success_dialog.dart';
-import '../../../../../utils/dialog/warning_dialog.dart';
-import '../../../../../utils/widgets/app_bar/right_status_app_bar.dart';
-import '../../data/fetch_questionnaire_detail.dart';
-import '../../data/fetch_questionnaire_detail_answer.dart';
-import '../../data/fetch_save_questionnaire_answer.dart';
-import '../../domain/questionnaire_detail.dart';
-import '../../domain/questionnaire_detail_answer_response.dart';
-import '../../domain/questionnaire_detail_response.dart';
-import '../../state/question_detail_provider.dart';
+import 'package:hihatu_project/apply/finance/api/fetch_image_upload.dart'; // 경로는 너 프로젝트에 맞춰
+import 'package:hihatu_project/base/base_main_screen.dart';
+import 'package:hihatu_project/tabbar/htt_tabbar.dart';
+import 'package:hihatu_project/utils/widgets/app_bar/basic_app_bar.dart';
+import 'package:hihatu_project/utils/date/date_utils.dart';
+import 'package:hihatu_project/utils/dialog/attention_dialog.dart';
+import 'package:hihatu_project/utils/dialog/success_dialog.dart';
+import 'package:hihatu_project/utils/dialog/warning_dialog.dart';
+import 'package:hihatu_project/utils/widgets/app_bar/right_status_app_bar.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/data/fetch_questionnaire_detail.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/data/fetch_questionnaire_detail_answer.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/data/fetch_save_questionnaire_answer.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/domain/questionnaire_detail.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/domain/questionnaire_detail_answer_response.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/domain/questionnaire_detail_response.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/state/question_detail_provider.dart';
 import 'widgets/question_item_widget.dart';
-import 'widgets/question_image_upload.dart';
 
 class QuestionDetailScreen extends ConsumerStatefulWidget {
   final int questionnaireId;

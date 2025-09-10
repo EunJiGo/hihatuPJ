@@ -1,7 +1,7 @@
 // lib/calendar/ui/scope/equipment_picker_page.dart
 import 'package:flutter/material.dart';
-import '../../domain/equipment.dart';
-import '../../styles.dart';
+import 'package:hihatu_project/calendar/domain/equipment.dart';
+import 'package:hihatu_project/calendar/styles.dart';
 
 class EquipmentPickerPage extends StatefulWidget {
   const EquipmentPickerPage({

@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../domain/questionnaire_detail.dart';
-import '../domain/questionnaire_detail_answer_response.dart';
-import '../data/fetch_questionnaire_detail.dart';
-import '../data/fetch_questionnaire_detail_answer.dart';
-import '../data/fetch_save_questionnaire_answer.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/domain/questionnaire_detail.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/domain/questionnaire_detail_answer_response.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/data/fetch_questionnaire_detail.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/data/fetch_questionnaire_detail_answer.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/data/fetch_save_questionnaire_answer.dart';
 
 // 질문 상세와 답변 상태를 함께 관리하는 StateNotifier
 class QuestionDetailState {

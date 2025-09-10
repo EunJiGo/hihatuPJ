@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../domain/calendar_single.dart';
-import '../../../styles.dart';
-import '../../../../utils/date/date_utils.dart';
-import '../utils/event_repeat_formatter.dart';
-import '../utils/timezone_to_jst.dart'; // parseUtc
+import 'package:hihatu_project/calendar/domain/calendar_single.dart';
+import 'package:hihatu_project/calendar/styles.dart';
+import 'package:hihatu_project/utils/date/date_utils.dart';
+import 'package:hihatu_project/calendar/ui/event_detail/utils/event_repeat_formatter.dart';
+import 'package:hihatu_project/calendar/ui/event_detail/utils/timezone_to_jst.dart'; // parseUtc
 
 // 반복 UI 두 컴포넌트
 class RepeatInfo extends StatelessWidget {

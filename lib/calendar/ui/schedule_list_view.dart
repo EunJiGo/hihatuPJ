@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import '../logic/recurrence.dart';
-import '../styles.dart';
+import 'package:hihatu_project/calendar/logic/recurrence.dart';
+import 'package:hihatu_project/calendar/styles.dart';
 
 enum NearEdge { top, bottom }
 

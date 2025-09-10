@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../types.dart';
-import '../ui/month_grid.dart';
+import 'package:hihatu_project/calendar/types.dart';
+import 'package:hihatu_project/calendar/ui/month_grid.dart';
 
 /// 월간: 제스처 + MonthGrid (동작 동일)
 class MonthBody extends StatelessWidget {

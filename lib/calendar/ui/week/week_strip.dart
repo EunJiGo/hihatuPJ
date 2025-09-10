@@ -1,7 +1,7 @@
 // 주간 날짜 스트립(일~토 숫자 줄 + 파란 동그라미 강조)
 import 'package:flutter/material.dart';
-import '../../styles.dart';
-import '../../logic/time_utils.dart';
+import 'package:hihatu_project/calendar/styles.dart';
+import 'package:hihatu_project/calendar/logic/time_utils.dart';
 
 class WeekStrip extends StatelessWidget {
   const WeekStrip({

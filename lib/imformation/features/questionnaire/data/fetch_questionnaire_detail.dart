@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../domain/questionnaire_detail_response.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/domain/questionnaire_detail_response.dart';
 
 Future<QuestionnaireDetailResponse> fetchQuestionnaireDetail(int id) async {
   final url = Uri.parse('http://192.168.1.8:19021/questionnaire/question/$id');

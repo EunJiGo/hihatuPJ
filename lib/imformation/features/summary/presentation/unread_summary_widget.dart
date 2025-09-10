@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../questionnaire/state/information_tab_index_provider.dart';
-import '../../questionnaire/state/questionnaire_providers.dart';
-import '../../questionnaire/state/questionnaire_status_legend_filter_provider.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/state/information_tab_index_provider.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/state/questionnaire_providers.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/state/questionnaire_status_legend_filter_provider.dart';
 
 class UnreadSummaryWidget extends ConsumerWidget {
   final int unreadNoticeCount;

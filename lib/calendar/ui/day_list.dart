@@ -1,7 +1,7 @@
 // 하루/여러날 리스트 위젯
 import 'package:flutter/material.dart';
-import '../logic/recurrence.dart';
-import '../styles.dart';
+import 'package:hihatu_project/calendar/logic/recurrence.dart';
+import 'package:hihatu_project/calendar/styles.dart';
 
 class DayList extends StatelessWidget {
   const DayList({

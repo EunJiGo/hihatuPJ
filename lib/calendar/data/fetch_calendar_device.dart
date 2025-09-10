@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../domain/calendar_single_response.dart';
+import 'package:hihatu_project/calendar/domain/calendar_single_response.dart';
 
 Future<CalendarSingleResponse> fetchCalendarDevice(String devideId, bool isAllList) async {
   final url = Uri.parse('http://192.168.1.8:19021/events/device/$devideId/$isAllList');

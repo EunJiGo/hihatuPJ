@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../../../utils/route_observer.dart';
-import '../../../domain/questionnaire_detail.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/domain/questionnaire_detail.dart';
 import 'question_text_field.dart';
 import 'question_drop_down.dart';
 import 'question_checkbox_list.dart';

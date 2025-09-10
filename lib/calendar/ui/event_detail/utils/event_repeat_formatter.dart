@@ -1,4 +1,4 @@
-import '../../../domain/calendar_single.dart';
+import 'package:hihatu_project/calendar/domain/calendar_single.dart';
 
 /// 반복 규칙을 일본어 문자열로 변환
 String? repeatDetail(CalendarSingle ev) {

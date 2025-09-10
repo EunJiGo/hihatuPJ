@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../../domain/calendar_single.dart';
-import '../../../styles.dart';
+import 'package:hihatu_project/calendar/domain/calendar_single.dart';
+import 'package:hihatu_project/calendar/styles.dart';
 import 'chips.dart';
 
 // 상세, 작성자, 설비, 참가자, URL, 장소

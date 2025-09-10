@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../../../utils/widgets/dropdown_option.dart';
-import '../../../../../../utils/widgets/dropdown_widget.dart';
-import '../../../../../../utils/widgets/modals/dropdown_modal_widget.dart';
+import 'package:hihatu_project/utils/widgets/dropdown_option.dart';
+import 'package:hihatu_project/utils/widgets/dropdown_widget.dart';
+import 'package:hihatu_project/utils/widgets/modals/dropdown_modal_widget.dart';
 
 class QuestionDropdown extends StatelessWidget {
   final List<String> options;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../../../utils/widgets/common_submit_buttons.dart';
+import 'package:hihatu_project/utils/widgets/common_submit_buttons.dart';
 
 class QuestionSubmitButtons extends StatelessWidget {
   // 비활성화를 위해 nullable 로

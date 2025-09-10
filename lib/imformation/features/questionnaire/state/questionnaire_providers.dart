@@ -1,8 +1,7 @@
 // providers/questionnaire_providers.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../summary/utils/deadline.dart';
-import '../state/questionnaire_list_provider.dart';
-import '../domain/questionnaire.dart';
+import 'package:hihatu_project/imformation/features/summary/utils/deadline.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/state/questionnaire_list_provider.dart';
 
 // 기한 안 지난 + 미작성/작성중
 final actionableQuestionnaireCountProvider = Provider<int>((ref) {

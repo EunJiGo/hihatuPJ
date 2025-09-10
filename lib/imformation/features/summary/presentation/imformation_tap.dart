@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hihatu_project/imformation/features/summary/presentation/questionnaire_status_legend.dart';
-import '../../questionnaire/presentation/questionnaire_list_screen.dart';
-import '../../questionnaire/state/information_tab_index_provider.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/presentation/questionnaire_list_screen.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/state/information_tab_index_provider.dart';
 
 class InformationTabs extends ConsumerStatefulWidget {
   final int initialTabIndex; // 0: お知らせ, 1: 安否確認

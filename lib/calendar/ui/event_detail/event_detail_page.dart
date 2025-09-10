@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:hihatu_project/calendar/ui/event_detail/utils/datetime_format.dart';
 import 'package:hihatu_project/calendar/ui/event_detail/utils/timezone_to_jst.dart';
-import '../../data/fetch_calendar_delete.dart';
-import '../../domain/calendar_single.dart';
-import '../../../../apply/finance/detail/summary/sections/action_bar_section.dart';
-import '../../../../utils/dialog/success_dialog.dart';
-import '../../../../utils/dialog/warning_dialog.dart';
-import '../../styles.dart';
-import '../shared/header.dart';
+import 'package:hihatu_project/calendar/data/fetch_calendar_delete.dart';
+import 'package:hihatu_project/calendar/domain/calendar_single.dart';
+import 'package:hihatu_project/apply/finance/detail/summary/sections/action_bar_section.dart';
+import 'package:hihatu_project/utils/dialog/success_dialog.dart';
+import 'package:hihatu_project/utils/dialog/warning_dialog.dart';
+import 'package:hihatu_project/calendar/styles.dart';
+import 'package:hihatu_project/calendar/ui/shared/header.dart';
 import 'sections/header_card.dart';
 import 'sections/info_blocks.dart';
-import '../../../../utils/date/date_utils.dart'; // parseUtc
+import 'package:hihatu_project/utils/date/date_utils.dart'; // parseUtc
 
 class EventDetailPage extends StatelessWidget {
   const EventDetailPage({super.key, required this.event, required this.pivotJst});

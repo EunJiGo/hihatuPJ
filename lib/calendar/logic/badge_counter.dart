@@ -1,5 +1,5 @@
 // 날짜별 스케줄 카운트 계산해서 월간 캘린더에 파란색 점 보여줄 수 있도록 하는 함수
-import '../domain/calendar_single.dart';
+import 'package:hihatu_project/calendar/domain/calendar_single.dart';
 import 'time_utils.dart';
 import 'recurrence.dart';
 

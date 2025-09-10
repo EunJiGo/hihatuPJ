@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../domain/questionnaire_response.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/domain/questionnaire_response.dart';
 
 // HTTP 요청 처리 (http://192.168.1.8:19021/questionnaire 호출)
 Future<QuestionnaireResponse> fetchQuestionnaireList() async {

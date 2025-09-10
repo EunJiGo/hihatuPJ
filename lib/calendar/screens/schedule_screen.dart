@@ -1,42 +1,35 @@
 library schedule_screen;
-
 import 'package:flutter/material.dart' hide ListBody;
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:hihatu_project/calendar/data/fetch_calendar_single_list.dart';
+import 'package:hihatu_project/calendar/data/fetch_employee.dart';
+import 'package:hihatu_project/calendar/data/fetch_equipment.dart';
+import 'package:hihatu_project/calendar/data/fetch_calendar_device.dart';
+import 'package:hihatu_project/calendar/domain/calendar_single.dart';
+import 'package:hihatu_project/calendar/domain/calendar_single_response.dart';
+import 'package:hihatu_project/calendar/domain/employee.dart';
+import 'package:hihatu_project/calendar/domain/equipment.dart';
+import 'package:hihatu_project/calendar/logic/occurrence_expander.dart';
+import 'package:hihatu_project/calendar/logic/recurrence.dart';
+import 'package:hihatu_project/calendar/styles.dart';
+import 'package:hihatu_project/calendar/logic/time_utils.dart';
+import 'package:hihatu_project/calendar/logic/badge_counter.dart';
+import 'package:hihatu_project/calendar/logic/debug_logger.dart';
+import 'package:hihatu_project/calendar/types.dart';
 import 'package:hihatu_project/calendar/ui/event_detail/event_detail_page.dart';
 import 'package:hihatu_project/calendar/ui/schedule_list_view.dart';
-
-import '../data/fetch_calendar_single_list.dart';
-import '../data/fetch_employee.dart';
-import '../data/fetch_equipment.dart';
-import '../data/fetch_calendar_device.dart';
-import '../domain/calendar_single.dart';
-import '../domain/calendar_single_response.dart';
-import '../domain/employee.dart';
-import '../domain/equipment.dart';
-import '../logic/occurrence_expander.dart';
-import '../logic/recurrence.dart';
-import '../styles.dart';
-import '../logic/time_utils.dart';
-import '../logic/badge_counter.dart';
-import '../logic/debug_logger.dart';
-import '../types.dart';
-import '../ui/month_body.dart';
-import '../ui/scope/calendar_scope.dart';
-import '../ui/scope/calendar_scope_bar.dart';
-import '../ui/scope/equipment_picker_page.dart';
-import '../ui/scope/people_picker_page.dart';
-import '../ui/shared/header.dart';
-import '../ui/week_body.dart';
-import '../ui/list_body.dart';
-
+import 'package:hihatu_project/calendar/ui/month_body.dart';
+import 'package:hihatu_project/calendar/ui/scope/calendar_scope.dart';
+import 'package:hihatu_project/calendar/ui/scope/calendar_scope_bar.dart';
+import 'package:hihatu_project/calendar/ui/scope/equipment_picker_page.dart';
+import 'package:hihatu_project/calendar/ui/scope/people_picker_page.dart';
+import 'package:hihatu_project/calendar/ui/shared/header.dart';
+import 'package:hihatu_project/calendar/ui/week_body.dart';
+import 'package:hihatu_project/calendar/ui/list_body.dart';
 // ====== 파트 구성 ======
 part 'schedule/schedule_prefs_part.dart';
-
 part 'schedule/schedule_fetch_part.dart';
-
 part 'schedule/schedule_list_mode_part.dart';
-
 part 'schedule/schedule_selection_part.dart';
 
 class ScheduleScreen extends StatefulWidget {
@@ -46,7 +39,7 @@ class ScheduleScreen extends StatefulWidget {
   State<ScheduleScreen> createState() => _ScheduleScreenState();
 }
 
-class _ScheduleScreenState extends State<ScheduleScreen> {
+class _ScheduleScreenState extends State<ScheduleScreen> with AutomaticKeepAliveClientMixin {
   // ====== API & 로딩 상태 ======
   late Future<CalendarSingleResponse> _futureCalendar;
   bool _loading = false;
@@ -112,6 +105,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     CalendarScopeItem(type: ScopeType.me, id: 'me', label: '自分', enabled: true),
   ];
 
+  @override
+  bool get wantKeepAlive => true; // ✅ 탭 바꿔도 상태 유지
+
   // ====== 생명주기 ======
   @override
   void initState() {
@@ -126,7 +122,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     _futureCalendar = fetchCalendarSingleList(null, true);
     _loadCalendar(); // 최초 로딩
     _loadSavedMode(); // 마지막 모드 복원
-    _loadScopes(); // 스코프용 마스터 로딩
+    // _loadScopes(); // 스코프용 마스터 로딩
+
+    //️ 마스터 로딩이 끝나면 필터 복원 & 반영
+    _loadScopes().then((_) {
+      _loadFilterPrefsAndApply(); // ← 추가
+    });
   }
 
   @override
@@ -144,6 +145,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         _employees = emps.data;
         _equipments = eqs.data;
       });
+      //  마스터 생겼으니, 혹시 선 저장된 선택값이 있다면 라벨로 칩 재구성
+      _rebuildScopeChipsFromSelections();   // ← 추가
     } catch (e) {
       debugPrint('scope load error: $e');
     }
@@ -159,6 +162,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       }
       _includeMe = _scopes.any((e) => e.type == ScopeType.me && e.enabled);
     });
+    await _saveFilterPrefs();
     await _reFetch(recomputeMonth: true); //  반드시
   }
 
@@ -174,6 +178,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         if (id != null) _selectedEquipIds.remove(id);
       }
     });
+    await _saveFilterPrefs();
     await _reFetch(recomputeMonth: true); //  반드시
   }
 
@@ -237,6 +242,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               ...personScopes,
             ];
           });
+          await _saveFilterPrefs();
           await _reFetch(recomputeMonth: true);
           break;
         }
@@ -295,7 +301,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           });
           debugPrint('[equip] after setState = $_selectedEquipIds');
 
-          // ✅ 선택 후 바로 재조회 & 회색 배지 갱신
+          await _saveFilterPrefs();
+          // 선택 후 바로 재조회 & 회색 배지 갱신
           await _reFetch(recomputeMonth: true);
           break;
         }
@@ -315,6 +322,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   // ====== 빌드 ======
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final dayOccMap = occurrencesByDay(events: _events, days: _effectiveDays);
 
     return Scaffold(
@@ -413,6 +421,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                             _pivotDate = base;
                             _displayMonth = DateTime(base.year, base.month, 1);
                           });
+                          // 저장은 비동기로 가볍게
+                          _saveFilterPrefs();
                         }
                       },
                     )
@@ -486,6 +496,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     _pivotDate = now;
     _selectedDays = [];
     setState(() {});
+    await _saveFilterPrefs();
     await _reFetch(recomputeMonth: true);
   }
 
@@ -495,6 +506,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     _pivotDate = DateTime(year, month, 1);
     _selectedDays = [];
     setState(() {});
+    await _saveFilterPrefs();
     await _reFetch(recomputeMonth: true);
   }
 }

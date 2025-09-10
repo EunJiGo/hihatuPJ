@@ -1,7 +1,7 @@
 // 서버 이벤트를 “로컬타임 발생들”로 전개하고, 선택한 날짜(1~2일)별로 잘라서 돌려줌
 import 'package:hihatu_project/calendar/logic/recurrence.dart';
 import 'package:hihatu_project/calendar/logic/time_utils.dart';
-import '../domain/calendar_single.dart';
+import 'package:hihatu_project/calendar/domain/calendar_single.dart';
 
 DateTime _localDate(DateTime t) => DateTime(t.year, t.month, t.day);
 

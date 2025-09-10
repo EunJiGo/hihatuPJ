@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../styles.dart';
-import '../types.dart';
+import 'package:hihatu_project/calendar/styles.dart';
+import 'package:hihatu_project/calendar/types.dart';
 import 'shared/header.dart';
 
 class YearCalendarPage extends StatefulWidget {

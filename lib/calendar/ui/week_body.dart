@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hihatu_project/calendar/ui/selected_days_header.dart';
 import 'package:hihatu_project/calendar/ui/week/week_strip.dart';
 import 'package:hihatu_project/calendar/ui/week/week_timeline.dart';
-import '../logic/recurrence.dart';
+import 'package:hihatu_project/calendar/logic/recurrence.dart';
 
 // ====== UI 빌더: 주간/일간 모드 ======
 class WeekBody extends StatelessWidget {

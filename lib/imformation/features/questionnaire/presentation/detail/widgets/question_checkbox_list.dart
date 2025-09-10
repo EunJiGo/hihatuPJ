@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../../utils/widgets/checkbox_list_widget.dart';
+import 'package:hihatu_project/utils/widgets/checkbox_list_widget.dart';
 
 class QuestionCheckboxList extends StatelessWidget {
   final List<String> options;

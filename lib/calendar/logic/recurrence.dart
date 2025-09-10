@@ -1,5 +1,5 @@
 // 반복 전개 엔진 (expand)
-import '../domain/calendar_single.dart';
+import 'package:hihatu_project/calendar/domain/calendar_single.dart';
 import 'time_utils.dart';
 
 class Occurrence {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../../utils/widgets/text_field_widget.dart';
+import 'package:hihatu_project/utils/widgets/text_field_widget.dart';
 
 class QuestionTextField extends StatelessWidget {
   final int answerStatus;

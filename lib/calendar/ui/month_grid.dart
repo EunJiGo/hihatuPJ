@@ -1,8 +1,8 @@
 // 월 그리드 + 점 렌더
 import 'package:flutter/material.dart';
-import '../logic/time_utils.dart';
-import '../styles.dart';
-import '../types.dart';
+import 'package:hihatu_project/calendar/logic/time_utils.dart';
+import 'package:hihatu_project/calendar/styles.dart';
+import 'package:hihatu_project/calendar/types.dart';
 
 class MonthGrid extends StatelessWidget {
   const MonthGrid({

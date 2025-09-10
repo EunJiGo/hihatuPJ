@@ -1,8 +1,8 @@
 // 타임 라인 박스 1개
 import 'package:flutter/material.dart';
 import 'package:hihatu_project/calendar/ui/week/time_label_jst.dart';
-import '../../logic/recurrence.dart';
-import '../../styles.dart';
+import 'package:hihatu_project/calendar/logic/recurrence.dart';
+import 'package:hihatu_project/calendar/styles.dart';
 
 class EventBox extends StatelessWidget {
   const EventBox({

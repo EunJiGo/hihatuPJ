@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hihatu_project/calendar/ui/event_detail/sections/repeat_info.dart';
-import '../../../domain/calendar_single.dart';
-import '../../../styles.dart';
+import 'package:hihatu_project/calendar/domain/calendar_single.dart';
+import 'package:hihatu_project/calendar/styles.dart';
 import 'chips.dart';
 
 // 제목, 기간, 반복, 공개칩

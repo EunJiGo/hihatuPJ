@@ -1,5 +1,5 @@
 // 일간 전개 유틸 (클리핑 + 섹션 빌드)
-import '../domain/calendar_single.dart';
+import 'package:hihatu_project/calendar/domain/calendar_single.dart';
 import 'time_utils.dart';
 import 'recurrence.dart';
 

@@ -1,6 +1,6 @@
 // 디버그 로그 출력
 import 'package:flutter/material.dart';
-import '../domain/calendar_single.dart';
+import 'package:hihatu_project/calendar/domain/calendar_single.dart';
 import 'time_utils.dart';
 import 'recurrence.dart';
 import 'badge_counter.dart';

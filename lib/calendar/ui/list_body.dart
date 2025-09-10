@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../logic/recurrence.dart';
-import '../ui/schedule_list_view.dart';
+import 'package:hihatu_project/calendar/logic/recurrence.dart';
+import 'package:hihatu_project/calendar/ui/schedule_list_view.dart';
 
 /// 리스트 모드: ScheduleListBody 래퍼 (동작 동일)
 class ListBody extends StatelessWidget {

@@ -1,6 +1,6 @@
 // 연 그리드
 import 'package:flutter/material.dart';
-import '../styles.dart';
+import 'package:hihatu_project/calendar/styles.dart';
 
 class YearGridSheet extends StatefulWidget {
   const YearGridSheet({

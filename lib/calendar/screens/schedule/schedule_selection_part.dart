@@ -29,9 +29,19 @@ extension _SelectionAndNav on _ScheduleScreenState {
     _saveMode(_mode);
   }
 
-  void _shiftMonth(int delta) async {
-    _displayMonth = DateTime(_displayMonth.year, _displayMonth.month + delta, 1);
-    setState(() {});                   // UI 먼저
+  // void _shiftMonth(int delta) async {
+  //   _displayMonth = DateTime(_displayMonth.year, _displayMonth.month + delta, 1);
+  //   setState(() {});                   // UI 먼저
+  //   await _reFetch(recomputeMonth: true);
+  // }
+
+  Future<void> _shiftMonth(int delta) async {
+    final base = DateTime(_displayMonth.year, _displayMonth.month + delta, 1);
+    _displayMonth = base;
+    _pivotDate = base;
+    _selectedDays = [];
+    setState(() {});
+    await _saveFilterPrefs();              // ← 추가
     await _reFetch(recomputeMonth: true);
   }
 

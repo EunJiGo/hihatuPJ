@@ -1,6 +1,6 @@
 // 주간 상단 라벨
 import 'package:flutter/material.dart';
-import '../styles.dart';
+import 'package:hihatu_project/calendar/styles.dart';
 
 class SelectedDaysHeader extends StatelessWidget {
   const SelectedDaysHeader({super.key, required this.days});

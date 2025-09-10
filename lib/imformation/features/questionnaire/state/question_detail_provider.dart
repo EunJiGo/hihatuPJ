@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../domain/questionnaire_detail_response.dart';
-import '../domain/questionnaire_detail_answer_response.dart';
-import '../data/fetch_questionnaire_detail.dart';
-import '../data/fetch_questionnaire_detail_answer.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/domain/questionnaire_detail_response.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/domain/questionnaire_detail_answer_response.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/data/fetch_questionnaire_detail.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/data/fetch_questionnaire_detail_answer.dart';
 
 // 질문 상세 데이터 FutureProvider
 final questionnaireDetailProvider = FutureProvider.family<QuestionnaireDetailResponse, int>((ref, questionnaireId) {

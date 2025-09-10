@@ -1,5 +1,5 @@
 import 'package:intl/intl.dart';
-import '../../../utils/date/date_utils.dart'; // parseUtc 사용
+import 'package:hihatu_project/utils/date/date_utils.dart'; // parseUtc 사용
 
 DateTime _toJst(DateTime utc) => utc.toUtc().add(const Duration(hours: 9));
 String _hhmm(DateTime jst) => DateFormat('HH:mm').format(jst);

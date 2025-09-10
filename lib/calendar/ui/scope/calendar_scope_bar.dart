@@ -1,7 +1,7 @@
 // lib/calendar/ui/scope/calendar_scope_bar.dart
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../../styles.dart';
+import 'package:hihatu_project/calendar/styles.dart';
 import 'calendar_scope.dart';
 
 class CalendarScopeBar extends StatelessWidget {

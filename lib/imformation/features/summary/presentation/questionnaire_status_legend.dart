@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../questionnaire/domain/questionnaire_status.dart';
-import '../../questionnaire/state/questionnaire_status_legend_filter_provider.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/domain/questionnaire_status.dart';
+import 'package:hihatu_project/imformation/features/questionnaire/state/questionnaire_status_legend_filter_provider.dart';
 
 class QuestionnaireStatusLegend extends ConsumerWidget {
   const QuestionnaireStatusLegend({super.key});

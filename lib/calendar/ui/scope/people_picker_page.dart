@@ -1,7 +1,7 @@
 // lib/calendar/ui/scope/people_picker_page.dart
 import 'package:flutter/material.dart';
-import '../../domain/employee.dart';
-import '../../styles.dart';
+import 'package:hihatu_project/calendar/domain/employee.dart';
+import 'package:hihatu_project/calendar/styles.dart';
 
 class PeoplePickerPage extends StatefulWidget {
   const PeoplePickerPage({

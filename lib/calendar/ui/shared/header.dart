@@ -2,8 +2,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hihatu_project/calendar/ui/year_calendar_page.dart'; // 연간 달력 페이지
-import '../../styles.dart';
-import '../../types.dart';
+import 'package:hihatu_project/calendar/styles.dart';
+import 'package:hihatu_project/calendar/types.dart';
 
 // 상단 헤더 위젯: StatelessWidget (내부 상태 없음, 모두 부모가 내려주는 값/콜백으로 동작)
 class ScheduleHeader extends StatelessWidget {
