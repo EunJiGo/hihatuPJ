@@ -12,6 +12,7 @@ class QuestionItemWidget extends StatefulWidget {
   final dynamic answer;
   final TextEditingController? textController;
   final void Function(dynamic) onChanged;
+  final bool beforeDeadline;
 
   const QuestionItemWidget({
     super.key,
@@ -20,6 +21,7 @@ class QuestionItemWidget extends StatefulWidget {
     required this.answer,
     this.textController,
     required this.onChanged,
+    required this.beforeDeadline,
   });
 
   @override
@@ -38,10 +40,9 @@ class _QuestionItemWidgetState extends State<QuestionItemWidget> with RouteAware
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      // 바깥 영역 터치 시 키보드 닫힘
     onTap: () {
         _focusNode.unfocus(); // 여기에도 명시적으로 unfocus
-        FocusScope.of(context).unfocus();
+        FocusScope.of(context).unfocus();  // 바깥 영역 터치 시 키보드 닫힘
       },
       behavior: HitTestBehavior.translucent,
       child: Container(
@@ -68,14 +69,14 @@ class _QuestionItemWidgetState extends State<QuestionItemWidget> with RouteAware
                 const Icon(
                   Icons.question_answer_rounded,
                   color: Color(0xFF42A5F5),
-                  size: 24,
+                  size: 20,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     widget.question.text,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF263238), // 다크그레이
                     ),
@@ -116,6 +117,7 @@ class _QuestionItemWidgetState extends State<QuestionItemWidget> with RouteAware
                 focusNode: _focusNode,
                 answerStatus: widget.answerStatus,
                 imagePath: widget.answer is String ? widget.answer : null,
+                beforeDeadline: widget.beforeDeadline,
                 onImageSelected: (path) => widget.onChanged(path),
               ),
 

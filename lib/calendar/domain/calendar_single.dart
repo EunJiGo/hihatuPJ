@@ -42,6 +42,11 @@ class CalendarSingle {
   /// 생성자 이름
   final String createdByName;
 
+  // ✅ 장비/사람 엔드포인트 공용으로 쓰기 위해 추가
+  final int? employeeId;   // employee_id (nullable)
+  final int? equipmentId;  // equipment_id (nullable)
+  final bool? temporary;   // temporary   (nullable)
+
   /// 관련 장비 목록 (예: 회의실, 프로젝터)
   /// [{equipment_id: 4, name: "회의실"}, ...]
   final List<Map<String, dynamic>> equipments;
@@ -80,6 +85,9 @@ class CalendarSingle {
     required this.status,
     required this.createdBy,
     required this.createdByName,
+    this.employeeId,
+    this.equipmentId,
+    this.temporary,
     required this.equipments,
     required this.people,
     required this.repeatWeekdays,
@@ -88,6 +96,29 @@ class CalendarSingle {
     this.repeatYearDay,
     required this.customDates,
   });
+
+  // 작은 헬퍼: 어떤 타입이 와도 int?로 안전 변환
+  static int? toInt(dynamic v) {
+    if (v == null) return null;
+    if (v is int) return v;
+    if (v is num) return v.toInt();
+    if (v is String) return int.tryParse(v);
+    return null;
+  }
+
+  static bool? toBool(dynamic v) {
+    if (v == null) return null;
+    if (v is bool) return v;
+    if (v is num) return v != 0;
+    if (v is String) {
+      final s = v.toLowerCase();
+      if (s == 'true') return true;
+      if (s == 'false') return false;
+      final n = int.tryParse(v);
+      if (n != null) return n != 0;
+    }
+    return null;
+  }
 
   /// JSON → CalendarSingle 변환
   factory CalendarSingle.fromJson(Map<String, dynamic> json) {
@@ -106,6 +137,11 @@ class CalendarSingle {
       status: json['status'] ?? 0,
       createdBy: json['created_by'] ?? '',
       createdByName: json['created_by_name'] ?? '',
+      //  추가 필드 매핑
+      employeeId: toInt(json['employee_id']),
+      equipmentId: toInt(json['equipment_id']),
+      temporary: toBool(json['temporary']),
+
       equipments: (json['equipments'] as List<dynamic>? ?? [])
           .map((e) => e as Map<String, dynamic>)
           .toList(),

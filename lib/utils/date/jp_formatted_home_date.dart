@@ -1,4 +1,4 @@
-String getJapaneseFormattedDate() {
+String jpFormattedHomeDate() {
   final now = DateTime.now();
 
   // 요일 일본어 변환 맵

@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../../../../../utils/widgets/text_field_widget.dart';
 
-class CommuterTextField extends StatelessWidget {
+class FinanceTextField extends StatelessWidget {
   final int answerStatus;
   final TextEditingController? controller;
   final FocusNode? focusNode;
@@ -14,7 +14,7 @@ class CommuterTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
 
-  const CommuterTextField({
+  const FinanceTextField({
     super.key,
     required this.answerStatus,
     this.controller,
@@ -42,8 +42,8 @@ class CommuterTextField extends StatelessWidget {
       // editableBorderColor: const Color(0xFF81C784),
       // selectedBorderColor: const Color(0xFFB8EF4F),
       hintColor: const Color(0xFFffffff),
-      editableBorderColor: const Color(0xFF0253B3),
-      selectedBorderColor: const Color(0xFF0253B3),
+      editableBorderColor: const Color(0xFF6096D0),
+      selectedBorderColor: const Color(0xFF6096D0),
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
     );

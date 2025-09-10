@@ -9,7 +9,8 @@ class TransportationUiItem {
   final int amount; // 금액
   final bool isCommuter; // 정기권 여부 (true면 commute)
   final bool twice; // 왕복 여부 (교통비용일 때 사용)
-  final String? updatedAt; // 신청 날짜
+  final String? durationStartDate; // 신청 날짜
+  final String? durationEndDate; // 종료 날짜
   final String? goals; // 목적 (단발 교통비)
   final String? commuteDuration; // 정기권 기간
   final String submissionStatus; // 신청 상태 (draft, submitted 등)
@@ -22,7 +23,8 @@ class TransportationUiItem {
     required this.amount,
     required this.isCommuter,
     required this.twice,
-    required this.updatedAt,
+    required this.durationStartDate,
+    this.durationEndDate,
     this.goals,
     this.commuteDuration,
     required this.submissionStatus,
@@ -65,7 +67,8 @@ class TransportationHistoryList extends StatelessWidget {
       itemCount: items.length, // transportationAsync 리스트에서  expenseType이 타입이 "commute"인 것만 그 길이
       itemBuilder: (context, index) {
         final item = items[index];
-        final dateText = _formatDate(item.updatedAt);
+        final startDateText = _formatDate(item.durationStartDate);
+        String? endDateText = _formatDate(item.durationEndDate) ?? '';
 
         return GestureDetector(
           onTap: () => onTap(item.id),
@@ -75,7 +78,7 @@ class TransportationHistoryList extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(8),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.05),
@@ -90,8 +93,9 @@ class TransportationHistoryList extends StatelessWidget {
                 // 상단: 역 정보 + 금액
                 Row(
                   children: [
-                    Icon(leadingIcon, color: leadingIconColor),
-                    const SizedBox(width: 8),
+                    // Icon(leadingIcon, size: 16, color: leadingIconColor),
+                    // Icon(Icons.confirmation_number_outlined, size: 16, color: Color(0xFF0253B3)),
+                    const SizedBox(width: 5),
                     Text(
                       item.fromStation,
                       style: const TextStyle(
@@ -115,27 +119,30 @@ class TransportationHistoryList extends StatelessWidget {
                       item.toStation,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 15,
                         color: Colors.black87,
                       ),
                     ),
                     const Spacer(),
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          '￥',
+                        _formatCurrency(item.amount),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: amountColor,
+                            fontSize: 15,
+                            color: Colors.black87,
                           ),
                         ),
+                        SizedBox(width: 3,),
                         Text(
-                          _formatCurrency(item.amount),
+                          '円',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Colors.black87,
+                            fontSize: 15,
+                            color: Color(0xFF0253B3),
+                            // color: amountColor,
                           ),
                         ),
                       ],
@@ -148,17 +155,19 @@ class TransportationHistoryList extends StatelessWidget {
                 // 하단: 신청일/기간or목적/상태
                 Row(
                   children: [
-                    const Icon(Icons.date_range, size: 16, color: Color(0xFFfe673e)),
+                    const Icon(Icons.date_range, size: 16, color: Color(0xFF0253B3)),
+                    // const Icon(Icons.date_range, size: 16, color: Color(0xFFfe673e)),
                     const SizedBox(width: 4),
                     Text(
-                      '申請日：$dateText',
+                      item.durationEndDate==null ? '開始日：$startDateText' : '$startDateText~$endDateText',
                       style: TextStyle(fontSize: 13, color: secondaryTextColor),
                     ),
                     const SizedBox(width: 16),
                     Icon(
                       item.isCommuter ? Icons.timelapse : Icons.info_outline,
                       size: 16,
-                      color: item.isCommuter ? const Color(0xFFfa6a23) : const Color(0xFF5b0075),
+                        color: Color(0xFF0253B3),
+                      // color: item.isCommuter ? const Color(0xFFfa6a23) : const Color(0xFF5b0075),
                     ),
                     const SizedBox(width: 4),
                     Text(
@@ -187,7 +196,17 @@ class TransportationHistoryList extends StatelessWidget {
   String _formatDate(String? date) {
     if (date == null) return '-';
     final parsed = DateTime.tryParse(date);
-    return parsed != null ? DateFormat('MM/dd').format(parsed) : '-';
+    return parsed != null ? DateFormat('M/d').format(parsed) : '-';
+  }
+
+  String _fmtDate(DateTime? dt) {
+    if (dt == null) return '';
+
+    final y = dt.year.toString().padLeft(4, '0'); // 4자리 연도
+    final m = dt.month.toString(); // 0 패딩 제거
+    final d = dt.day.toString();   // 0 패딩 제거
+
+    return '$y年$m月$d日';
   }
 
   String _formatCommuteDuration(String? duration) {

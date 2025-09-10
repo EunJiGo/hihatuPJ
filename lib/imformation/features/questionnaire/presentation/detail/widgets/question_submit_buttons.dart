@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import '../../../../../../utils/widgets/common_submit_buttons.dart';
 
 class QuestionSubmitButtons extends StatelessWidget {
-  final VoidCallback onSavePressed;
-  final VoidCallback onSubmitPressed;
+  // 비활성화를 위해 nullable 로
+  final VoidCallback? onSavePressed;
+  final VoidCallback? onSubmitPressed;
 
   const QuestionSubmitButtons({
     super.key,

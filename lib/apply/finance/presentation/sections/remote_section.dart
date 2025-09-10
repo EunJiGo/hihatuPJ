@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:hihatu_project/apply/transportations/summary/widgets/remote_and_other_history.dart';
-import 'package:hihatu_project/apply/transportations/summary/widgets/transportation_title_section.dart';
-import 'package:hihatu_project/apply/transportations/summary/widgets/status_icon.dart';
-import 'package:hihatu_project/apply/transportations/transportation/domain/transportation_item.dart';
+import 'package:hihatu_project/apply/finance/presentation/sections/widgets/transportation_title_section.dart';
+
+import '../../data/dtos/transportation_item.dart';
+import '../widgets/history/remote_and_other_history.dart';
+import '../widgets/status/status_icon.dart';
 
 class RemoteSection extends StatelessWidget {
   const RemoteSection({
@@ -18,7 +19,7 @@ class RemoteSection extends StatelessWidget {
   final List<TransportationItem> items;
   final bool isExpanded;
   final VoidCallback onToggle;
-  final Future<void> Function(String id) onTapItem;
+  final Future<void> Function(int id) onTapItem;
   final Animation<double> animation;
 
   @override
@@ -31,11 +32,11 @@ class RemoteSection extends StatelessWidget {
         TransportationTitleSection(
           icon: FontAwesomeIcons.houseLaptop,
           iconColor: const Color(0xFFfeaaa9),
-          iconSize: 22,
+          iconSize: 16,
           title: '在宅勤務手当の申請履歴',
           isExpanded: isExpanded,
           isData: items.isEmpty,
-          gap: 15,
+          gap: 10,
           onToggle: onToggle,
         ),
         if (isExpanded)
@@ -53,7 +54,7 @@ class RemoteSection extends StatelessWidget {
               ),
             )
                 .toList(),
-            onTap: (id) => onTapItem('$id'),
+            onTap: (id) => onTapItem(id),
             getStatusIcon: (submission, review) => buildStatusIcon(
               submissionStatus: submission,
               reviewStatus: review,

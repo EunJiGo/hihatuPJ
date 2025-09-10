@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hihatu_project/apply/transportations/summary/widgets/remote_and_other_history.dart';
-import 'package:hihatu_project/apply/transportations/summary/widgets/transportation_title_section.dart';
-import 'package:hihatu_project/apply/transportations/summary/widgets/status_icon.dart';
-import 'package:hihatu_project/apply/transportations/transportation/domain/transportation_item.dart';
+import 'package:hihatu_project/apply/finance/presentation/sections/widgets/transportation_title_section.dart';
+
+import '../../data/dtos/transportation_item.dart';
+import '../widgets/history/remote_and_other_history.dart';
+import '../widgets/status/status_icon.dart';
 
 class OtherSection extends StatelessWidget {
   const OtherSection({
@@ -17,7 +18,7 @@ class OtherSection extends StatelessWidget {
   final List<TransportationItem> items;
   final bool isExpanded;
   final VoidCallback onToggle;
-  final Future<void> Function(String id) onTapItem;
+  final Future<void> Function(int id) onTapItem;
   final Animation<double> animation;
 
   @override
@@ -30,11 +31,11 @@ class OtherSection extends StatelessWidget {
         TransportationTitleSection(
           icon: Icons.receipt_long,
           iconColor: const Color(0xFF89e6f4),
-          iconSize: 25,
+          iconSize: 18,
           title: '立替金の申請履歴',
           isExpanded: isExpanded,
           isData: items.isEmpty,
-          gap: 8,
+          gap: 6,
           onToggle: onToggle,
         ),
         if (isExpanded)
@@ -52,7 +53,7 @@ class OtherSection extends StatelessWidget {
               ),
             )
                 .toList(),
-            onTap: (id) => onTapItem('$id'),
+            onTap: (id) => onTapItem(id),
             getStatusIcon: (submission, review) => buildStatusIcon(
               submissionStatus: submission,
               reviewStatus: review,

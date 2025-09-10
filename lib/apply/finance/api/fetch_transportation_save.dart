@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
-import '../domain/transportation_save.dart';
-import '../domain/transportation_update.dart';
+import '../data/dtos/transportation_save.dart';
+import '../data/dtos/transportation_update.dart';
 
 // 교통비 등록 요청 (PUT)
 Future<bool> fetchTransportationSaveUpload(TransportationSave? saveData, TransportationUpdate? uploadData, bool isSave) async {

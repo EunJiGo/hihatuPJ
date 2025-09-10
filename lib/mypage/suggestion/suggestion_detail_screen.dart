@@ -132,6 +132,7 @@ class _SuggestionFormScreenExState
                 subtitleFontSize: 12,
                 imagePath:
                     'assets/images/mypage/suggest/suggest_image/suggest_image.png',
+                imageWidth: 110,
               ),
 
               // 본문

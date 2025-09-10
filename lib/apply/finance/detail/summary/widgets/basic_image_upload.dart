@@ -4,13 +4,13 @@ import 'package:image_picker/image_picker.dart';
 import '../../../../../../../utils/widgets/image_upload_widget.dart';
 import '../../../../../../../utils/widgets/modals/image_picker_bottom_sheet.dart';
 
-class TransportationImageUpload extends StatelessWidget {
+class BasicImageUpload extends StatelessWidget {
   final FocusNode focusNode;
   final String? imagePath;
   final Color themeColor;
   final void Function(String) onImageSelected;
 
-  const TransportationImageUpload({
+  const BasicImageUpload({
     super.key,
     required this.focusNode,
     required this.imagePath,
@@ -30,8 +30,7 @@ class TransportationImageUpload extends StatelessWidget {
         // 2. 이미지 선택 모달
         final result = await ImagePickerBottomSheet.showImagePicker(
           context,
-            themeColor // 초록색 계열 테마
-          // const Color(0xFFfea643), // 초록색 계열 테마
+            themeColor
         );
 
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -53,11 +52,11 @@ class TransportationImageUpload extends StatelessWidget {
       },
       child: ImageUploadDisplayWidget(
         imagePath: imagePath,
-        isDisabled: false, // 운송비 등록은 항상 활성화 상태
-        enabledBorderColor: themeColor,     // 연초록 테두리
-        enabledShadowColor: themeColor,     // 연초록 그림자
-        enabledIconColor: themeColor,       // 연초록 아이콘
-        enabledTextColor: themeColor,       // 연초록 텍스트
+        isDisabled: false, // 등록 항상 활성화 상태
+        enabledBorderColor: themeColor,
+        enabledShadowColor: themeColor,
+        enabledIconColor: themeColor,
+        enabledTextColor: themeColor,
       ),
     );
   }

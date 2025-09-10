@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 import '../../../../utils/dialog/confirmation_dialog.dart';
 
 class CommonSubmitButtons extends StatelessWidget {
-  final VoidCallback? onSavePressed;
+  final VoidCallback? onSavePressed; // null
   final VoidCallback? onSubmitPressed;
 
   final String saveText;
   final String submitText;
 
+  /// [일관화 포인트1] 동적 확인 메시지: 우선 적용
+  final String? Function(BuildContext context)? saveConfirmBuilder;
+  final String? Function(BuildContext context)? submitConfirmBuilder;
+
+  /// 레거시: 문자열 고정 메시지 (빌더 없을 때 fallback)
   final String? saveConfirmMessage;
   final String? submitConfirmMessage;
 
@@ -15,7 +20,9 @@ class CommonSubmitButtons extends StatelessWidget {
   final Color themeColor;
 
   final bool showSaveButton;
-  final bool showSubmitButton;
+  final bool showSubmitButton; // ture
+
+  final bool activeSubmitButton;
 
   const CommonSubmitButtons({
     super.key,
@@ -23,19 +30,25 @@ class CommonSubmitButtons extends StatelessWidget {
     this.onSubmitPressed,
     this.saveText = '保　　存',
     this.submitText = '提　　出',
+    this.saveConfirmBuilder,
+    this.submitConfirmBuilder,
     this.saveConfirmMessage,
     this.submitConfirmMessage,
     this.padding = 0.0,
     this.themeColor = const Color(0xFF0253B3),
     this.showSaveButton = true,
     this.showSubmitButton = true,
+    this.activeSubmitButton = true,
   });
 
   Future<void> _handleAction(BuildContext context, String type) async {
-    final message = type == 'save' ? saveConfirmMessage : submitConfirmMessage;
-    final callback = type == 'save' ? onSavePressed : onSubmitPressed;
-
+    final VoidCallback? callback = (type == 'save') ? onSavePressed : onSubmitPressed;
     if (callback == null) return;
+
+    // [일관화 포인트2] 확인 메시지 결정(빌더 > 메시지 > 없음)
+    final String? message = (type == 'save')
+        ? (saveConfirmBuilder?.call(context) ?? saveConfirmMessage)
+        : (submitConfirmBuilder?.call(context) ?? submitConfirmMessage);
 
     if (message == null) {
       callback();
@@ -50,32 +63,43 @@ class CommonSubmitButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final wantsSave = showSaveButton && onSavePressed != null;
+    final wantsSubmit = showSubmitButton && onSubmitPressed != null;
+    final count = (wantsSave ? 1 : 0) + (wantsSubmit ? 1 : 0);
+    if (count == 0) return const SizedBox.shrink();
+
+    final isSingle = count == 1;
     final buttons = <Widget>[];
 
-    if (showSaveButton && onSavePressed != null) {
-      final saveBtn = _buildButton(
+    if (wantsSave) {
+      buttons.add(_buildButton(
         label: saveText,
-        isFilled: !showSubmitButton, // 단독이면 채우기
+        isFilled: isSingle ? true : false, // 단독이면 채우기
         onPressed: () => _handleAction(context, 'save'),
-        fullWidth: !showSubmitButton,
-      );
-      buttons.add(saveBtn);
+        fullWidth: isSingle,
+        enabled: true, // 필요하면 activeSaveButton 도입
+      ));
     }
 
-    if (showSubmitButton && onSubmitPressed != null) {
-      final submitBtn = _buildButton(
+    // if (wantsSave && wantsSubmit) {
+    //   buttons.add(const SizedBox(width: 12)); // 고정 간격 권장
+    // }
+
+    if (wantsSubmit) {
+      buttons.add(_buildButton(
         label: submitText,
         isFilled: true,
-        onPressed: () => _handleAction(context, 'submit'),
-        fullWidth: !showSaveButton,
-      );
-      buttons.add(submitBtn);
+        onPressed: activeSubmitButton ? () => _handleAction(context, 'submit') : null,
+        fullWidth: isSingle,
+        enabled: activeSubmitButton,
+      ));
     }
 
     return Padding(
       padding: EdgeInsets.all(padding),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        // mainAxisAlignment: MainAxisAlignment.start,
         children: buttons.length == 1 ? [buttons.first] : buttons,
       ),
     );
@@ -84,32 +108,36 @@ class CommonSubmitButtons extends StatelessWidget {
   Widget _buildButton({
     required String label,
     required bool isFilled,
-    required VoidCallback onPressed,
+    required VoidCallback? onPressed,
     required bool fullWidth,
+    required bool enabled,
   }) {
     final button = Container(
       width: fullWidth ? double.infinity : 150,
       height: 50,
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        border: Border.all(color: themeColor),
+        border: Border.all(color: enabled ? themeColor : Color(0xffbababa)),
         borderRadius: BorderRadius.circular(15),
-        color: isFilled ? themeColor : Colors.white,
+        color: isFilled ? (enabled ? themeColor : Color(0xffcccccc)) : Colors.white,
       ),
       child: Center(
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 19,
             fontWeight: FontWeight.w600,
-            color: isFilled ? Colors.white : themeColor,
+            color: isFilled ? Colors.white : (enabled ? themeColor : Colors.grey),
           ),
         ),
       ),
     );
 
-    return fullWidth
-        ? Expanded(child: GestureDetector(onTap: onPressed, child: button))
-        : GestureDetector(onTap: onPressed, child: button);
+    final buttonWidget = GestureDetector(
+      onTap: enabled ? onPressed : null, // 비활성화 시 클릭 안됨
+      child: button,
+    );
+
+    return fullWidth ? Expanded(child: buttonWidget) : buttonWidget;
   }
 }

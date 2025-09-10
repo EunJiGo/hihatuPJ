@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../transportation/domain/transportation_item.dart';
+import '../data/dtos/transportation_item.dart';
 import '../state/transportation_provider.dart';
 
 class TransportationVM {

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:hihatu_project/apply/finance/presentation/sections/widgets/transportation_title_section.dart';
 
-import '../summary/widgets/status_icon.dart';
-import '../summary/widgets/transportation_history_list.dart';
-import '../summary/widgets/transportation_title_section.dart';
-import '../transportation/domain/transportation_item.dart';
-
+import '../../data/dtos/transportation_item.dart';
+import '../widgets/history/transportation_history_list.dart';
+import '../widgets/status/status_icon.dart';
 
 class SingleSection extends StatelessWidget {
   const SingleSection({
@@ -19,7 +18,7 @@ class SingleSection extends StatelessWidget {
   final List<TransportationItem> items;
   final bool isExpanded;
   final VoidCallback onToggle;
-  final Future<void> Function(String id) onTapItem;
+  final Future<void> Function(int id) onTapItem;
   final Animation<double> animation;
 
   @override
@@ -47,13 +46,13 @@ class SingleSection extends StatelessWidget {
               amount: e.amount,
               isCommuter: false,
               twice: e.twice,
-              updatedAt: e.updatedAt,
+              durationStartDate: e.durationStart,
               goals: e.goals,
               submissionStatus: e.submissionStatus,
               reviewStatus: e.reviewStatus,
             ))
                 .toList(),
-            onTap: (id) => onTapItem('$id'),
+            onTap: (id) => onTapItem(id),
             getStatusIcon: (submission, review) =>
                 buildStatusIcon(submissionStatus: submission, reviewStatus: review, animation: animation),
             leadingIcon: Icons.directions_bus,

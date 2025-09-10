@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-
-import '../../../presentation/constants/commuter_transport_options.dart';
 import '../../../presentation/widgets/form_label.dart';
-import '../widgets/commuter_drop_down.dart';
-import '../widgets/commuter_text_field.dart';
+import '../widgets/finance_text_field.dart';
+import '../widgets/finance_drop_down.dart';
+
 class TransportSection extends StatelessWidget {
   const TransportSection({
     super.key,
@@ -33,9 +32,9 @@ class TransportSection extends StatelessWidget {
         const FormLabel(
           text: '交通手段',
           icon: Icons.directions_transit,
-          iconColor: Color(0xFF81C784),
+          iconColor: Color(0xFF0253B3),
         ),
-        CommuterDropDown(
+        DropDown(
           options: options,
           answerStatus: isDisabled ? 1 : 0,
           selectedValue: dropdownValue,
@@ -48,7 +47,7 @@ class TransportSection extends StatelessWidget {
         ),
         if (dropdownValue == 'その他') ...[
           const SizedBox(height: 12),
-          CommuterTextField(
+          FinanceTextField(
             answerStatus: isDisabled ? 1 : 0,
             controller: customTransportController,
             hintText: '交通手段を入力してください。',

@@ -25,7 +25,8 @@ class QuestionCheckboxList extends StatelessWidget {
       onChanged: onChanged,
       isDisabled: isDisabled,
       selectedBackgroundColor: const Color(0xFFF0F7FF),
-      selectedBorderColor: const Color(0xFF90CAF9),
+      selectedBorderColor: const Color(0xFF6096D0),
+      // selectedBorderColor: const Color(0xFF90CAF9),
       selectedIconColor: const Color(0xFF6096D0),
       selectedTextColor: const Color(0xFF6096D0),
     );

@@ -3,13 +3,13 @@ import '../../../../../../../../utils/widgets/dropdown_widget.dart';
 import '../../../../../../../../utils/widgets/modals/dropdown_modal_widget.dart';
 import '../../../../../utils/widgets/dropdown_option.dart';
 
-class CommuterDropDown extends StatelessWidget {
+class DropDown extends StatelessWidget {
   final List<String> options;
   final int answerStatus;
   final String? selectedValue;
   final void Function(String?) onChanged;
 
-  const CommuterDropDown({
+  const DropDown({
     super.key,
     required this.options,
     required this.answerStatus,
@@ -33,19 +33,22 @@ class CommuterDropDown extends StatelessWidget {
           context: context,
           options: dropdownOptions,
           selectedValue: selectedValue,
+          isSelectCircleIcon: true,
           onSelected: (val) => onChanged(val),
-          selectedTextColor: const Color(0xFF0253B3),
-          selectedIconColor: const Color(0xFF0253B3),
-          selectedBorderColor: const Color(0xFF0253B3),
-          selectedBackgroundColor: const Color(0xFFffffff),
+          selectedTextColor: const Color(0xFF1565C0),
+          // selectedIconColor: const Color(0xFF0253B3),
+          selectedIconColor: Colors.blueAccent,
+          selectedBorderColor: const Color(0xFF64B5F6),
+          selectedBackgroundColor: const Color(0xFFE3F2FD),
         );
       },
 
       // 💡 활성화 시 커스터마이징 가능한 색상
-      iconColor: const Color(0xFF0253B3), // 0xFF4CAF50  0xFF388E3C
+      iconColor: const Color(0xFF1565C0),
+      // 0xFF4CAF50  0xFF388E3C
       textColor: Colors.black87,
-      enabledBorderColor: const Color(0xFF0253B3),
-      focusedBorderColor: const Color(0xFF0253B3),
+      enabledBorderColor: const Color(0xFF6096D0),
+      focusedBorderColor: const Color(0xFF6096D0),
       fillColor: const Color(0xFFffffff),
     );
   }

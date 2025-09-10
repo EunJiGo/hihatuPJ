@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class UnreadSummaryWidget extends StatelessWidget {
+import '../../questionnaire/state/information_tab_index_provider.dart';
+import '../../questionnaire/state/questionnaire_providers.dart';
+import '../../questionnaire/state/questionnaire_status_legend_filter_provider.dart';
+
+class UnreadSummaryWidget extends ConsumerWidget {
   final int unreadNoticeCount;
-  final int unreadQuestionnaireCount;
 
   const UnreadSummaryWidget({
     super.key,
     required this.unreadNoticeCount,
-    required this.unreadQuestionnaireCount,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final actionableCount = ref.watch(actionableQuestionnaireCountProvider);
+
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -22,14 +27,14 @@ class UnreadSummaryWidget extends StatelessWidget {
             children: [
               Image.asset(
                 'assets/images/add/notice_bell.png',
-                height: 30,
-                width: 25,
+                height: 25,
+                width: 20,
               ),
               const SizedBox(width: 6),
               const Text(
                 '未確認状況',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.w600,
                   color: Colors.black87,
                 ),
@@ -40,7 +45,7 @@ class UnreadSummaryWidget extends StatelessWidget {
 
           // 📦 알림 요약 박스
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
@@ -67,7 +72,7 @@ class UnreadSummaryWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        padding: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.only(bottom: 3),
                         // 텍스트와 밑줄 사이 간격
                         decoration: const BoxDecoration(
                           border: Border(
@@ -99,7 +104,7 @@ class UnreadSummaryWidget extends StatelessWidget {
                       Text(
                         '${unreadNoticeCount}件',
                         style: const TextStyle(
-                          fontSize: 24,
+                          fontSize: 20,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -108,54 +113,61 @@ class UnreadSummaryWidget extends StatelessWidget {
                 ),
 
                 // 🛡️ 安否確認
-                Container(
-                  padding: const EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    // color: const Color(0xFFE7F0FB), // 연한 파란색 배경
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        // 텍스트와 밑줄 사이 간격
-                        decoration: const BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                              color: Colors.black54, // 밑줄 색상
-                              width: 2, // 밑줄 두께
-                            ),
-                          ),
-                        ),
-                        child: Row(
-                          children: const [
-                            Icon(
-                              Icons.health_and_safety_outlined,
-                              size: 20,
-                              color: Color(0xFF0253B3),
-                            ),
-                            SizedBox(width: 6),
-                            Text(
-                              '安否確認',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
+                InkWell(
+                  onTap: () {
+                    // 1) 탭 전환
+                    ref.read(informationTabIndexProvider.notifier).state = 1;
+                    // 2) 필터: 미작성(0) + 작성中(1)
+                    ref.read(questionnaireFilterSetProvider.notifier).state = {0, 1};
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.only(bottom: 3),
+                          // 텍스트와 밑줄 사이 간격
+                          decoration: const BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: Colors.black54, // 밑줄 색상
+                                width: 2, // 밑줄 두께
                               ),
                             ),
-                          ],
+                          ),
+                          child: Row(
+                            children: const [
+                              Icon(
+                                Icons.health_and_safety_outlined,
+                                size: 20,
+                                color: Color(0xFF0253B3),
+                              ),
+                              SizedBox(width: 6),
+                              Text(
+                                '安否確認',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        '${unreadQuestionnaireCount}件',
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
+                        const SizedBox(height: 10),
+                        Text(
+                          '${actionableCount}件',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],

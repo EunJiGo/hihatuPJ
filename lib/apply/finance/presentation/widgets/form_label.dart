@@ -17,14 +17,16 @@ class FormLabel extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(icon, size: 20, color: iconColor),
-          const SizedBox(width: 6),
+          // Icon(icon, size: 16, color: iconColor),
+          Icon(icon, size: 16, color: Color(0xFF0253B3)),
+          const SizedBox(width: 3),
           Text(
             text,
             style: const TextStyle(
               fontWeight: FontWeight.w600,
-              fontSize: 15,
+              fontSize: 14,
               color: Color(0xFF263238),
             ),
           ),

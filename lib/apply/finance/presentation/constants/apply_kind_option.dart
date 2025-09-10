@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'apply_kind.dart';
+
+import '../../domain/enums/apply_kind.dart';
 
 class ApplyKindOption {
   static (IconData, Color) iconOf(ApplyKind k) => switch (k) {

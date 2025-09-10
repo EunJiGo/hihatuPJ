@@ -34,6 +34,7 @@ class SuggestionDropDown extends StatelessWidget {
           options: dropdownOptions,
           selectedValue: selectedValue,
           onSelected: (val) => onChanged(val),
+          isSelectCircleIcon: true,
           selectedTextColor: const Color(0xFF0253B3),
           selectedIconColor: const Color(0xFF0253B3),
           selectedBorderColor: const Color(0xFF0253B3),

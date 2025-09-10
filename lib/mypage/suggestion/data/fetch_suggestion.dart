@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'package:hihatu_project/apply/transportations/transportation/domain/transportation_response.dart';
-import 'package:hihatu_project/apply/transportations/transportation/domain/transportation_item.dart';
 import 'package:http/http.dart' as http;
 
 import '../domain/suggestion_item.dart';

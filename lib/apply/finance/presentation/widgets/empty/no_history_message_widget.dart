@@ -56,7 +56,7 @@ class _NoHistoryMessageState extends State<NoHistoryMessage>
               '申請履歴がないです。\n交通費及び定期券を申請してください。',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 15,
                 fontWeight: FontWeight.w600,
                 color: Colors.black87,
                 height: 1.5, // 줄 간격

@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide TextField;
 import '../../../presentation/widgets/form_label.dart';
-import '../../commuter/widgets/commuter_drop_down.dart';
-import '../../commuter/widgets/commuter_text_field.dart';
+import '../widgets/finance_text_field.dart';
+import '../widgets/finance_drop_down.dart';
+
 class PurposeSection extends StatelessWidget {
   const PurposeSection({
     super.key,
@@ -33,7 +34,7 @@ class PurposeSection extends StatelessWidget {
           icon: Icons.flag,
           iconColor: Color(0xFF0253B3),
         ),
-        CommuterDropDown(
+        DropDown(
           options: options,
           answerStatus: isDisabled ? 1 : 0,
           selectedValue: dropdownValue,
@@ -46,7 +47,7 @@ class PurposeSection extends StatelessWidget {
         ),
         if (dropdownValue == 'その他') ...[
           const SizedBox(height: 12),
-          CommuterTextField(
+          FinanceTextField(
             answerStatus: isDisabled ? 1 : 0,
             controller: customPurposeController,
             hintText: '具体的な目的を入力してください。',

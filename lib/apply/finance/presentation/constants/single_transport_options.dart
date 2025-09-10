@@ -1,4 +1,4 @@
-final List<String> transportationTransportOptions = [
+final List<String> singleTransportOptions = [
   '電車',
   'バス',
   'タクシー',

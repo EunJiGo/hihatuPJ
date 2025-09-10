@@ -1,24 +1,41 @@
 import 'package:flutter/material.dart';
 
+import 'show_year_month_picker.dart';
+
 class MonthNav extends StatelessWidget {
   const MonthNav({
     super.key,
-    required this.label,
+    required this.currentMonth,
     required this.onPrev,
     required this.onNext,
+    required this.onSelectYearMonth,
   });
 
-  final String label;
+  final DateTime currentMonth;
   final VoidCallback onPrev;
   final VoidCallback onNext;
+  final ValueChanged<DateTime> onSelectYearMonth;
+
 
   @override
   Widget build(BuildContext context) {
+    final label = "${currentMonth.year}年 ${currentMonth.month}月"; // 여기서 포맷팅
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         _gradButton(text: '前月', onTap: onPrev, colors: const [Color(0xFF64B5F6), Color(0xFF1976D2)]),
-        Text(label, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Color(0xFF1976D2))),
+        InkWell(
+            onTap: () async {
+              final picked = await showYearMonthPicker(
+                context,
+                currentMonth.year,
+                currentMonth.month,
+              );
+              if (picked != null) {
+                onSelectYearMonth(picked);
+              }
+            },
+            child: Text(label, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Color(0xFF1976D2)))),
         _gradButton(text: '次月', onTap: onNext, colors: const [Color(0xFF1976D2), Color(0xFF64B5F6)]),
       ],
     );
@@ -28,7 +45,7 @@ class MonthNav extends StatelessWidget {
     return ElevatedButton(
       onPressed: onTap,
       style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         backgroundColor: Colors.transparent,
         elevation: 0,

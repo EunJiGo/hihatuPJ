@@ -1,8 +1,8 @@
 // 타임 라인 박스 1개
 import 'package:flutter/material.dart';
-import 'package:hihatu_project/calendar/widgets/weekly/time_label_jst.dart';
-import '../logic/recurrence.dart';
-import '../styles.dart';
+import 'package:hihatu_project/calendar/ui/week/time_label_jst.dart';
+import '../../logic/recurrence.dart';
+import '../../styles.dart';
 
 class EventBox extends StatelessWidget {
   const EventBox({
@@ -16,9 +16,13 @@ class EventBox extends StatelessWidget {
   final DateTime dayJst; // 지금 이 박스가 속한 캘린더 셀의 JST 날짜(00:00)
   final void Function(Occurrence occ)? onTap;
 
+  // 재사용 가능한 작은 const 위젯들
+  static const _iconPerson = Icon(Icons.person, size: 14, color: iosSecondary);
+  static const _iconTime = Icon(Icons.access_time, size: 12, color: iosSecondary);
+  static const _iconRoom = Icon(Icons.meeting_room, size: 12, color: iosSecondary);
+
   @override
   Widget build(BuildContext context) {
-
     // 1) 길이(분) 계산 — "보이는 구간(minHour~maxHour)"으로 클램프한 길이
     //    (보드가 8~19시인데, 이벤트가 19:30~ 시작이면 visibleDurMin=0 → Compact)
     final visibleDurMin = _visibleDurationMinutesLocal(
@@ -61,17 +65,11 @@ class EventBox extends StatelessWidget {
 
     // 텍스트 스타일
     const titleStyle = TextStyle(fontWeight: FontWeight.w700, fontSize: 13);
-    const titleStyleCompact = TextStyle(
-      fontWeight: FontWeight.w700,
-      fontSize: 12,
-    );
-    const subStyle = TextStyle(
-      fontWeight: FontWeight.w600,
-      fontSize: 11,
-      color: iosSecondary,
-    );
+    const titleStyleCompact = TextStyle(fontWeight: FontWeight.w700, fontSize: 12);
+    const subStyle = TextStyle(fontWeight: FontWeight.w600, fontSize: 11, color: iosSecondary);
 
     // ── 위젯 트리 ────────────────────────────────────────────────
+
     return Material(
       color: iosBlue.withValues(alpha: 0.12),
       borderRadius: BorderRadius.circular(3),
@@ -81,42 +79,26 @@ class EventBox extends StatelessWidget {
         child: Container(
           padding: outerPad,
           decoration: BoxDecoration(
-            border: Border.all(
-              color: iosBlue.withValues(alpha: 0.12),
-              width: 1,
-            ),
+            border: Border.all(color: iosBlue.withValues(alpha: 0.12), width: 1),
             borderRadius: BorderRadius.circular(3),
           ),
           child: Container(
             padding: innerPad,
-            constraints: minConstraints,
-            // ← 최소 높이 보장(Compact)
-            clipBehavior: Clip.hardEdge,
-            // ← 아주 얕을 때도 페인팅 오버플로우 방지
+            constraints: minConstraints, // Compact 최소 높이 보장
+            clipBehavior: Clip.hardEdge, // 얕을 때 오버플로우 방지
             decoration: BoxDecoration(
-              border: Border(
-                left: BorderSide(
-                  color: iosBlue.withValues(alpha: 0.4),
-                  width: 3.0,
-                ),
-              ),
+              border: Border(left: BorderSide(color: iosBlue.withValues(alpha: 0.4), width: 3.0)),
             ),
-            // 내용은 항상 위쪽부터 렌더링
             child: Align(
               alignment: Alignment.topLeft,
-              // 슬롯이 너무 얕아도 '디자인 기준'은 유지하면서 에러만 방지하기 위해
-              // 필요할 때만 스크롤 래핑
               child: LayoutBuilder(
                 builder: (context, c) {
                   // 아주 얕은 높이에서 Medium/Full이 넘칠 수 있으므로 조건부 스크롤
-                  // (규칙은 durMin으로 이미 확정, 구성요소는 절대 줄이지 않음)
                   const oneLine = 16.0; // 제목 1줄 대략
                   const twoLines = 34.0; // 제목+서브 한 줄 대략
 
-                  final bool needScrollFull =
-                      isFull && c.maxHeight < (twoLines + 10);
-                  final bool needScrollMedium =
-                      isMedium && c.maxHeight < oneLine;
+                  final bool needScrollFull = isFull && c.maxHeight < (twoLines + 10);
+                  final bool needScrollMedium = isMedium && c.maxHeight < oneLine;
 
                   final content = _buildByMode(
                     isFull: isFull,
@@ -163,7 +145,7 @@ class EventBox extends StatelessWidget {
       children: [
         Expanded(
           child: Text(
-            occurrence.src.title ?? '-',
+            occurrence.src.title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             softWrap: false,
@@ -174,7 +156,7 @@ class EventBox extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start, // ← 위 정렬
             children: [
-              const Icon(Icons.person, size: 14, color: iosSecondary),
+              _iconPerson,
               const SizedBox(width: 2),
               Text('$peopleCount', style: subStyle),
             ],
@@ -193,7 +175,7 @@ class EventBox extends StatelessWidget {
             const SizedBox(height: 2),
             Row(
               children: [
-                const Icon(Icons.access_time, size: 12, color: iosSecondary),
+                _iconTime,
                 const SizedBox(width: 2),
                 Expanded(
                   child: Text(
@@ -211,7 +193,7 @@ class EventBox extends StatelessWidget {
             const SizedBox(height: 2),
             Row(
               children: [
-                const Icon(Icons.meeting_room, size: 12, color: iosSecondary),
+                _iconRoom,
                 const SizedBox(width: 2),
                 Expanded(
                   child: Text(
@@ -261,22 +243,6 @@ class EventBox extends StatelessWidget {
 
     final diff = e.difference(s).inMinutes;
     return diff <= 0 ? 0 : diff;
-  }
-
-  /// 혹시라도 특정 데이터에서 Occurrence가 제대로 클리핑되지 않았다면
-  /// (예: 다음날 새벽까지 이어지는 조각)
-  /// 아래처럼 day 경계로 한 번 더 잘라서 계산:
-  int _durationMinutesLocalClamped(
-    DateTime startLocal,
-    DateTime endLocal,
-    DateTime dayJst,
-  ) {
-    final dayStart = DateTime(dayJst.year, dayJst.month, dayJst.day, 0, 0);
-    final dayEnd = dayStart.add(const Duration(days: 1));
-    final s = startLocal.isBefore(dayStart) ? dayStart : startLocal;
-    final e = endLocal.isAfter(dayEnd) ? dayEnd : endLocal;
-    final diff = e.difference(s).inMinutes;
-    return diff < 0 ? 0 : diff;
   }
 
   /// List<Map<String, dynamic>> → 이름 문자열 (중복 제거)

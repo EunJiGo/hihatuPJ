@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../apply_kind.dart';
-import '../../others/other_expense_screen.dart';
-import '../../remote/remoteScreen.dart';
-import '../commuter/presentation/commuter_screen.dart';
-import '../transportation/presentation/detail/transportation_detail_screen.dart';
+
+import '../../detail/commuter/commuter_screen.dart';
+import '../../detail/others/other_expense_screen.dart';
+import '../../detail/remote/remote_screen.dart';
+import '../../detail/single/single_screen.dart';
+import '../../domain/enums/apply_kind.dart';
 
 typedef MonthUpdater = void Function(DateTime yyyymm);
 
@@ -12,18 +13,21 @@ class TransportationActions {
     required this.context,
     required this.updateMonth,
     required this.afterInvalidate,
+    required this.getAnchorDate,
   });
 
   final BuildContext context;
   final MonthUpdater updateMonth;
   final VoidCallback afterInvalidate;
+  final DateTime Function() getAnchorDate; // 👈 현재 위치의 날짜(월) 제공
 
   Future<DateTime?> pushFor(ApplyKind kind) {
+    final anchor = getAnchorDate(); // ex) TransportationScreen의 currentMonth
     final page = switch (kind) {
-      ApplyKind.commute => const CommuterScreen(),
-      ApplyKind.single  => const TransportationInputScreen(),
-      ApplyKind.remote  => const RemoteScreen(),
-      ApplyKind.other   => const OtherExpenseScreen(),
+      ApplyKind.commute =>  CommuterScreen(currentLocalDate: DateTime(anchor.year, anchor.month, anchor.day),),
+      ApplyKind.single  =>  SingleScreen(currentLocalDate: DateTime(anchor.year, anchor.month, anchor.day),),
+      ApplyKind.remote  =>  RemoteScreen(currentLocalDate: DateTime(anchor.year, anchor.month, anchor.day),),
+      ApplyKind.other   => OtherExpenseScreen(currentLocalDate: DateTime(anchor.year, anchor.month, anchor.day),),
     };
     return Navigator.push<DateTime?>(
       context, MaterialPageRoute(builder: (_) => page),
@@ -36,4 +40,5 @@ class TransportationActions {
     updateMonth(DateTime(res.year, res.month));
     afterInvalidate();
   }
+
 }

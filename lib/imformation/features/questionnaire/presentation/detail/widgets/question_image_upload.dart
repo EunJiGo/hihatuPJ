@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import '../../../../../../apply/finance/detail/summary/widgets/server_image_upload.dart';
 import '../../../../../../utils/widgets/image_upload_widget.dart';
 import '../../../../../../utils/widgets/modals/image_picker_bottom_sheet.dart';
 
@@ -7,9 +8,11 @@ import 'package:image_picker/image_picker.dart';
 
 class QuestionImageUpload extends StatelessWidget {
   final FocusNode focusNode;
-  final int answerStatus;
-  final String? imagePath;
+  final int answerStatus; // 1이면 read-only
+  final String? imagePath; // 로컬 경로 또는 서버 파일명
   final void Function(String) onImageSelected;
+  final bool beforeDeadline;
+
 
   const QuestionImageUpload({
     super.key,
@@ -17,10 +20,15 @@ class QuestionImageUpload extends StatelessWidget {
     required this.answerStatus,
     required this.imagePath,
     required this.onImageSelected,
+    required this.beforeDeadline,
   });
 
   @override
   Widget build(BuildContext context) {
+
+    print('QuestionImageUpload answerStatus : $answerStatus');
+    print('QuestionImageUpload imagePath : $imagePath');
+    print('QuestionImageUpload : $beforeDeadline');
 
     return GestureDetector(
         behavior: HitTestBehavior.translucent,
@@ -52,15 +60,15 @@ class QuestionImageUpload extends StatelessWidget {
             }
           }
         },
-        child: ImageUploadDisplayWidget(
+        child: ServerImageUpload(
+          focusNode: FocusNode(),
           imagePath: imagePath,
-          isDisabled: answerStatus == 1,
-          enabledBorderColor: Color(0xFF90CAF9),
-          enabledShadowColor: Color(0x220253B3),
-          enabledIconColor: Color(0xFF6096D0),
-          enabledTextColor: Color(0xFF6096D0),
-        )
-      ,
+          themeColor: const Color(0xFF6096D0),
+          shadowColor: const Color(0x2281C784),
+          isDisabled: answerStatus == 1 || beforeDeadline == false,
+          // 업로드 활성화 -- 이상
+          onImageSelected: onImageSelected,
+        ),
       );
   }
 }

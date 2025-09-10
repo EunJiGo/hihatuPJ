@@ -9,7 +9,7 @@ Future<DateTime?> showYearMonthPicker(
 ) async {
   final now = DateTime.now();
 
-  // 연도 범위(원하시면 파라미터로 빼도 좋아요)
+  // 연도 범위(원하면 파라미터로 빼기)
   final List<int> years = List.generate(7, (i) => now.year - 3 + i);
   final List<int> months = List.generate(12, (i) => i + 1);
 
@@ -24,7 +24,7 @@ Future<DateTime?> showYearMonthPicker(
   return showModalBottomSheet<DateTime>(
     context: context,
     // backgroundColor: theme.colorScheme.surface,
-    backgroundColor: Colors.white.withOpacity(0.95), // ← 불투명 흰색이 아니라 살짝 투명
+    backgroundColor: Colors.white.withValues(alpha:0.95), // ← 불투명 흰색이 아니라 살짝 투명
     isScrollControlled: false,
     useSafeArea: true,
     shape: const RoundedRectangleBorder(
@@ -44,8 +44,8 @@ Future<DateTime?> showYearMonthPicker(
                 height: 4,
                 decoration: BoxDecoration(
                   color: isDark
-                      ? Colors.white.withOpacity(0.24)
-                      : Colors.black.withOpacity(0.12),
+                      ? Colors.white.withValues(alpha:0.24)
+                      : Colors.black.withValues(alpha:0.12),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -78,8 +78,8 @@ Future<DateTime?> showYearMonthPicker(
               //   height: 1,
               //   thickness: 1,
               //   color: isDark
-              //       ? Colors.white.withOpacity(0.08)
-              //       : Colors.black.withOpacity(0.06),
+              //       ? Colors.white.withValues(alpha:0.08)
+              //       : Colors.black.withValues(alpha:0.06),
               // ),
 
               // ── Labels for columns
@@ -92,7 +92,7 @@ Future<DateTime?> showYearMonthPicker(
                         '年',
                         textAlign: TextAlign.center,
                         style: theme.textTheme.labelMedium?.copyWith(
-                          color: theme.textTheme.bodySmall?.color?.withOpacity(
+                          color: theme.textTheme.bodySmall?.color?.withValues(alpha:
                             0.7,
                           ),
                           fontSize: 16,
@@ -104,7 +104,7 @@ Future<DateTime?> showYearMonthPicker(
                         '月',
                         textAlign: TextAlign.center,
                         style: theme.textTheme.labelMedium?.copyWith(
-                          color: theme.textTheme.bodySmall?.color?.withOpacity(
+                          color: theme.textTheme.bodySmall?.color?.withValues(alpha:
                             0.7,
                           ),
                           fontSize: 16,
@@ -255,13 +255,13 @@ class _PickerColumn<T> extends StatelessWidget {
             decoration: BoxDecoration(
               border: Border(
                 top: BorderSide(
-                  color: (isDark ? Colors.white : Color(0xFF0253B3)).withOpacity(
+                  color: (isDark ? Colors.white : Color(0xFF0253B3)).withValues(alpha:
                     0.3,
                   ),
                   width: 1,
                 ),
                 bottom: BorderSide(
-                  color: (isDark ? Colors.white : Color(0xFF0253B3)).withOpacity(
+                  color: (isDark ? Colors.white : Color(0xFF0253B3)).withValues(alpha:
                     0.3,
                   ),
                   width: 1,
@@ -273,15 +273,15 @@ class _PickerColumn<T> extends StatelessWidget {
               .map((e) => Center(child: Text(itemToText(e), style: baseText)))
               .toList(),
         ),
-        // 좌우 가장자리에 살짝 그라데이션로 페이드(시각적 깊이)
+        // 좌우 가장자리에 살짝 그라데이션으로 페이드(시각적 깊이)
         Positioned.fill(
           child: IgnorePointer(
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    (isDark ? Colors.black : Colors.white).withOpacity(0.0),
-                    (isDark ? Colors.black : Colors.white).withOpacity(0.0),
+                    (isDark ? Colors.black : Colors.white).withValues(alpha:0.0),
+                    (isDark ? Colors.black : Colors.white).withValues(alpha:0.0),
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,

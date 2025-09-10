@@ -1,7 +1,8 @@
 import 'dart:convert';
-import 'package:hihatu_project/apply/transportations/transportation/domain/transportation_response.dart';
-import 'package:hihatu_project/apply/transportations/transportation/domain/transportation_item.dart';
 import 'package:http/http.dart' as http;
+
+import '../data/dtos/transportation_item.dart';
+import '../data/dtos/transportation_response.dart';
 
 // HTTP 요청 처리 (http://192.168.1.8:19021/questionnaire 호출)
 Future<List<TransportationItem>> fetchTransportation(int year, int month) async {

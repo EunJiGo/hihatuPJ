@@ -55,10 +55,6 @@ class StatusItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8,),
-      // decoration: BoxDecoration(
-      //   border: Border.all(color: color.withOpacity(0.4)),
-      //   borderRadius: BorderRadius.circular(20),
-      // ),
       child: Row(
         children: [
           Icon(icon, color: color, size: 16),

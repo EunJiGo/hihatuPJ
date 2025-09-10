@@ -18,9 +18,9 @@ class TransportationUpdate {
   final String? reviewStatus;
   final String? submissionStatus;
   final bool update;
+  final String? destination;
 
   // 옵션 or 사용 안 하는 필드
-  final String? destination;
   final String? goals;
   final String? reason;
   final String? payTo;

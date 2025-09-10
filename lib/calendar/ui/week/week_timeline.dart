@@ -1,9 +1,9 @@
 // 시간표(좌 레일+우 스택)
 import 'package:flutter/material.dart';
-import '../logic/recurrence.dart';
-import '../styles.dart';
-import 'event_box.dart';
-import 'event_detail_page.dart';
+import '../../logic/recurrence.dart';
+import '../../styles.dart';
+import '../shared/event_box.dart';
+import '../event_detail/event_detail_page.dart';
 
 class WeekTimeline extends StatelessWidget {
   const WeekTimeline({
@@ -12,6 +12,7 @@ class WeekTimeline extends StatelessWidget {
     required this.controller,
     required this.dayOccurrences, // 추가(occurrence_expander 위함)
     this.onRefreshRequested, // 새로고침 위함
+    this.onTapOccurrence,
   });
 
   final List<DateTime> days; // 1~2일
@@ -19,6 +20,7 @@ class WeekTimeline extends StatelessWidget {
   final Map<DateTime, List<Occurrence>>
   dayOccurrences; // 추가(occurrence_expander 위함)
   final Future<void> Function()? onRefreshRequested; // 새로고침 위함
+  final void Function(Occurrence occ)? onTapOccurrence;
 
   double _yFromHour(double hour) => (hour - minHour) * hourHeight;
 

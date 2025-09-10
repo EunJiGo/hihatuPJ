@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-class TitleAppBar extends StatelessWidget implements PreferredSizeWidget {
+class RightStatusAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
+  final VoidCallback? onBack;
 
-  const TitleAppBar({required this.title, super.key});
+  const RightStatusAppBar({required this.title, this.onBack, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +16,7 @@ class TitleAppBar extends StatelessWidget implements PreferredSizeWidget {
           Align(
             alignment: Alignment.centerLeft,
             child: IconButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: onBack ?? () => Navigator.pop(context),
               icon: const Icon(Icons.arrow_back_ios, size: 20, color: Color(0xffadadad)),
             ),
           ),

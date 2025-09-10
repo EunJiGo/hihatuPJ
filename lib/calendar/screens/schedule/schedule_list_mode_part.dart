@@ -1,9 +1,9 @@
-part of schedule_screen;
+part of '../schedule_screen.dart';
 
-extension _ScheduleListModePart on _ScheduleScreenState {
-
+extension _ListModeWindow on _ScheduleScreenState {
   void _initListWindow() {
     final focus = dateOnly(_focusDayForList);
+
     _listMin = _dOnly(focus.subtract(_ScheduleScreenState._chunk));
     if (_listMin.isBefore(_globalMin)) _listMin = _globalMin;
 
@@ -17,37 +17,59 @@ extension _ScheduleListModePart on _ScheduleScreenState {
 
   Future<void> _extendPast(DateTime anchorDay) async {
     if (_extending) return;
+    if (!_listMin.isAfter(_globalMin)) return;
     _extending = true;
-    _anchorToPreserve = anchorDay;
-    try {
-      final newMin = _listMin.subtract(_ScheduleScreenState._chunk);
-      final extDays = buildDaySpan(windowStart: newMin, windowEnd: _listMin);
+
+    final targetMin = _listMin.subtract(_ScheduleScreenState._chunk);
+    final newMin = targetMin.isBefore(_globalMin) ? _globalMin : targetMin;
+
+    final extDays = buildDaySpan(
+      windowStart: newMin,
+      windowEnd: _listMin.subtract(const Duration(days: 1)),
+    );
+
+    if (extDays.isNotEmpty) {
       final extMap = occurrencesByDay(events: _events, days: extDays);
       _days = [...extDays, ..._days];
       _byDay = {...extMap, ..._byDay};
       _listMin = newMin;
+
+      final anchorLocal = anchorDay;
+      _anchorToPreserve = anchorLocal;
       setState(() {});
-    } finally {
-      _extending = false;
-      _anchorToPreserve = null;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (_anchorToPreserve == anchorLocal) {
+          setState(() => _anchorToPreserve = null);
+        }
+      });
     }
+    _extending = false;
   }
 
   Future<void> _extendFuture(DateTime anchorDay) async {
     if (_extending) return;
+    if (!_listMax.isBefore(_globalMax)) return;
     _extending = true;
-    _anchorToPreserve = anchorDay;
-    try {
-      final newMax = _listMax.add(_ScheduleScreenState._chunk);
-      final extDays = buildDaySpan(windowStart: _listMax, windowEnd: newMax);
+
+    final targetMax = _listMax.add(_ScheduleScreenState._chunk);
+    final newMax = targetMax.isAfter(_globalMax) ? _globalMax : targetMax;
+
+    final extDays = buildDaySpan(
+      windowStart: _listMax.add(const Duration(days: 1)),
+      windowEnd: newMax,
+    );
+
+    if (extDays.isNotEmpty) {
       final extMap = occurrencesByDay(events: _events, days: extDays);
       _days = [..._days, ...extDays];
       _byDay = {..._byDay, ...extMap};
       _listMax = newMax;
-      setState(() {});
-    } finally {
-      _extending = false;
+
       _anchorToPreserve = null;
+      setState(() {});
     }
+    _extending = false;
   }
 }

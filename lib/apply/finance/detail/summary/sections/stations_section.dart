@@ -1,9 +1,6 @@
-// sections/stations_section.dart
-
 import 'package:flutter/material.dart';
-
 import '../../../presentation/widgets/form_label.dart';
-import '../widgets/commuter_text_field.dart';
+import '../widgets/finance_text_field.dart';
 
 class StationsSection extends StatelessWidget {
   const StationsSection({
@@ -48,12 +45,12 @@ class StationsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const FormLabel(text: '出発駅', icon: Icons.my_location, iconColor: Color(0xFF81C784)),
-        CommuterTextField(
+        const FormLabel(text: '出発駅', icon: Icons.my_location, iconColor: Color(0xFF0253B3)),
+        FinanceTextField(
           answerStatus: disabled,
           controller: departureCtrl,
           hintText: '例）荻窪',
-          onChanged: onDepartureChanged, // ✅
+          onChanged: onDepartureChanged,
         ),
 
         const SizedBox(height: 10),
@@ -67,18 +64,34 @@ class StationsSection extends StatelessWidget {
                 child: FormLabel(
                   text: '経由駅${viaCtrls.isNotEmpty ? '（${viaCtrls.length}個）' : ''}',
                   icon: Icons.transfer_within_a_station,
-                  iconColor: const Color(0xFF81C784),
+                  iconColor: const Color(0xFF0253B3),
                 ),
               ),
-              GestureDetector(onTap: submissionLocked ? null : onAddVia, child: const Icon(Icons.add_circle_outline, size: 18, color: Color(0xFF0253B3))),
+              GestureDetector(
+                onTap: submissionLocked
+                    ? null
+                    : () {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  onAddVia(); // ← 실제 호출
+                },
+                child: Icon(Icons.add_circle_outline, size: 18, color: Color(0xFF0253B3)),
+              ),
               const SizedBox(width: 15),
-              GestureDetector(onTap: submissionLocked || viaCtrls.isEmpty ? null : onRemoveVia, child: const Icon(Icons.remove_circle_outline, size: 18, color: Color(0xFF0253B3))),
+              GestureDetector(
+                onTap: (submissionLocked || viaCtrls.isEmpty)
+                    ? null
+                    : () {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  onRemoveVia(); // ← 실제 호출
+                },
+                child: Icon(Icons.remove_circle_outline, size: 18, color: Color(0xFF0253B3)),
+              ),
             ],
           ),
 
           for (int i = 0; i < viaCtrls.length; i++) ...[
             if (i != 0) const SizedBox(height: 15),
-            CommuterTextField(
+            FinanceTextField(
               answerStatus: disabled,
               controller: viaCtrls[i],
               hintText: '例）新宿',
@@ -89,12 +102,12 @@ class StationsSection extends StatelessWidget {
           ],
         ],
 
-        const FormLabel(text: '到着駅', icon: Icons.location_on, iconColor: Color(0xFF81C784)),
-        CommuterTextField(
+        const FormLabel(text: '到着駅', icon: Icons.location_on, iconColor: Color(0xFF0253B3)),
+        FinanceTextField(
           answerStatus: disabled,
           controller: arrivalCtrl,
           hintText: '例）品川',
-          onChanged: onArrivalChanged, // ✅
+          onChanged: onArrivalChanged,
         ),
 
         if(isCommuter)
@@ -113,7 +126,12 @@ class StationsSection extends StatelessWidget {
                   scale: 0.8,
                   child: Switch.adaptive(
                     value: hasVia,
-                    onChanged: submissionLocked ? null : onToggleVia,
+                    onChanged: submissionLocked
+                        ? null
+                        : (value) {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      onToggleVia(value); // ← bool 전달
+                    },
                     activeColor: submissionLocked ? Colors.black45 : const Color(0xFF0253B3),
                     inactiveThumbColor: submissionLocked ? Colors.black26 : Colors.black45,
                   ),

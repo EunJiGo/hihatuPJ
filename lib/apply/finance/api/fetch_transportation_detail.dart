@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../domain/TransportationDetailResponse.dart';
+
+import '../data/dtos/TransportationDetailResponse.dart';
 
 Future<TransportationDetailResponse> fetchTransportationDetail(int id) async {
   //id: 교통비 / 정기권 id

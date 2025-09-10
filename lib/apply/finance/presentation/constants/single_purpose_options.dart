@@ -1,4 +1,4 @@
-final List<String> transportationPurposeOptions = [
+final List<String> singlePurposeOptions = [
   '通勤',
   '打ち合わせ',
   '作業',

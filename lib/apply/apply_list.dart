@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as ref;
 
-import 'transportations/transportation_screen.dart';
-import 'transportations/transportation/state/transportation_provider.dart';
+import '../base/base_main_screen.dart';
+import '../header/title_header.dart';
+import 'finance/transportation_screen.dart';
 
 // class ApplicationListScreen extends StatelessWidget {
 class ApplicationListScreen extends ConsumerWidget {
@@ -25,147 +25,138 @@ class ApplicationListScreen extends ConsumerWidget {
   // Widget build(BuildContext context) {
   Widget build(BuildContext context, WidgetRef ref) {
     DateTime _selectedDate = DateTime.now();
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
-      // backgroundColor: const Color(0xFFF5F7FA),
-      // appBar: AppBar(
-      //   title: const Text('申請・承認'),
-      //   backgroundColor: const Color(0xFF82B1FF),
-      //   elevation: 0,
-      // ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              '申請メニュー',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF333333),
-              ),
-            ),
-            const SizedBox(height: 10),
-            ...applyItems.map((item) {
-              String tag = 'ListTile-Hero-${item['label']}';
-              return Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.15),
-                      blurRadius: 8,
-                      offset: const Offset(2, 4),
+    return SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '申請メニュー',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF333333),
                     ),
-                  ],
-                ),
-                child: Hero(
-                  tag: tag,
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: const Color(0xFFE3F2FD),
-                      child: Icon(
-                        item['icon'],
-                        color: const Color(0xFF42A5F5),
-                      ),
-                    ),
-                    title: Text(
-                      item['label'],
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF333333),
-                      ),
-                    ),
-                    trailing: const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 16,
-                      color: Color(0xFF888888),
-                    ),
-                    onTap: () async {
-                      final label = item['label'];
-
-                      if (label == '休暇管理') {
-                        // Navigator.push(context, MaterialPageRoute(builder: (_) => VacationScreen()));
-                      } else if (label == '交通費・立替金') {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => TransportationScreen(initialDate: _selectedDate,)));
-                      } else if (label == '書類発行申請') {
-                        // Navigator.push(context, MaterialPageRoute(builder: (_) => DocumentRequestScreen()));
-                      }
-                    },
                   ),
-                ),
-              );
-            }).toList(),
-
-            const SizedBox(height: 30),
-
-            const Text(
-              '申請・承認状況',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF333333),
-              ),
-            ),
-            const SizedBox(height: 10),
-            ...appliedHistory.map((item) {
-              return Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      blurRadius: 6,
-                      offset: const Offset(1, 3),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          item['title'] ?? '',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                  const SizedBox(height: 10),
+                  ...applyItems.map((item) {
+                    String tag = 'ListTile-Hero-${item['label']}';
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.15),
+                            blurRadius: 8,
+                            offset: const Offset(2, 4),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '申請日：${item['date']}',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFF777777),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      item['status'] ?? '',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: _statusColor(item['status'] ?? ''),
+                        ],
                       ),
+                      child: Hero(
+                        tag: tag,
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: const Color(0xFFE3F2FD),
+                            child: Icon(
+                              item['icon'],
+                              color: const Color(0xFF42A5F5),
+                            ),
+                          ),
+                          title: Text(
+                            item['label'],
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF333333),
+                            ),
+                          ),
+                          trailing: const Icon(
+                            Icons.arrow_forward_ios,
+                            size: 16,
+                            color: Color(0xFF888888),
+                          ),
+                          onTap: () async {
+                            final label = item['label'];
+
+                            if (label == '休暇管理') {
+                              // Navigator.push(context, MaterialPageRoute(builder: (_) => VacationScreen()));
+                            } else if (label == '交通費・立替金') {
+                              Navigator.push(context, MaterialPageRoute(builder: (_) => TransportationScreen(initialDate: _selectedDate,)));
+                            } else if (label == '書類発行申請') {
+                              // Navigator.push(context, MaterialPageRoute(builder: (_) => DocumentRequestScreen()));
+                            }
+                          },
+                        ),
+                      ),
+                    );
+                  }).toList(),
+
+                  const SizedBox(height: 30),
+
+                  const Text(
+                    '申請・承認状況',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF333333),
                     ),
-                  ],
-                ),
-              );
-            }).toList(),
-          ],
-        ),
-      ),
-    );
+                  ),
+                  const SizedBox(height: 10),
+                  ...appliedHistory.map((item) {
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            blurRadius: 6,
+                            offset: const Offset(1, 3),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item['title'] ?? '',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '申請日：${item['date']}',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Color(0xFF777777),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            item['status'] ?? '',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: _statusColor(item['status'] ?? ''),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ],
+              ),
+            );
   }
 
   Color _statusColor(String status) {

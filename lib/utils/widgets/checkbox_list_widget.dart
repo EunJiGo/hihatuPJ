@@ -37,6 +37,7 @@ class SelectableCheckboxList extends StatelessWidget {
           onTap: isDisabled
               ? null
               : () {
+            FocusScope.of(context).unfocus();
             currentCheckedList[index] =
             isChecked ? null : option;
             onChanged(List.from(currentCheckedList));
@@ -44,21 +45,21 @@ class SelectableCheckboxList extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
             decoration: BoxDecoration(
               color: isDisabled
-                  ? Colors.grey.shade200
+                  ? Colors.white
                   : isChecked
                   ? selectedBackgroundColor
                   : const Color(0xFFF9FBFC),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isDisabled
-                    ? Colors.grey.shade400
+                    ? Colors.grey.shade600
                     : isChecked
-                    ? selectedBorderColor
-                    : Colors.grey.shade300,
-                width: isChecked ? 1.5 : 1,
+                      ?  selectedBorderColor
+                      : Colors.grey.shade300,
+                width: isChecked ? 1 : 1,
               ),
               boxShadow: isChecked && !isDisabled
                   ? [
@@ -77,7 +78,7 @@ class SelectableCheckboxList extends StatelessWidget {
                       ? Icons.check_box_rounded
                       : Icons.check_box_outline_blank_rounded,
                   color: isDisabled
-                      ? Colors.grey.shade400
+                      ? Colors.grey.shade500
                       : isChecked
                       ? selectedIconColor
                       : Colors.grey,
@@ -87,7 +88,7 @@ class SelectableCheckboxList extends StatelessWidget {
                   child: Text(
                     option,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: isChecked ? FontWeight.w600 : FontWeight.w500,
                       color: isDisabled
                           ? Colors.grey

@@ -14,11 +14,11 @@ class TransportationTitleSection extends StatelessWidget {
     super.key,
     required this.icon,
     required this.iconColor,
-    this.iconSize = 25,
+    this.iconSize = 18,
     required this.title,
     required this.isExpanded,
     required this.isData,
-    this.gap = 8,
+    this.gap = 6,
     required this.onToggle,
   });
 

@@ -6,6 +6,7 @@ class DropdownModalWidget extends StatelessWidget {
   final List<DropdownOption> options;
   final String? selectedValue;
   final void Function(String) onSelected;
+  final bool isSelectCircleIcon;
 
   final Color selectedTextColor;
   final Color selectedIconColor;
@@ -17,6 +18,7 @@ class DropdownModalWidget extends StatelessWidget {
     required this.options,
     required this.selectedValue,
     required this.onSelected,
+    required this.isSelectCircleIcon,
     required this.selectedTextColor,
     required this.selectedIconColor,
     required this.selectedBorderColor,
@@ -28,6 +30,7 @@ class DropdownModalWidget extends StatelessWidget {
     required List<DropdownOption> options,
     required String? selectedValue,
     required void Function(String) onSelected,
+    required bool isSelectCircleIcon,
     Color selectedTextColor = const Color(0xFF1565C0),
     Color selectedIconColor = Colors.blueAccent,
     Color selectedBorderColor = const Color(0xFF64B5F6),
@@ -55,6 +58,7 @@ class DropdownModalWidget extends StatelessWidget {
                     options: options,
                     selectedValue: selectedValue,
                     onSelected: onSelected,
+                    isSelectCircleIcon: isSelectCircleIcon,
                     selectedTextColor: selectedTextColor,
                     selectedIconColor: selectedIconColor,
                     selectedBorderColor: selectedBorderColor,
@@ -117,34 +121,34 @@ class DropdownModalWidget extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
             decoration: BoxDecoration(
-              color:
-                  isSelected
-                      ? selectedBackgroundColor
-                      : const Color(0xFFF7FAFC),
+              color: isSelected
+                  ? selectedBackgroundColor
+                  : const Color(0xFFF7FAFC),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isSelected ? selectedBorderColor : Colors.grey.shade300,
                 width: isSelected ? 2 : 1,
               ),
-              boxShadow:
-                  isSelected
-                      ? [
-                        BoxShadow(
-                          color: selectedBorderColor.withOpacity(0.4),
-                          blurRadius: 6,
-                          offset: const Offset(0, 3),
-                        ),
-                      ]
-                      : [],
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: selectedBorderColor.withOpacity(0.4),
+                        blurRadius: 6,
+                        offset: const Offset(0, 3),
+                      ),
+                    ]
+                  : [],
             ),
             child: Row(
               children: [
-                Icon(
-                  isSelected ? Icons.check_circle : Icons.circle_outlined,
-                  color: isSelected ? selectedIconColor : Colors.grey,
-                  size: 20,
-                ),
-                const SizedBox(width: 12),
+                if (isSelectCircleIcon == true) ...[
+                  Icon(
+                    isSelected ? Icons.check_circle : Icons.circle_outlined,
+                    color: isSelected ? selectedIconColor : Colors.grey,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                ],
                 Expanded(child: opt.display),
               ],
             ),

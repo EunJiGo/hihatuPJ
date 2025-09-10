@@ -6,6 +6,7 @@ class WelcomeHeader extends StatelessWidget {
   final double titleFontSize;
   final double subtitleFontSize;
   final String imagePath;
+  final double imageWidth;
 
   const WelcomeHeader({ //WelcomeHeaderWidget??
     super.key,
@@ -14,6 +15,7 @@ class WelcomeHeader extends StatelessWidget {
     required this.titleFontSize,
     required this.subtitleFontSize,
     required this.imagePath,
+    required this.imageWidth,
   });
 
   @override
@@ -30,7 +32,7 @@ class WelcomeHeader extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 6),
             blurRadius: 8,
             // spreadRadius: 2,
             spreadRadius: -1, // 👉 퍼짐 없음 (좌우 그림자 최소화)
@@ -71,7 +73,7 @@ class WelcomeHeader extends StatelessWidget {
           Image.asset(
             imagePath,
             height: 80,
-            width: 110,
+            width: imageWidth,
           ),
         ],
       ),

@@ -1,3 +1,4 @@
+/// commuter：날짜·역 문자열
 import 'package:intl/intl.dart';
 
 final _jpDateFmt = DateFormat('y年M月d日', 'ja_JP');

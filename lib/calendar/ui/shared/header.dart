@@ -1,32 +1,9 @@
 // 상단 헤더/메뉴 위젯이 들어있는 파일
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hihatu_project/calendar/widgets/year_calendar_page.dart'; // 연간 달력 페이지
-import '../styles.dart';
-
-// 선택 모드: 하루만 표시/선택할지(single), 이틀(pair)로 볼지
-// list 목록형추가
-enum SelectionMode { single, pair, list }
-
-int modeToInt(SelectionMode m) {
-  switch (m) {
-    case SelectionMode.single: return 0;
-    case SelectionMode.pair:   return 1;
-    case SelectionMode.list:   return 2;
-  }
-}
-
-SelectionMode intToMode(int v) {
-  switch (v) {
-    case 1: return SelectionMode.pair;
-    case 2: return SelectionMode.list;
-    default: return SelectionMode.single;
-  }
-}
-
-
-// 헤더가 어떤 화면에서 쓰이는지 구분(월간/주간/연간/상세)
-enum HeaderVariant { month, week, year, detail }
+import 'package:hihatu_project/calendar/ui/year_calendar_page.dart'; // 연간 달력 페이지
+import '../../styles.dart';
+import '../../types.dart';
 
 // 상단 헤더 위젯: StatelessWidget (내부 상태 없음, 모두 부모가 내려주는 값/콜백으로 동작)
 class ScheduleHeader extends StatelessWidget {
@@ -71,6 +48,8 @@ class ScheduleHeader extends StatelessWidget {
   final VoidCallback? onTapEdit; // 편집 버튼
 
   final bool hideWeekdayLabels;
+
+  static const List<String> _weekdayLabels = ['日','月','火','水','木','金','土'];
 
   /// 상세 전용 헤더를 쉽게 만들기 위한 named constructor
   ScheduleHeader.detail({
@@ -354,13 +333,12 @@ class ScheduleHeader extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(8, 2, 8, 8),
             child: Row(
               children: List.generate(7, (i) {
-                const labels = ['日', '月', '火', '水', '木', '金', '土'];
                 final isSun = i == 0, isSat = i == 6; // 일/토 구분
                 final c = isSun ? iosRed : (isSat ? iosBlue : iosSecondary);
                 return Expanded(
                   child: Center(
                     child: Text(
-                      labels[i],
+                      _weekdayLabels[i],
                       style: TextStyle(color: c, fontWeight: FontWeight.w700),
                     ),
                   ),

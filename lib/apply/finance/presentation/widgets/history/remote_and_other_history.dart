@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-import '../../../remote/domain/remote_allowanceRules.dart';
+import '../../../domain/policies/remote_allowanceRules.dart';
 
 /// 공통 모델: 정기권/교통비 항목 통합
 class RemoteAndOtherItem {
@@ -84,33 +83,43 @@ class RemoteAndOtherItemHistoryList extends StatelessWidget {
                 // 상단: 재택/경비정보 + 금액
                 Row(
                   children: [
-                    Icon(leadingIcon, color: leadingIconColor, size: 22),
-                    SizedBox(width: item.isRemote ? 15 : 8),
+                    // Icon(leadingIcon, color: leadingIconColor, size: 22),
+                    // SizedBox(width: item.isRemote ? 15 : 8),
                     Text(
                       item.isRemote ? _getRemoteAllowanceLabel(item.amount) ?? '-' : item.goals ?? '-',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 15,
                         color: Colors.black87,
                       ),
                     ),
                     const Spacer(),
                     Row(
                       children: [
-                        Text(
-                          '￥',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: amountColor,
-                          ),
-                        ),
+                        // Text(
+                        //   '￥',
+                        //   style: TextStyle(
+                        //     fontWeight: FontWeight.bold,
+                        //     fontSize: 16,
+                        //     color: amountColor,
+                        //   ),
+                        // ),
                         Text(
                           _formatCurrency(item.amount),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 15,
                             color: Colors.black87,
+                          ),
+                        ),
+                        SizedBox(width: 3,),
+                        Text(
+                          '円',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: Color(0xFF0253B3),
+                            // color: amountColor,
                           ),
                         ),
                       ],

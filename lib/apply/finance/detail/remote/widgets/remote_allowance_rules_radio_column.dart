@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../domain/remote_allowanceRules.dart';
+import '../../../domain/policies/remote_allowanceRules.dart';
 
 class RemoteAllowanceRulesRadioColumn extends StatelessWidget {
   final dynamic value;
@@ -26,7 +25,7 @@ class RemoteAllowanceRulesRadioColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final selectedColor = activeColor ?? Color(0xFFfe6966);
+    final selectedColor = activeColor ?? Color(0xFF0253B3);
     final unselectedColor = Color(0xFFb5b5b5);
     return Column(
       children:

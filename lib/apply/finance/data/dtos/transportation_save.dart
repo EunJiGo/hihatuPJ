@@ -3,6 +3,7 @@ class TransportationSave {
   final String expenseType;
   final String? fromStation;
   final String? toStation;
+  final String? destination;
   final String? via;
   final bool twice;
   final String? railwayName;
@@ -23,6 +24,7 @@ class TransportationSave {
     required this.expenseType,
     this.fromStation,
     this.toStation,
+    this.destination,
     this.via,
     required this.twice,
     this.railwayName,
@@ -49,7 +51,7 @@ class TransportationSave {
       "expense_type": expenseType, // "交通費" → API에서는 "single" 로 기대할 수 있음
       "pay_day": todayStr,
       "goals": goals ?? "",
-      "destination": "", // 임의 값 지정 railwayName
+      "destination": destination, // 行先
       "railway_name": railwayName ?? "",
       "from_station": fromStation ?? "",
       "to_station": toStation,

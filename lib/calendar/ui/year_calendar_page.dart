@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../styles.dart';
-import '../ui/shared/header.dart';
+import '../types.dart';
+import 'shared/header.dart';
 
 class YearCalendarPage extends StatefulWidget {
   const YearCalendarPage({
@@ -26,7 +27,7 @@ class YearCalendarPage extends StatefulWidget {
 }
 
 class _YearCalendarPageState extends State<YearCalendarPage> {
-  late int _year; // ← 화면에 표시할 연도 상태
+  late int _year; // 화면에 표시할 연도 상태
 
   @override
   void initState() {
@@ -53,10 +54,10 @@ class _YearCalendarPageState extends State<YearCalendarPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       // backgroundColor: iosBg,
-      backgroundColor: Colors.white, // ← 전체 흰색
+      backgroundColor: Colors.white,
       body: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onVerticalDragEnd: _onVerticalDragEnd, // ← 세로 스와이프 연결
+        onVerticalDragEnd: _onVerticalDragEnd, // 세로 스와이프 연결
         child: Column(
           children: [
             // 1) 상단 툴바 (검색/추가만)
@@ -120,7 +121,7 @@ class _YearCalendarPageState extends State<YearCalendarPage> {
 
                   final tileAspect = tileW / tileH;
 
-                  final months = List<int>.generate(12, (i) => i + 1);
+                  const months = [1,2,3,4,5,6,7,8,9,10,11,12];
 
                   return Padding(
                     padding: const EdgeInsets.fromLTRB(gridHPad, gridVPad, gridHPad, gridVPad),
@@ -134,7 +135,7 @@ class _YearCalendarPageState extends State<YearCalendarPage> {
                         crossAxisCount: crossCount,
                         mainAxisSpacing: mainSpacing,
                         crossAxisSpacing: crossSpacing,
-                        childAspectRatio: tileAspect, // ← 실제 영역 기준 종횡비
+                        childAspectRatio: tileAspect, // 실제 영역 기준 종횡비
                       ),
                       itemBuilder: (context, idx) {
                         final m = months[idx];
@@ -178,6 +179,8 @@ class _YearMonthTile extends StatelessWidget {
   final bool isSelectedMonth;
   final VoidCallback onTap;
 
+  static const List<String> _weekday = ['日','月','火','水','木','金','土'];
+
   @override
   Widget build(BuildContext context) {
     final firstDay = DateTime(year, month, 1);
@@ -194,6 +197,7 @@ class _YearMonthTile extends StatelessWidget {
       ..addAll(List<int>.generate(daysInMonth, (i) => i + 1))
       ..addAll(List<int?>.filled(trailing, null, growable: true));
 
+
     return Material(
       color: Colors.white,
       shape: RoundedRectangleBorder(
@@ -203,12 +207,8 @@ class _YearMonthTile extends StatelessWidget {
           width: isSelectedMonth ? 2 : 0,
         ),
       ),
-      // shape: RoundedRectangleBorder(
-      //   borderRadius: BorderRadius.zero, // 완전 네모
-      //   side: BorderSide(color: Color(0xFFffffff), width: 0),
-      // ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
@@ -239,13 +239,12 @@ class _YearMonthTile extends StatelessWidget {
                 height: 14, // 요일 헤더(고정 높이로 공간 절약)
                 child: Row(
                   children: List.generate(7, (i) {
-                    const labels = ['日', '月', '火', '水', '木', '金', '土'];
                     final isSun = i == 0, isSat = i == 6;
                     final c = isSun ? iosRed : (isSat ? iosBlue : iosSecondary);
                     return Expanded(
                       child: Center(
                         child: Text(
-                          labels[i],
+                          _weekday[i],
                           style: TextStyle(
                             fontSize: 9,
                             color: c,
@@ -274,18 +273,25 @@ class _YearMonthTile extends StatelessWidget {
                     final isToday = _isToday(year, month, day);
                     return Center(
                       child: Container(
+                        width: 18,  // ← 원하는 크기로 조절 (텍스트보다 넉넉히)
+                        height: 18,
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.all(0),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: isToday
                               ? iosRed.withValues(alpha: 0.40)
                               : Colors.transparent,
                         ),
-                        child: Text(
-                          '$day',
-                          style: const TextStyle(
-                            fontSize: 8,
-                            fontWeight: FontWeight.w600,
-                            color: iosLabel,
+                        child: Transform.translate(
+                          offset: const Offset(0, - 1), // y축으로 1px 정도 내림 : 1 / y축으로 1px 정도 올림 : -1
+                          child: Text(
+                            '$day',
+                            style: const TextStyle(
+                              fontSize: 8,
+                              fontWeight: FontWeight.w600,
+                              color: iosLabel,
+                            ),
                           ),
                         ),
                       ),

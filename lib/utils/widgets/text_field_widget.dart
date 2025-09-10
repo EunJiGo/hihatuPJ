@@ -34,19 +34,20 @@ class TextFieldWidget extends StatelessWidget {
     if (isReadOnly) {
       return Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(12),
         margin: const EdgeInsets.only(top: 4),
         decoration: BoxDecoration(
-          color: Colors.grey.shade200,
+          color: Colors.white,
           // color: Colors.grey.shade200,
-          border: Border.all(color: Colors.grey.shade400),
+          // color: Colors.grey.shade200,
+          border: Border.all(color: Colors.grey.shade600),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
           controller?.text ?? '',
           style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey.shade500,
+            fontSize: 14,
+            color: Colors.grey.shade600,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -57,23 +58,23 @@ class TextFieldWidget extends StatelessWidget {
       maxLines: null,
       controller: controller,
       focusNode: focusNode,
-      style: const TextStyle(fontSize: 16),
+      style: const TextStyle(fontSize: 14),
       decoration: InputDecoration(
         hintText: hintText,
         // hintStyle: TextStyle(color: const Color(0xFF1565C0),),
         hintStyle: TextStyle(color: Colors.grey),
-        contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+        contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: controller!.text.isEmpty ? Colors.grey.shade400 : editableBorderColor),
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: selectedBorderColor, width: 1.8),
+          borderSide: BorderSide(color: selectedBorderColor, width: 1),
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
         filled: true,
-        // fillColor: Colors.white,
-        fillColor: controller?.text.isEmpty == true ? Colors.white : hintColor, // ⬅️ 내부도 동일한 색상
+        fillColor: Colors.white,
+        // fillColor: controller?.text.isEmpty == true ? Colors.white : hintColor, // ⬅️ 내부도 동일한 색상
       ),
       onChanged: onChanged,
       keyboardType: keyboardType,

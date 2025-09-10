@@ -12,7 +12,7 @@ import '../../header/title_header.dart';
 import '../../utils/dialog/confirmation_dialog.dart';
 import '../../utils/dialog/warning_dialog.dart';
 import 'data/fetch_suggestion_input.dart';
-import 'domain/suggestionCategoryOptions.dart';
+import 'domain/suggestion_category_options.dart';
 
 class SuggestionInputScreen extends ConsumerStatefulWidget {
 
@@ -131,6 +131,7 @@ class _SuggestionInputScreenState extends ConsumerState<SuggestionInputScreen> {
                 subtitleFontSize: 12,
                 imagePath:
                     'assets/images/mypage/suggest/suggest_image/suggest_image.png',
+                imageWidth: 110,
               ),
 
               // 본문

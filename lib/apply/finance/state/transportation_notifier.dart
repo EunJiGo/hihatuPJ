@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../data/fetch_transportation.dart';
-import '../domain/transportation_item.dart';
+import '../api/fetch_transportation.dart';
+import '../data/dtos/transportation_item.dart';
 
 class TransportationNotifier extends StateNotifier<AsyncValue<List<TransportationItem>>> {
   TransportationNotifier(this.ref, this.date) : super(const AsyncLoading()) {

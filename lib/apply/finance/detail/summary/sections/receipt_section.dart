@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:hihatu_project/apply/finance/detail/commuter/widgets/commuter_image_upload.dart';
+import 'package:hihatu_project/apply/finance/detail/summary/widgets/server_image_upload.dart';
 import '../../../presentation/widgets/form_label.dart';
-import '../../single/widgets/transportation_image_upload.dart';
+import '../widgets/basic_image_upload.dart';
 
 class ReceiptSection extends StatefulWidget {
   const ReceiptSection({
@@ -12,7 +12,7 @@ class ReceiptSection extends StatefulWidget {
     required this.onImageSelected,           // 선택된 파일 경로 전달
     this.imageFile,                          // 현재 선택된 파일(신규에서 주로 사용)
     this.imageName,                          // 저장된 파일명(수정에서 주로 사용)
-    this.themeColor = const Color(0xFF0253B3),
+    this.themeColor = const Color(0xFF6096D0),
     this.shadowColor = const Color(0x2281C784),
     this.label = '領収書/チケット添付',
   });
@@ -61,7 +61,7 @@ class _ReceiptSectionState extends State<ReceiptSection> {
 
         if (hasExisting) ...[
           // 기존 데이터가 있는 경우: CommuterImageUpload
-          CommuterImageUpload(
+          ServerImageUpload(
             focusNode: _focusNode,
             imagePath: widget.imageName,                  // 저장된 파일명(또는 경로) 표시
             themeColor: widget.themeColor,
@@ -73,7 +73,7 @@ class _ReceiptSectionState extends State<ReceiptSection> {
           ),
         ] else ...[
           // 신규 작성: TransportationImageUpload
-          TransportationImageUpload(
+          BasicImageUpload(
             focusNode: _focusNode,
             imagePath: widget.imageFile?.path,
             themeColor: widget.themeColor,

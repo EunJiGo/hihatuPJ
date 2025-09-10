@@ -35,33 +35,38 @@ class DropdownTextFieldWidget extends StatelessWidget {
           controller: controller,
           readOnly: true,
           style: TextStyle(
-            color: isDisabled ? Colors.grey.shade500 : textColor,
+            color: isDisabled ? Colors.grey.shade600 : textColor,
+            fontSize: 14,
           ),
           decoration: InputDecoration(
+            isDense: true, // 👈 높이를 줄여줌
+            contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+            // ↑ padding 직접 지정해서 세로/가로 여백 줄이기
             labelText: selectedValue != null ? null : '選択してください。',
             labelStyle: TextStyle(
-              color: isDisabled ? Colors.grey : textColor,
+              color: isDisabled ? Colors.grey.shade600 : textColor,
+              fontSize: 14,
             ),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(
-                color: isDisabled ? Colors.grey.shade400 : enabledBorderColor,
+                color: isDisabled ? Colors.grey.shade500 : enabledBorderColor,
               ),
               borderRadius: BorderRadius.circular(12),
             ),
             focusedBorder: OutlineInputBorder(
               borderSide: BorderSide(
-                color: isDisabled ? Colors.grey.shade400 : focusedBorderColor,
+                color: isDisabled ? Colors.grey.shade500 : focusedBorderColor,
                 width: 2,
               ),
               borderRadius: BorderRadius.circular(12),
             ),
             suffixIcon: Icon(
               Icons.arrow_drop_down,
-              color: isDisabled ? Colors.grey : iconColor,
+              color: isDisabled ? Colors.grey.shade500 : iconColor,
             ),
             filled: true,
             fillColor: isDisabled
-                ? Colors.grey.shade200
+                ? Colors.white
                 : (selectedValue == null ? Colors.white : fillColor),
           ),
         ),

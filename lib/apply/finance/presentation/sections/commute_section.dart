@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hihatu_project/apply/transportations/summary/widgets/transportation_history_list.dart';
-import 'package:hihatu_project/apply/transportations/summary/widgets/transportation_title_section.dart';
-import 'package:hihatu_project/apply/transportations/summary/widgets/status_icon.dart';
-import 'package:hihatu_project/apply/transportations/transportation/domain/transportation_item.dart';
+import 'package:hihatu_project/apply/finance/presentation/sections/widgets/transportation_title_section.dart';
+
+import '../../data/dtos/transportation_item.dart';
+import '../widgets/history/transportation_history_list.dart';
+import '../widgets/status/status_icon.dart';
 
 class CommuteSection extends StatelessWidget {
   const CommuteSection({
@@ -17,7 +18,7 @@ class CommuteSection extends StatelessWidget {
   final List<TransportationItem> items;
   final bool isExpanded;
   final VoidCallback onToggle;
-  final Future<void> Function(String id) onTapItem;
+  final Future<void> Function(int id) onTapItem;
   final Animation<double> animation;
 
   @override
@@ -40,20 +41,21 @@ class CommuteSection extends StatelessWidget {
             items: items
                 .map(
                   (e) => TransportationUiItem(
-                id: e.id!,
-                fromStation: e.fromStation,
-                toStation: e.toStation,
-                amount: e.amount,
-                isCommuter: true,
-                twice: false,
-                updatedAt: e.updatedAt,
-                commuteDuration: e.commuteDuration,
-                submissionStatus: e.submissionStatus,
-                reviewStatus: e.reviewStatus,
-              ),
-            )
+                    id: e.id!,
+                    fromStation: e.fromStation,
+                    toStation: e.toStation,
+                    amount: e.amount,
+                    isCommuter: true,
+                    twice: false,
+                    durationStartDate: e.durationStart,
+                    durationEndDate: e.durationEnd,
+                    commuteDuration: e.commuteDuration,
+                    submissionStatus: e.submissionStatus,
+                    reviewStatus: e.reviewStatus,
+                  ),
+                )
                 .toList(),
-            onTap: (id) => onTapItem('$id'),
+            onTap: (id) => onTapItem(id),
             getStatusIcon: (submission, review) => buildStatusIcon(
               submissionStatus: submission,
               reviewStatus: review,

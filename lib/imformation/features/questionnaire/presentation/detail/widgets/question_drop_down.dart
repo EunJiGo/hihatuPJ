@@ -35,6 +35,7 @@ class QuestionDropdown extends StatelessWidget {
           context: context,
           options: dropdownOptions,
           selectedValue: selectedValue,
+          isSelectCircleIcon: true,
           onSelected: (val) => onChanged(val),
           selectedTextColor: const Color(0xFF1565C0),
           selectedIconColor: Colors.blueAccent,
@@ -46,9 +47,10 @@ class QuestionDropdown extends StatelessWidget {
       // 💡 활성화 시 커스터마이징 가능한 색상
       iconColor: const Color(0xFF1565C0),
       textColor: Colors.black87,
-      enabledBorderColor: const Color(0xFF90CAF9),
+      enabledBorderColor: const Color(0xFF6096D0),
       focusedBorderColor: const Color(0xFF42A5F5),
-      fillColor: const Color(0xFFF0F7FF),
+      fillColor: const Color(0xFFffffff),
+      // fillColor: const Color(0xFFF0F7FF),
     );
   }
 }

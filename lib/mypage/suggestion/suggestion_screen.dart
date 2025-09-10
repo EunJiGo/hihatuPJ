@@ -147,6 +147,7 @@ class _SuggestionListScreenState extends ConsumerState<SuggestionListScreen> {
               titleFontSize: 18,
               subtitleFontSize: 12,
               imagePath: 'assets/images/mypage/suggest/suggest_image/suggest_image.png',
+              imageWidth: 110,
             ),
 
             // 본문

@@ -1,32 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hihatu_project/imformation/features/summary/presentation/questionnaire_status_legend.dart';
-
 import '../../questionnaire/presentation/questionnaire_list_screen.dart';
+import '../../questionnaire/state/information_tab_index_provider.dart';
 
-class InformationTabs extends StatefulWidget {
-  final int initialTabIndex; // 추가
-
-  const InformationTabs({super.key, this.initialTabIndex = 0}); // 기본값은 お知らせ
+class InformationTabs extends ConsumerStatefulWidget {
+  final int initialTabIndex; // 0: お知らせ, 1: 安否確認
+  const InformationTabs({super.key, this.initialTabIndex = 0});
 
   @override
-  State<InformationTabs> createState() => _InformationTabsState();
+  ConsumerState<InformationTabs> createState() => _InformationTabsState();
 }
 
-class _InformationTabsState extends State<InformationTabs> with TickerProviderStateMixin{
-  // int selectedIndex = 0; // 0: お知らせ, 1: 安否確認
-
+class _InformationTabsState extends ConsumerState<InformationTabs>
+    with TickerProviderStateMixin {
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
 
-    _tabController = TabController(length: 2, vsync: this);
-    _tabController.index = widget.initialTabIndex; // 초기 탭 설정
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: widget.initialTabIndex,
+    );
+
+    // 첫 프레임 이후 provider 초기값 세팅 (initState 중 직접 변경 금지)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final notifier = ref.read(informationTabIndexProvider.notifier);
+      if (notifier.state != widget.initialTabIndex) {
+        notifier.state = widget.initialTabIndex;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // ✅ ref.listen은 build 안에서 호출 (버전 제약)
+    ref.listen<int>(informationTabIndexProvider, (prev, next) {
+      if (_tabController.index != next) {
+        _tabController.animateTo(next);
+      }
+    });
+
+    // 단일 소스: 화면/하이라이트 모두 provider 값을 기준으로
+    final currentIndex = ref.watch(informationTabIndexProvider);
+
     return Column(
       children: [
         // 탭 버튼
@@ -35,37 +61,31 @@ class _InformationTabsState extends State<InformationTabs> with TickerProviderSt
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildTabButton('お知らせ', 0),
-              _buildTabButton('安否確認', 1),
+              _buildTabButton('お知らせ', 0, isSelected: currentIndex == 0),
+              _buildTabButton('安否確認', 1, isSelected: currentIndex == 1),
             ],
           ),
         ),
-        // const SizedBox(height: 16),
-        if (_tabController.index == 1) QuestionnaireStatusLegend(),
 
-        const SizedBox(height: 03),
+        if (currentIndex == 1) ...[
+          const QuestionnaireStatusLegend(),
+          const Expanded(child: QuestionnaireListScreen()),
+        ],
 
-        // 선택된 리스트 보여주기
-        if (_tabController.index == 0)
-          _buildNoticeList()
-        else
-          Expanded(child: QuestionnaireListScreen())
-          // _buildQuestionnaireList(),
+        if (currentIndex == 0) _buildNoticeList(),
       ],
     );
   }
 
-  Widget _buildTabButton(String title, int index) {
-    final bool isSelected = _tabController.index  == index;
-
+  Widget _buildTabButton(String title, int index, {required bool isSelected}) {
     return GestureDetector(
       onTap: () {
-        setState(() {
-          _tabController.index  = index;
-        });
+        // 사용자 액션에서 provider만 변경
+        ref.read(informationTabIndexProvider.notifier).state = index;
+        // TabController 이동은 위 build의 ref.listen이 처리
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
@@ -77,7 +97,7 @@ class _InformationTabsState extends State<InformationTabs> with TickerProviderSt
         child: Text(
           title,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 15,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             color: isSelected ? const Color(0xFF0253B3) : Colors.grey,
           ),
@@ -91,15 +111,6 @@ class _InformationTabsState extends State<InformationTabs> with TickerProviderSt
       children: const [
         Text('📢 お知らせ 리스트 1'),
         Text('📢 お知らせ 리스트 2'),
-      ],
-    );
-  }
-
-  Widget _buildQuestionnaireList() {
-    return Column(
-      children: const [
-        Text('🛡️ 安否確認 리스트 1'),
-        Text('🛡️ 安否確認 리스트 2'),
       ],
     );
   }

@@ -233,9 +233,9 @@ class _ScheduleListBodyState extends State<ScheduleListBody> {
   }
 
   String _dateLabel(DateTime d) {
-    const youbi = ['月','火','水','木','金','土','日'];
+    const weekday = ['月','火','水','木','金','土','日'];
     final idx = (d.weekday - 1) % 7;
-    final wd  = youbi[idx < 0 ? idx + 7 : idx];
+    final wd  = weekday[idx < 0 ? idx + 7 : idx];
     return '${d.year}年${d.month}月${d.day}日（$wd）';
   }
 
